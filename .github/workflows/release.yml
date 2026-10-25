@@ -1,0 +1,26 @@
+name: Build Windows installer
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Install
+        working-directory: app
+        run: npm install
+      - name: Build installer
+        working-directory: app
+        run: npx electron-builder --win nsis --x64 --publish never
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/dist/Eredon-KoV-Setup.exe
+          name: Eredon KoV ${{ github.ref_name }}
+          make_latest: true

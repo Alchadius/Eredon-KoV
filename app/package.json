@@ -1,0 +1,21 @@
+{
+  "name": "eredon-kov",
+  "productName": "Eredon KoV",
+  "version": "1.0.0",
+  "description": "Eredon KoV - Knights of Valor, a cozy dark-fantasy dungeon crawler with online co-op",
+  "main": "main.js",
+  "author": "Alchadius",
+  "license": "UNLICENSED",
+  "scripts": { "start": "electron .", "dist": "electron-builder --win nsis --x64 --publish never" },
+  "devDependencies": { "electron": "33.2.1", "electron-builder": "25.1.8" },
+  "build": {
+    "appId": "com.alchadius.eredonkov",
+    "productName": "Eredon KoV",
+    "artifactName": "Eredon-KoV-Setup.exe",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["main.js", "preload.js", "package.json"],
+    "extraResources": [{ "from": "../game", "to": "game" }],
+    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }], "icon": "build/icon.ico" },
+    "nsis": { "oneClick": true, "perMachine": false, "runAfterFinish": true, "createDesktopShortcut": true, "createStartMenuShortcut": true, "shortcutName": "Eredon KoV", "deleteAppDataOnUninstall": false }
+  }
+}
