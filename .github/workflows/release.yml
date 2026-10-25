@@ -1,7 +1,8 @@
 name: Build Windows installer
 on:
   push:
-    tags: ['v*']
+    branches: [main]
+    paths: ['app/**', '.github/workflows/release.yml']
   workflow_dispatch:
 permissions:
   contents: write
@@ -18,9 +19,15 @@ jobs:
       - name: Build installer
         working-directory: app
         run: npx electron-builder --win nsis --x64 --publish never
+      - name: Read version
+        id: v
+        shell: bash
+        run: echo "ver=$(node -p "require('./app/package.json').version")" >> "$GITHUB_OUTPUT"
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           files: app/dist/Eredon-KoV-Setup.exe
-          name: Eredon KoV ${{ github.ref_name }}
+          tag_name: v${{ steps.v.outputs.ver }}
+          target_commitish: ${{ github.sha }}
+          name: Eredon KoV v${{ steps.v.outputs.ver }}
           make_latest: true
