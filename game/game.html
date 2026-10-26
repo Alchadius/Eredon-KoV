@@ -4105,12 +4105,12 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.0.1';
+const KOV_VER='1.0.2';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
 if(!DESK)return;
-const CFG=Object.assign({broker:'wss://0.peerjs.com/peerjs?key=peerjs',stun:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},window.kovDesk.cfg||{});
+const CFG=Object.assign({broker:'wss://0.peerjs.com/peerjs?key=peerjs',mqtt:['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt'],stun:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},window.kovDesk.cfg||{});
 const FK='kov_friends_v1';
 let FD={me:null,friends:[]};
 try{const s=JSON.parse(localStorage.getItem(FK)||'null');if(s&&typeof s==='object'){FD.me=s.me&&typeof s.me.name==='string'?{name:String(s.me.name).slice(0,12),num:String(s.me.num).slice(0,4)}:null;FD.friends=(s.friends||[]).filter(f=>f&&typeof f.name==='string'&&/^\d{4}$/.test(String(f.num))).slice(0,60).map(f=>({name:String(f.name).slice(0,12),num:String(f.num),st:['ok','sent','recv'].includes(f.st)?f.st:'sent'}));}}catch(e){}
@@ -4124,17 +4124,50 @@ const parseTag=s=>{const m=String(s||'').trim().match(/^([A-Za-z0-9]{2,12})\s*#\
 
 // ---------- matchmaker (PeerJS-cloud compatible signaling socket) ----------
 const BR={ws:null,ok:false,err:'',hb:0,retry:0,timer:0,reqs:{},on:false,fails:0};
-function brStatusText(){if(!FD.me)return'';if(BR.ok)return'Online as '+label(FD.me)+' (friends can reach you)';if(BR.err==='taken')return'Your name still looks online from a moment ago. Retrying...';if(BR.fails>=2)return'Cannot reach the matchmaker service. Check your internet or firewall. Retrying...';return BR.on?'Connecting to the matchmaker...':'Offline';}
-function brConnect(){if(!FD.me||BR.ws)return;BR.on=true;const id=myId(),tok=Math.random().toString(36).slice(2,14);let ws;
-  try{ws=new WebSocket(CFG.broker+(CFG.broker.includes('?')?'&':'?')+'id='+id+'&token='+tok+'&version=1.5.4');}catch(e){BR.err='fail';brLater();return;}
-  BR.ws=ws;ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data);}catch(e){return;}brMsg(m);};
-  ws.onclose=()=>{clearInterval(BR.hb);const was=BR.ok;BR.ok=false;if(BR.ws===ws)BR.ws=null;if(!was&&BR.err!=='taken')BR.fails++;brLater();hubRefresh();};
-  ws.onerror=()=>{};}
-function brLater(){clearTimeout(BR.timer);BR.retry=Math.min(BR.retry+1,6);BR.timer=setTimeout(()=>{BR.timer=0;brConnect();},BR.err==='taken'?8000:Math.min(30000,2000*BR.retry));}
-function brSend(dst,type,payload){if(!BR.ok||!BR.ws||BR.ws.readyState!==1)return false;try{BR.ws.send(JSON.stringify({type,dst,payload}));return true;}catch(e){return false;}}
+function brStatusText(){if(!FD.me)return'';if(BR.ok)return'Online as '+label(FD.me)+' (friends can reach you)';if(BR.err==='taken')return'Your name still looks online from a moment ago. Retrying...';if(BR.fails>=1)return'Cannot reach the matchmaker services. Check your internet or firewall. Retrying...';return BR.on?'Connecting to the matchmaker...':'Offline';}
+// Signaling runs over several free public relays at once (two MQTT-over-WebSocket brokers + the PeerJS cloud). Messages go out on every relay that is up and duplicates are dropped, so one relay being down does not matter.
+const SIGROOT='kov/v1/';
+function makeSig(id,onmsg,onstate){
+  const S={ts:[],closed:false,seen:new Map()};
+  const dup=mid=>{if(!mid)return false;if(S.seen.has(mid))return true;S.seen.set(mid,1);if(S.seen.size>500)S.seen.delete(S.seen.keys().next().value);return false;};
+  const state=()=>{const alive=S.ts.filter(t=>t.up).length;onstate(alive,alive?0:Math.min(...S.ts.map(t=>t.fails),99));};
+  const deliver=m=>{if(m&&m.payload&&typeof m.payload==='object'&&dup(m.payload.mid))return;onmsg(m);};
+  const enc=new TextEncoder(),dec=new TextDecoder();
+  const vl=n=>{const a=[];do{let b=n%128;n=Math.floor(n/128);if(n>0)b|=128;a.push(b);}while(n>0);return a;};
+  const str=s=>{const b=enc.encode(s);return[b.length>>8,b.length&255,...b];};
+  const pkt=(h,body)=>{const l=vl(body.length),o=new Uint8Array(1+l.length+body.length);o[0]=h;o.set(l,1);o.set(body,1+l.length);return o;};
+  function mqtt(url){const T={up:false,fails:0,ws:null,lt:0};S.ts.push(T);
+    function later(){if(S.closed)return;clearTimeout(T.lt);T.lt=setTimeout(go,Math.min(30000,2000*(T.fails+1)));}
+    function go(){if(S.closed)return;let ws,ka=0,buf=new Uint8Array(0);try{ws=new WebSocket(url,'mqtt');}catch(e){T.fails++;state();later();return;}
+      ws.binaryType='arraybuffer';T.ws=ws;
+      ws.onopen=()=>{try{ws.send(pkt(0x10,[0,4,77,81,84,84,4,2,0,60,...str('kov'+Math.random().toString(36).slice(2,12))]));}catch(e){}};
+      ws.onmessage=ev=>{const d=new Uint8Array(ev.data),nb=new Uint8Array(buf.length+d.length);nb.set(buf);nb.set(d,buf.length);buf=nb;
+        for(;;){if(buf.length<2)break;let i=1,len=0,mul=1,b;do{if(i>=buf.length)return;b=buf[i++];len+=(b&127)*mul;mul*=128;}while(b&128);if(buf.length<i+len)break;
+          const type=buf[0]>>4,body=buf.subarray(i,i+len);buf=buf.subarray(i+len);
+          if(type===2){if(body[1]!==0){try{ws.close();}catch(e){}return;}T.up=true;T.fails=0;ws.send(pkt(0x82,[0,1,...str(SIGROOT+id),0]));clearInterval(ka);ka=setInterval(()=>{try{ws.send(new Uint8Array([0xC0,0]));}catch(e){}},25000);state();}
+          else if(type===3){const tl=(body[0]<<8)|body[1];try{deliver(JSON.parse(dec.decode(body.subarray(2+tl))));}catch(e){}}}};
+      ws.onclose=()=>{clearInterval(ka);if(!T.up)T.fails++;T.up=false;state();later();};ws.onerror=()=>{};}
+    T.send=m=>{if(!T.up||!T.ws||T.ws.readyState!==1)return false;try{T.ws.send(pkt(0x30,[...str(SIGROOT+m.dst),...enc.encode(JSON.stringify({type:m.type,src:id,dst:m.dst,payload:m.payload}))]));return true;}catch(e){return false;}};
+    go();}
+  function peerjs(url){const T={up:false,fails:0,ws:null,lt:0};S.ts.push(T);const tok=Math.random().toString(36).slice(2,14);
+    function later(t){if(S.closed)return;clearTimeout(T.lt);T.lt=setTimeout(go,t||Math.min(30000,2000*(T.fails+1)));}
+    function go(){if(S.closed)return;let ws,hb=0,taken=false;try{ws=new WebSocket(url+(url.includes('?')?'&':'?')+'id='+id+'&token='+tok+'&version=1.5.4');}catch(e){T.fails++;state();later();return;}
+      T.ws=ws;ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data);}catch(e){return;}
+        if(m.type==='OPEN'){T.up=true;T.fails=0;clearInterval(hb);hb=setInterval(()=>{try{ws.send(JSON.stringify({type:'HEARTBEAT'}));}catch(e){}},5000);state();}
+        else if(m.type==='ID-TAKEN'){taken=true;try{ws.close();}catch(e){}}
+        else deliver(m);};
+      ws.onclose=()=>{clearInterval(hb);if(!T.up)T.fails++;T.up=false;state();later(taken?8000:0);};ws.onerror=()=>{};}
+    T.send=m=>{if(!T.up||!T.ws||T.ws.readyState!==1)return false;try{T.ws.send(JSON.stringify({type:m.type,dst:m.dst,payload:m.payload}));return true;}catch(e){return false;}};
+    go();}
+  (CFG.mqtt||[]).forEach(mqtt);if(CFG.broker)peerjs(CFG.broker);
+  S.send=m=>{if(m.payload&&typeof m.payload==='object')m.payload.mid=Math.random().toString(36).slice(2,12);let ok=false;S.ts.forEach(t=>{if(t.send(m))ok=true;});return ok;};
+  S.close=()=>{S.closed=true;S.ts.forEach(t=>{try{t.ws&&t.ws.close();}catch(e){}});};
+  return S;}
+function brConnect(){if(!FD.me||BR.ws)return;BR.on=true;
+  BR.ws=makeSig(myId(),brMsg,(alive,fails)=>{BR.fails=fails;if(alive&&!BR.ok)brMsg({type:'OPEN'});else if(!alive&&BR.ok){BR.ok=false;hubRefresh();}else hubRefresh();});}
+function brSend(dst,type,payload){if(!BR.ok||!BR.ws)return false;try{return BR.ws.send({type,dst,payload});}catch(e){return false;}}
 function brMsg(m){
-  if(m.type==='OPEN'){BR.ok=true;BR.err='';BR.retry=0;BR.fails=0;clearInterval(BR.hb);BR.hb=setInterval(()=>{try{BR.ws.send(JSON.stringify({type:'HEARTBEAT'}));}catch(e){}},5000);hubRefresh();pollFriends();return;}
-  if(m.type==='ID-TAKEN'){BR.err='taken';try{BR.ws.close();}catch(e){}hubRefresh();return;}
+  if(m.type==='OPEN'){BR.ok=true;BR.err='';BR.retry=0;BR.fails=0;hubRefresh();pollFriends();return;}
   if(m.type==='EXPIRE'){const r=BR.reqs[m.src];if(r){Object.values(r).forEach(x=>x(null,'offline'));BR.reqs[m.src]={};}return;}
   const p=m.payload;if(!p||typeof p!=='object'||typeof m.src!=='string')return;
   if(m.type==='ANSWER'&&p.rid){const r=BR.reqs[m.src]&&BR.reqs[m.src][p.rid];if(r)r(p);return;}
@@ -4296,7 +4329,7 @@ function identityScreen(msg){show('<div class="panel fade"><h2>Choose Your Onlin
 ACT.idset=()=>{const e=document.getElementById('oname'),n=cleanName(e&&e.value);if(n.length<2){identityScreen('Please use 2 to 12 letters or numbers.');return;}
   FD.me={name:n,num:String(1000+Math.floor(Math.random()*9000))};saveFD();brConnect();deskMenuFn();};
 function deskMenuFn(){
-  if(!FD.me){identityScreen();return;}if(pendingJoin){const h=pendingJoin;pendingJoin=null;deskJoin(h);return;}if(!BR.ws&&!BR.timer)brConnect();
+  if(!FD.me){identityScreen();return;}if(pendingJoin){const h=pendingJoin;pendingJoin=null;deskJoin(h);return;}if(!BR.ws)brConnect();
   const c=NET.myCh;
   show('<div class="panel fade" id="kovhub"><h2>Play Online</h2><p>Your hero: <b>'+esc(c.name)+'</b>, Lv '+c.lvl+' '+RACES[c.race].name+' '+CLASSES[c.cls].name+'</p>'+
     '<p class="dim" id="brst">'+esc(brStatusText())+'</p><p style="margin:2px 0">Your friend ID: <b style="color:var(--parch)">'+esc(label(FD.me))+'</b> <button class="btn alt" data-a="fcopy" style="padding:2px 10px">Copy</button></p>'+
