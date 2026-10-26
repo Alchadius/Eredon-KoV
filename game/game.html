@@ -77,6 +77,7 @@ label{font-size:14px;color:var(--parch-dim);display:flex;gap:8px;align-items:cen
 .bkbar{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:12px}.bkt{font-family:var(--display);font-size:13px;color:#e8d8a8}
 .bkpages.out-n{transform-origin:left center;transition:transform .24s ease-in;transform:rotateY(-80deg);opacity:.5}.bkpages.out-p{transform-origin:right center;transition:transform .24s ease-in;transform:rotateY(80deg);opacity:.5}.bkpages.in-n{animation:bkin-n .26s ease-out}.bkpages.in-p{animation:bkin-p .26s ease-out}@keyframes bkin-n{from{transform:rotateY(80deg);transform-origin:left center;opacity:.5}to{transform:none;opacity:1}}@keyframes bkin-p{from{transform:rotateY(-80deg);transform-origin:right center;opacity:.5}to{transform:none;opacity:1}}
 @media(max-width:719px){.bkpages:before{display:none}.bkside{padding:18px 20px}.bkp p{font-size:16px}}
+.bkp{align-items:center;text-align:center;justify-content:flex-start!important;padding-top:10px}.bkp p{text-align:center;margin-top:12px;font-size:17px}.bkmed{width:92px;height:92px;border-radius:50%;background:radial-gradient(#f6e9c4,#e2cc98);border:3px double #8a5a22;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 12px #8a5a2255}.bkmed svg{width:64px;height:64px}.bkmed.lock span{font-size:40px;color:#b89a62;font-family:var(--display)}.bkmed svg *{stroke:#4a2a10;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}.bkmed svg .ig{fill:#d9a93a}.bkmed svg .ir{fill:#9a3a24}.bkmed svg .ib{fill:#3a5a9a}.bkmed svg .ik{fill:#6a5a4a}.bkmed svg .iw{fill:#f4ead0}.bkmed svg .igr{fill:#4a8a4a}.bkmed svg .ibr{fill:#8a5a30}.bkmed svg .in{fill:none}.bktag{font-variant:small-caps;letter-spacing:.14em;font-size:12px;color:#8a5a22;margin-top:8px}
 .abl{display:flex;gap:6px;flex-wrap:wrap}.abl span{background:#0006;border:1px solid #6a4a22;border-radius:3px;padding:3px 7px;font-size:13px}.abl kbd{font-family:var(--display);color:var(--ink);background:var(--gold);border-radius:2px;padding:0 5px;margin-right:5px;font-size:11px}
 .slots{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .slot{display:flex;gap:7px;align-items:center;background:#0006;border:1px dashed #4a3a2a;border-radius:4px;padding:5px;min-width:0;font-size:12px;line-height:1.25}
@@ -3266,7 +3267,45 @@ function sheetHTML(){let h='<div class="panel"><h2>Roll of the Knights of Valor<
   window.KOV_SEEN=[...seen].sort((a,b)=>a-b);
   h+='<div class="codexbar"><button class="codexbtn" data-a="codex"><svg viewBox="0 0 48 48" width="44" height="44"><path d="M6 10c7-3 13-2 18 2v28c-5-4-11-5-18-2z" fill="#7a2a1c" stroke="#e8b84a" stroke-width="2"/><path d="M42 10c-7-3-13-2-18 2v28c5-4 11-5 18-2z" fill="#9a3a24" stroke="#e8b84a" stroke-width="2"/><path d="M11 17c4-1 8-.5 10 1M11 23c4-1 8-.5 10 1M27 18c2-1.500 6-2 10-1M27 24c2-1.500 6-2 10-1" stroke="#f4e4b0" stroke-width="1.500" fill="none"/></svg><span>Codex</span><small>'+seen.size+' / '+LORE.length+' pages found</small></button></div>';
   return h+'</div><div class="row"><button class="btn" data-a="resume">Resume</button></div></div>';}
-function codexPage(i,n){const f=KOV_SEEN.includes(i);return'<div class="bkp"><div class="bkn">'+(i+1)+'</div>'+(f?'<div class="bko">&#10086;</div><p>'+LORE[i]+'</p>':'<div class="bko dim">&#10086;</div><p class="dim" style="text-align:center;font-style:italic">This page has not been found yet.<br>Chests and hidden rooms hold scraps of the old tales.</p>')+'</div>';}
+const LORE_ART=[
+['Keepsake','<circle cx=22 cy=40 r=8 class=iw /><path d="M22 48v8M16 52l6-2 6 2" class=in /><path d="M40 52c0-8 3-12 8-12s8 4 8 12z" class=ir /><circle cx=48 cy=32 r=6 class=iw /><path d="M40 28l3-8 5 5 5-5 3 8z" class=ig />'],
+['Oath','<path d="M8 40c0-10 10-16 24-16s24 6 24 16c0 6-10 10-24 10S8 46 8 40z" class=ibr /><path d="M20 32l4 4M30 30l4 4M40 32l4 4" class=in /><path d="M32 6v22M26 12h12" class=ig />'],
+['Archive','<path d="M4 44h56M8 44c0-14 10-22 24-22s24 8 24 22" class=in /><path d="M14 44v12M50 44v12M32 22v22" class=in /><path d="M24 8h16v10H24z" class=iw />'],
+['Rhyme','<path d="M16 12h32c4 10 4 30 0 40H16c-4-10-4-30 0-40z" class=ibr /><path d="M15 24h34M15 40h34" class=ik /><path d="M26 30l6 6 8-8" class=in />'],
+['Graveyard','<path d="M18 54V26c0-10 6-16 14-16s14 6 14 16v28z" class=ik /><path d="M32 20v14M26 26h12" class=iw /><path d="M8 54h48" class=in />'],
+['Map','<path d="M4 54L24 16l12 18 8-10 16 30z" class=ik /><path d="M26 54V42a6 6 0 0 1 12 0v12z" class=ibr /><circle cx=32 cy=46 r=1.500 class=ig />'],
+['Item','<circle cx=22 cy=22 r=10 class=ig /><circle cx=22 cy=22 r=4 class=iw /><path d="M30 26l24 24M44 40l6-6M50 46l6-6" class=in />'],
+['Poem','<path d="M32 8c-14 6-20 20-14 40 8 6 20 6 28 0 6-20 0-34-14-40z" class=igr /><path d="M32 12v44M32 24l-10 6M32 34l12-8M32 44l-10 6" class=in />'],
+['Diary','<path d="M10 12h40a4 4 0 0 1 4 4v38H14a4 4 0 0 1-4-4z" class=ir /><path d="M20 20h24M20 28h24" class=iw /><path d="M42 40l2 5 5 .5-4 3 1.500 5-4.500-3-4.500 3 1.500-5-4-3 5-.5z" class=ig />'],
+['War-song','<path d="M14 54V24a18 18 0 0 1 36 0v30z" class=ik /><path d="M20 54V26a12 12 0 0 1 24 0v28" class=ibr /><path d="M32 30v8" class=in /><circle cx=32 cy=40 r=2 class=ig />'],
+['Elder','<circle cx=32 cy=32 r=26 class=ibr /><circle cx=32 cy=32 r=18 class=in /><circle cx=32 cy=32 r=10 class=in /><circle cx=32 cy=32 r=3 class=ig />'],
+['Legend','<path d="M8 44c6-18 18-22 26-18l10-12 2 12 12 4-10 6c0 10-8 18-22 18-8 0-14-2-18-10z" class=ir /><path d="M44 14l-4 10M36 28l4 2M16 40l6 4M26 46l6 2" class=in /><circle cx=44 cy=26 r=1.500 class=iw /><path d="M10 50l-4 6 10-2" class=ir />'],
+['Warning','<path d="M14 8h32v48l-6-4-5 4-5-4-5 4-5-4-6 4z" class=iw /><path d="M22 18h20M22 26h14" class=in /><path d="M24 40c0 4 3 4 3 8s-6 4-3-8zM38 36c0 4 3 4 3 8s-6 4-3-8z" class=ir />'],
+['Recipe','<path d="M10 28h44c0 16-6 26-22 26S10 44 10 28z" class=ik /><path d="M6 28h52M4 34h6M54 34h6" class=in /><path d="M22 20c-4-4 4-6 0-10M34 20c-4-4 4-6 0-10M44 20c-4-4 4-6 0-10" class=in />'],
+['Statue','<path d="M12 56h40M16 56V44h32v12" class=ik /><circle cx=24 cy=22 r=5 class=iw /><circle cx=40 cy=22 r=5 class=iw /><path d="M18 44V30h12v14M34 44V30h12v14" class=iw /><path d="M20 12l4-4 4 4M36 12l4-4 4 4" class=ig />'],
+['Journal','<path d="M12 40c0-16 8-26 20-26s20 10 20 26v8H12z" class=ik /><path d="M12 40h40M32 14v14M22 30h20v8H22z" class=iw /><path d="M10 48h44" class=in />'],
+['Notes','<path d="M6 14c10-4 20-2 26 4 6-6 16-8 26-4v38c-10-4-20-2-26 4-6-6-16-8-26-4z" class=ib /><path d="M32 18v38" class=in /><path d="M44 24l2 5 5 .5-4 3 1.500 5-4.500-3-4.500 3 1.500-5-4-3 5-.5z" class=ig />'],
+['Inscription','<path d="M12 58V26c0-12 8-18 20-18s20 6 20 18v32z" class=ik /><path d="M20 58V28c0-8 5-12 12-12s12 4 12 12v30" class=ibr /><circle cx=40 cy=40 r=2 class=ig /><path d="M24 8h16" class=ig />'],
+['Letter','<path d="M6 16h52v34H6z" class=iw /><path d="M6 16l26 20 26-20" class=in /><circle cx=32 cy=38 r=6 class=ir />'],
+['Banners','<path d="M10 8v52" class=in /><path d="M10 10h12v18l-6-4-6 4zM24 10h12v18l-6-4-6 4zM38 10h12v18l-6-4-6 4zM52 10h8v18l-4-4-4 4z" class=ir /><path d="M24 10h12v18l-6-4-6 4z" class=ib /><path d="M38 10h12v18l-6-4-6 4z" class=igr /><path d="M52 10h8v18l-4-4-4 4z" class=ig />'],
+['Note','<path d="M10 12l22-4 22 4v40l-22 4-22-4z" class=iw /><path d="M32 8v48" class=in /><path d="M18 24h8M38 24h8M18 32h8" class=in />'],
+['Last words','<path d="M8 46l4-26 12 12 8-18 8 18 12-12 4 26z" class=ik /><path d="M8 46h48v8H8z" class=ik /><circle cx=32 cy=36 r=3 class=ir />'],
+['Complaint','<path d="M12 28h32c0 14-4 22-16 22S12 42 12 28z" class=iw /><path d="M44 32c8 0 10 8 2 10" class=in /><path d="M28 24c-6-4 4-8-2-14 8 2 10 8 8 12 2-2 4-2 4-6 6 6 2 14-10 8z" class=ir />'],
+['Wizardry','<path d="M12 38c0-14 8-26 20-26s20 12 20 26z" class=ib /><path d="M6 40h52c0 6-6 8-26 8S6 46 6 40z" class=ib /><path d="M32 12l-4-6M32 12l4-6" class=in /><circle cx=20 cy=28 r=3 class=ig /><circle cx=44 cy=26 r=2 class=ig />'],
+['Prayer','<path d="M14 8h36v48H14z" class=iw /><ellipse cx=32 cy=20 rx=10 ry=4 class=ig /><circle cx=32 cy=30 r=6 class=iw /><path d="M22 52c0-10 4-14 10-14s10 4 10 14" class=iw />'],
+['Armory','<path d="M10 10h44v22c0 14-10 22-22 26C20 54 10 46 10 32z" class=ib /><path d="M32 14v40M14 28h36" class=ig />'],
+['Warning','<circle cx=32 cy=26 r=14 class=iw /><circle cx=26 cy=24 r=3 class=ik /><circle cx=38 cy=24 r=3 class=ik /><path d="M32 28v4M24 40h16v8H24zM29 40v8M35 40v8" class=iw />'],
+['Complaint','<ellipse cx=32 cy=42 rx=14 ry=12 class=igr /><circle cx=14 cy=28 r=6 class=igr /><circle cx=26 cy=16 r=6 class=igr /><circle cx=38 cy=16 r=6 class=igr /><circle cx=50 cy=28 r=6 class=igr />'],
+['Tavern','<ellipse cx=26 cy=42 rx=16 ry=14 class=ibr /><circle cx=26 cy=42 r=4 class=ik /><path d="M38 34l18-24M44 10l12 4" class=in /><path d="M18 36h16M18 48h16" class=in />'],
+['Records','<path d="M18 30h24v20a6 6 0 0 1-6 6H24a6 6 0 0 1-6-6z" class=iw /><path d="M22 30V14h6v16M28 30V10h6v20M34 30V12h6v18M40 30V18h5v14" class=iw />'],
+['Measure','<path d="M8 24h12l16-12v40L20 40H8z" class=ig /><path d="M44 22c4 6 4 14 0 20M50 16c8 10 8 22 0 32" class=in />'],
+['Bill','<path d="M16 8h32l8 12-8 6v30H16V26l-8-6z" class=ik /><path d="M24 30l4 4M36 40l4 4M26 46l3 3" class=in /><path d="M24 12l8 6 8-6" class=in />'],
+['Lecture','<ellipse cx=32 cy=36 rx=18 ry=22 class=ibr /><circle cx=24 cy=30 r=6 class=iw /><circle cx=40 cy=30 r=6 class=iw /><circle cx=24 cy=30 r=2 class=ik /><circle cx=40 cy=30 r=2 class=ik /><path d="M30 36l2 4 2-4M20 10l6 6M44 10l-6 6" class=ig />'],
+['Stitched','<path d="M32 54C8 36 8 16 22 14c6 0 10 4 10 8 0-4 4-8 10-8 14 2 14 22-10 40z" class=ir /><path d="M26 28l4 6 8-10" class=in />'],
+['Roster','<path d="M12 8h40v48H12z" class=iw /><path d="M20 18h24M20 26h24M20 34h24M20 42h14" class=in /><circle cx=44 cy=44 r=4 class=ig />'],
+['Journal','<path d="M10 12h40a4 4 0 0 1 4 4v38H14a4 4 0 0 1-4-4z" class=ibr /><path d="M18 22h24M18 30h24" class=iw /><path d="M52 6L30 40l-3 8 8-3L56 12z" class=ig />']
+];
+function codexPage(i,n){const f=KOV_SEEN.includes(i),A=LORE_ART[i]||['Lore','<circle cx=32 cy=32 r=18 class=ig />'];return'<div class="bkp"><div class="bkn">'+(i+1)+'</div>'+(f?'<div class="bkmed"><svg viewBox="0 0 64 64">'+A[1]+'</svg></div><div class="bktag">'+A[0]+'</div><p>'+LORE[i]+'</p>':'<div class="bkmed lock"><span>?</span></div><div class="bktag">Unfound</div><p class="dim" style="text-align:center;font-style:italic">This page has not been found yet.<br>Chests and hidden rooms hold scraps of the old tales.</p>')+'</div>';}
 ACT.codex=()=>{const old=document.getElementById('bookov');if(old)old.remove();
   const seen=window.KOV_SEEN||[],total=LORE.length;let sp=0,busy=false;
   const one=()=>window.innerWidth<720,per=()=>one()?1:2,spreads=()=>Math.ceil(total/per());
@@ -4144,7 +4183,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.0.4';
+const KOV_VER='1.0.5';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
