@@ -70,6 +70,8 @@ label{font-size:14px;color:var(--parch-dim);display:flex;gap:8px;align-items:cen
 .hero h4{margin:0;font-family:var(--display);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:8px}
 .hero h4:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,#e8b84a88,transparent)}
 .gift{background:#0006;border:1px solid #4a3a2a;border-radius:4px;padding:6px 8px;font-size:13px;line-height:1.35}.gift b{color:var(--gold)}
+.abtn{cursor:pointer}.abtn:hover{border-color:var(--gold)!important;background:#0009!important}.upn{font-family:var(--display);color:var(--gold);font-size:14px}
+.abcard{position:fixed;inset:0;z-index:9999;background:#000a;display:flex;align-items:center;justify-content:center;padding:16px}.abc{max-width:420px;width:100%;background:#1c1510;border:2px solid var(--hc,#e8b84a);border-radius:8px;padding:16px 20px;box-shadow:0 8px 40px #000}.abc h3{margin:0;font-family:var(--display);color:var(--gold);font-size:22px}.abc .abk{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#b8a888;margin-bottom:8px}.abc p{font-size:14px;line-height:1.4;margin:8px 0}.abm{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#b8a888}.abm b{color:#fff4d0}
 .abl{display:flex;gap:6px;flex-wrap:wrap}.abl span{background:#0006;border:1px solid #6a4a22;border-radius:3px;padding:3px 7px;font-size:13px}.abl kbd{font-family:var(--display);color:var(--ink);background:var(--gold);border-radius:2px;padding:0 5px;margin-right:5px;font-size:11px}
 .slots{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .slot{display:flex;gap:7px;align-items:center;background:#0006;border:1px dashed #4a3a2a;border-radius:4px;padding:5px;min-width:0;font-size:12px;line-height:1.25}
@@ -174,7 +176,7 @@ const CLASS_INFO={
   warrior:{role:'Tank / Brawler',range:'Melee',diff:1,lore:'Squires of Valeron are drilled to stand in the doorway so everyone else can stand behind it. Warriors trade finesse for steel, noise and an alarming enthusiasm for being hit.',pros:'Tough, simple, strong in a crowd',cons:'Must stay close to the fight',tip:'Open with War Cry, then wade in and whirl.',
     ab:['Wide melee arc that cuts every foe in front of you.','Spin for 150% damage to everything around you.','Allies within range deal 50% more damage for 7s.']},
   paladin:{role:'Bulwark / Support',range:'Mid-range',diff:1,lore:'Sworn to the old sun-order of Valeron. Their hammers are blessed, their armor is blessed, and their sermons are, regrettably, also blessed and very long.',pros:'Sturdiest class, protects the party',cons:'Slow hammer, modest speed',tip:'Cast Aegis Prayer just before a boss slam.',
-    ab:['Hurl a holy hammer that pierces every foe in its path (140% damage).','—','Nearby allies take 40% less damage for 9s.']},
+    ab:['Hurl a holy hammer that pierces every foe in its path (140% damage).','—','Nearby allies take 40% less damage for 9s and are healed for 8% of their max health.']},
   priest:{role:'Healer / Support',range:'Ranged',diff:2,lore:'Keepers of the candle-halls beneath the castle. A priest believes every wound is a chance for mercy, and every skeleton is a chance for a lecture.',pros:'Heals allies with every shot; party shields',cons:'Fragile, low damage',tip:'Aim light bolts through your friends to heal them.',
     ab:['Light bolt that wounds foes and heals the allies it strikes.','—','Shield nearby allies (45 + 8 per level) for 10s.']},
   ranger:{role:'Marksman / Trapper',range:'Long range',diff:2,lore:'Wardens of the Elderwood border who sleep in trees and shoot from the next one over. Rangers prefer to meet danger at a comfortable distance.',pros:'Longest reach, fast, crits slowed foes',cons:'Light armor, needs room to kite',tip:'Drop a snare in the doorway, shoot from the back.',
@@ -376,7 +378,7 @@ function recalc(p){const ch=p.ch,C=CLASSES[ch.cls];let hp=C.hp+ch.lvl*9+ch.up.vi
 function pdmg(p,m){let d=p.base*(m||1)*dmgMul(p);if(p.b.dmg)d*=p.b.dmg.v;if(p.ch.racial==='rage'&&p.hp<p.maxhp/2)d*=1.35;
   const crit=Math.random()<.06+(p.ch.racial==='crit'?.15:0)+(p.crit||0)/100;return[crit?d*1.8:d,crit];}
 function addBuff(p,k,v,t){p.b[k]={v,t};}
-function addXp(p,n){const ch=p.ch;if(ch.racial==='xp'&&n>0&&(!p.studyT||G.t-p.studyT>1.2)){p.studyT=G.t;spFx('study',p.x,p.y-6,'#b8d8ff',0);}ch.xp+=n*(ch.racial==='xp'?1.2:1);
+function addXp(p,n){const ch=p.ch;if(ch.racial==='xp'&&n>0&&(!p.studyT||G.t-p.studyT>1.2)){p.studyT=G.t;spFx('study',p.x,p.y-6,'#b8d8ff',0);}ch.xp+=Math.max(0,Math.round(n*(ch.racial==='xp'?1.2:1)));
   while(ch.xp>=xpNeed(ch.lvl)){ch.xp-=xpNeed(ch.lvl);ch.lvl++;recalc(p);p.hp=p.maxhp;ring(p.x,p.y,70,'#ffd34a');toast(ch.name+' reached level '+ch.lvl+'!','#ffd34a');sfx('levelup');}}
 
 // ----- map -----
@@ -526,7 +528,7 @@ function useAbil0(p,slot){const a=CLASSES[p.cls].ab[slot];if(p.ch.racial==='cd')
   case'whirl':spFx('spin',p.x,p.y,'#fff',86);spFx('whirl',p.x,p.y,'#fff',86);ring(p.x,p.y,90,'#fff');for(const e of foes(p.x,p.y,86)){[d,c]=pdmg(p,1.5);hitE(e,d,p,c,16);}crackNear(p.x,p.y,86);sfx('whirl');break;
   case'scream':for(const q of allies(p,220)){addBuff(q,'dmg',1.5,7);ring(q.x,q.y,50,'#ff6a3a');spFx('cry',q.x,q.y,'#ff6a3a',120);}toast('War Cry! Party damage up','#ff9a6a');sfx('cry');break;
   case'hammer':[d,c]=pdmg(p,1.4);shoot(p,{sp:380,dmg:d,crit:c,life:.7,pierce:1,col:'#ffe27a',r:7,k:'hammer'});sfx('hammer');break;
-  case'guard':for(const q of allies(p,230)){addBuff(q,'def',.4,9);ring(q.x,q.y,50,'#ffe27a');spFx('aegis',q.x,q.y,'#ffe27a',0);}toast('Aegis Prayer! Party armor up','#ffe27a');sfx('bless');break;
+  case'guard':for(const q of allies(p,230)){addBuff(q,'def',.4,9);ring(q.x,q.y,50,'#ffe27a');spFx('aegis',q.x,q.y,'#ffe27a',0);}allyHeal(p,230,.08);toast('Aegis Prayer! Party armor up and a small heal','#ffe27a');sfx('bless');break;
   case'smite':[d,c]=pdmg(p,1);shoot(p,{sp:430,dmg:d,crit:c,life:.8,col:'#fff7c0',r:6,heal:true});sfx('smite');break;
   case'ward':for(const q of allies(p,230)){addBuff(q,'shield',45+p.ch.lvl*8,10);q.b.shield.v=45+p.ch.lvl*8;ring(q.x,q.y,50,'#9ad0ff');spFx('bubble',q.x,q.y,'#9ad0ff',0);}toast('Ward! Party shielded','#9ad0ff');sfx('bless');break;
   case'arrow':[d,c]=pdmg(p,1);if(Math.random()<.0)c=false;shoot(p,{sp:560,dmg:d,crit:c,life:.9,col:'#d9c89a',r:4,k:'arrow'});sfx('arrow');break;
@@ -547,7 +549,7 @@ function nextLore(){const have=new Set();G.players.forEach(q=>q.ch.lore.forEach(
 function giveLore(p){const i=nextLore();if(i<0)return;G.players.forEach(q=>{if(!q.ch.lore.includes(i))q.ch.lore.push(i);});toast('Lore found: '+LORE[i],'#e8d9a0',9);}
 function updPick(dt){const np=[];G.pick=G.pick.filter(o=>{o.t+=dt;
   for(const p of G.players){if(p.down)continue;const d=dist(p,o);
-    if(o.k==='gold'&&d<26){p.ch.gold+=o.v;G.score+=o.v;sfx('gold');return false;}
+    if(o.k==='gold'&&d<26){const gv=Math.max(1,Math.round(o.v));p.ch.gold+=gv;G.score+=gv;sfx('gold');return false;}
     if(o.k==='heart'&&d<26){p.hp=Math.min(p.maxhp,p.hp+p.maxhp*.25);ring(o.x,o.y,30,'#ff7a8a');sfx('heart');return false;}
     if(o.k==='item'&&d<28){takeItem(p,o.src);return false;}
     if(o.k==='potion'&&d<26&&givePotion(p,o.pt)){sfx('item');return false;}
@@ -934,7 +936,7 @@ function hudPlate(p,i,x,y,ctl){
     const kn=ctl&&ctl.po?keyName(ctl.po):'';if(kn){cx.font='800 10px '+HN;cx.textAlign='center';const kw=Math.max(11,cx.measureText(kn).width+6);cx.fillStyle='#eadfc4';hrr(bx+S-kw+4,ty-5,kw,11,3);cx.fill();cx.lineWidth=1;cx.strokeStyle='#120d0a';cx.stroke();cx.fillStyle='#120d0a';cx.fillText(kn,bx+S-kw/2+4,ty+3.5);}
     bx+=S+6;}
   // coin pill (this hero's own gold)
-  const gs=p.ch.gold.toLocaleString();cx.font='800 14px '+HN;const gw=cx.measureText(gs).width,pw=gw+30,px=rx-pw;
+  const gs=Math.round(p.ch.gold).toLocaleString();cx.font='800 14px '+HN;const gw=cx.measureText(gs).width,pw=gw+30,px=rx-pw;
   cx.fillStyle='#0c0806';hrr(px,y+37,pw,20,10);cx.fill();cx.lineWidth=1;cx.strokeStyle='#5a4620';cx.stroke();
   hudCoin(px+11,y+47,7);cx.textAlign='right';cx.fillStyle='#ffe27a';cx.fillText(gs,rx-7,y+52);
   cx.restore();cx.textAlign='left';}
@@ -943,7 +945,7 @@ function hudMini(p,x,y){const W=212,cl=CLASSES[p.cls],cxr=x+15,cyr=y+17;cx.save(
   cx.globalAlpha=.88;cx.fillStyle='#1c1510';hrr(x+20,y+4,W-20,26,6);cx.fill();cx.globalAlpha=1;cx.lineWidth=1.3;cx.strokeStyle='#b98a2e';hrr(x+20,y+4,W-20,26,6);cx.stroke();
   hudRing(cxr,cyr,12,3.5,p);cx.save();if(p.down)cx.globalAlpha=.45;cx.drawImage(hudIcon(p.cls),cxr-10,cyr-10,20,20);cx.restore();
   cx.textAlign='left';cx.font='800 12px '+HF;hot(p.ch.name+'  Lv '+p.ch.lvl,x+36,y+16,'#f6ecd0');
-  const gs=p.ch.gold.toLocaleString();cx.font='800 11px '+HN;cx.textAlign='right';cx.fillStyle='#ffe27a';cx.fillText(gs,x+W-8,y+16);const gw=cx.measureText(gs).width;hudCoin(x+W-14-gw,y+12.5,5);
+  const gs=Math.round(p.ch.gold).toLocaleString();cx.font='800 11px '+HN;cx.textAlign='right';cx.fillStyle='#ffe27a';cx.fillText(gs,x+W-8,y+16);const gw=cx.measureText(gs).width;hudCoin(x+W-14-gw,y+12.5,5);
   const f=Math.max(0,p.hp/p.maxhp);cx.fillStyle='#0c0806';hrr(x+36,y+21,W-48,5,2.5);cx.fill();if(f>0){cx.fillStyle=p.down?'#777':'#c0392b';hrr(x+36,y+21,Math.max(5,(W-48)*f),5,2.5);cx.fill();}
   cx.restore();cx.textAlign='left';}
 // parchment panel (top right): depth, zone, foes felled, glory
@@ -3174,7 +3176,7 @@ function charsScreen(){const s=loadSave(),co=SEL.coop;let h='<div class="panel">
     const C=CLASSES[c.cls],R=RACES[c.race],inP=SEL.party.includes(c.id),ni=SLOTS.filter(k=>c.items[k]).length;
     h+='<section class="hero" style="--hc:'+C.col+'"><header><canvas class="pt big" width="80" height="96" data-pc="'+c.cls+'" data-pr="'+c.race+(c.g==='f'?'|f':'')+'"></canvas><div><h3>'+esc(c.name)+'</h3><div class="rank">'+rankOf(c.lvl)+'</div><p class="dim">Level '+c.lvl+' '+R.name+' '+C.name+'</p></div>'+CREST+'</header><div class="body"><p class="dim" style="font-size:13px">Deepest floor '+c.best+' &middot; Gold '+c.gold+' &middot; Relics '+ni+'/4 &middot; Lore '+c.lore.length+'/'+LORE.length+'</p>'+
       '<div class="row" style="justify-content:flex-start">'+(co?'':'<button class="btn" style="padding:7px 12px;font-size:12px" data-a="cplay" data-id="'+c.id+'">Play</button>')+'<button class="btn alt" style="padding:7px 12px;font-size:12px" data-a="cparty" data-id="'+c.id+'">'+(inP?(co?'Chosen &#10003;':'In party'):(co?'Choose':'Add to party'))+'</button>'+
-      '<button class="btn alt" style="padding:7px 12px;font-size:12px" data-a="cdel" data-id="'+c.id+'">'+(SEL.del===c.id?'Really retire?':'Retire')+'</button></div></div></section>';}
+      '<button class="btn alt" style="padding:7px 12px;font-size:12px" data-a="csheet" data-id="'+c.id+'">Character Sheet</button><button class="btn alt" style="padding:7px 12px;font-size:12px" data-a="cdel" data-id="'+c.id+'">'+(SEL.del===c.id?'Really retire?':'Retire')+'</button></div></div></section>';}
   h+='</div><div class="row">'+(SEL.party.length===2?'<button class="btn" data-a="cduo">Play Together (2 players)</button>':'')+(co?'<button class="btn alt" data-a="ccontrols">Controls</button>':'')+'<button class="btn alt" data-a="title">Back</button></div></div>';
   show(h);paintPortraits();}
 const byId=id=>loadSave().chars.find(c=>c.id===id);
@@ -3185,6 +3187,16 @@ ACT.ccontrols=()=>{SEL.from='coop';REBIND=null;settingsScreen();};
 ACT.cduo=()=>{COOP=true;const cs=SEL.party.map(byId).filter(Boolean);if(cs.length===2)beginRun(cs,false);};
 ACT.cdel=d=>{if(SEL.del===d.id){const s=loadSave();s.chars=s.chars.filter(c=>c.id!==d.id);writeRoster(s);SEL.party=SEL.party.filter(x=>x!==d.id);SEL.del=null;}else SEL.del=d.id;charsScreen();};
 
+ACT.abinfo=d=>{const C=CLASSES[d.cls],a=C&&C.ab[+d.s],CI=CLASS_INFO[d.cls]||{ab:[]};if(!a)return;
+  const keys=['Primary Attack','Secondary Attack','Utility'],old=document.getElementById('abcard');if(old)old.remove();
+  const el=document.createElement('div');el.id='abcard';el.className='abcard';
+  el.innerHTML='<div class="abc" style="--hc:'+C.col+'"><h3>'+esc(a.n)+'</h3><div class="abk">'+esc(C.name)+' &middot; '+keys[+d.s]+'</div><p>'+(CI.ab[+d.s]&&CI.ab[+d.s]!=='\u2014'?CI.ab[+d.s]:C.desc)+'</p><div class="abm"><span>Recharge <b>'+a.cd+'s</b></span><span>Role <b>'+esc(CI.role||'')+'</b></span><span>Range <b>'+esc(CI.range||'')+'</b></span></div>'+(CI.tip?'<p class="dim"><b>Tip:</b> '+esc(CI.tip)+'</p>':'')+'<div class="row"><button class="btn" data-x="1">Close</button></div></div>';
+  el.addEventListener('click',()=>el.remove());document.body.appendChild(el);};
+ACT.csheet=d=>{const c=byId(d.id);if(!c)return;const sv=G;let h;
+  G={players:[makePlayer(c,0)],depth:0,view:1,selBag:null,selSlot:null,mode:'view'};
+  try{h=sheetHTML();}finally{G=sv;}
+  h=h.replace(/ data-a="(bagsel|slotsel)"/g,'').replace(/<button class="btn" data-a="resume">Resume<\/button>/,'<button class="btn" data-a="chars">Back to roster</button>');
+  show(h);paintPortraits();};
 function RG(s){return s.race+(s.g==='f'?'|f':'');}
 function createScreen(back,go){const s=SEL.h[0],C=CLASSES[s.cls],R=RACES[s.race];const sc=ov.querySelector('.panel'),st=sc?sc.scrollTop:0;
   let h='<div class="panel create"><h2>Create Your Hero</h2><div class="cbox cprev"><canvas class="pt big2" width="112" height="134" data-pc="'+s.cls+'" data-pr="'+RG(s)+'"></canvas><div><input type="text" id="nm0" maxlength="16" placeholder="Name (or leave blank for a random one)" value="'+esc(s.name)+'"><h3 style="margin-top:8px">'+(s.g==='f'?'Female ':'Male ')+R.name+' '+C.name+'</h3><p class="dim">'+C.desc+'</p><p class="dim">Racial gift, rolled at birth: <b style="color:var(--gold)">'+R.opts.map(o=>RACIALS[o][0]).join(' or ')+'</b></p><p class="dim" style="font-style:italic">'+(RACE_LORE[s.race]||'')+'</p></div></div>';
@@ -3218,7 +3230,7 @@ function cost(n){return Math.round(30*Math.pow(1.5,n));}
 const UPS={vit:['Vitality','+12 max health'],mig:['Might','+2 damage'],swi:['Swiftness','+4% move speed'],foc:['Focus','abilities recharge 4% faster']};
 function levelDoneScreen(){musicPlay('title');sfx('stairs');const d=G.depth;G.players.forEach(p=>{p.ch.best=Math.max(p.ch.best,d);});HI=Math.max(HI,G.score);saveGame();
   let h='<div class="panel"><h2>Depth '+d+' cleared</h2>'+(VICTORY[d]?(VSC[d]?sceneTag(VSC[d],'',1):'')+'<p class="story">'+VICTORY[d]+'</p>':'<p class="dim">The way down is open. Rest, spend your gold, and heal up a little between floors.</p>')+'<p>Score <b>'+G.score+'</b></p><div class="sheet">';
-  G.players.forEach((p,i)=>{const ch=p.ch;h+='<section><h3>'+esc(ch.name)+' &middot; Lv '+ch.lvl+' &middot; '+ch.gold+' gold</h3><div class="row" style="justify-content:flex-start;margin-top:8px">';
+  G.players.forEach((p,i)=>{const ch=p.ch;h+='<section><h3>'+esc(ch.name)+' &middot; Lv '+ch.lvl+' &middot; '+Math.round(ch.gold)+' gold</h3><div class="row" style="justify-content:flex-start;margin-top:8px">';
     for(const u in UPS){const c=cost(ch.up[u]);h+='<button class="btn alt" style="font-size:12px;padding:6px 10px" data-a="buy" data-i="'+i+'" data-u="'+u+'"'+(ch.gold<c?' disabled':'')+'>'+UPS[u][0]+' ('+ch.up[u]+') &middot; '+c+'g<br><span style="text-transform:none;font-weight:400">'+UPS[u][1]+'</span></button>';}
     h+='</div></section>';});
   show(h+'</div><div class="row"><button class="btn" data-a="descend">Descend to Depth '+(d+1)+'</button></div></div>');paintAll(ov);}
@@ -3235,16 +3247,16 @@ function rankOf(l){let r=RANKS[0][1];for(const x of RANKS)if(l>=x[0])r=x[1];retu
 function sheetHTML(){let h='<div class="panel"><h2>Roll of the Knights of Valor</h2><div class="sheet">';
   G.players.forEach((p,i)=>{const ch=p.ch,C=CLASSES[ch.cls],ra=RACIALS[ch.racial]||['',''],R=RACES[ch.race]||RACES.human;
     const bar=(l,v,m,t)=>'<div class="stat"><span>'+l+'</span><i><b style="width:'+Math.min(100,v/m*100)+'%"></b></i><em>'+t+'</em></div>';
-    const up=(n,v)=>'<span>'+n+' <u>'+Array.from({length:Math.min(v,10)},()=>'<s></s>').join('')+(v>10?'+'+(v-10):'')+(v===0?'<s class="o"></s>':'')+'</u></span>';
+    const up=(n,v)=>'<span>'+n+' <b class="upn">'+v+'</b></span>';
     h+='<section class="hero" style="--hc:'+C.col+'"><header>'+paperDoll(p,i)+'<div><h3>'+esc(ch.name)+'</h3><div class="rank">'+rankOf(ch.lvl)+'</div><p class="dim">Level '+ch.lvl+' '+R.name+' '+C.name+'</p>'+
       '<div class="stat" style="grid-template-columns:1fr;margin-top:4px"><i><b style="width:'+(ch.xp/xpNeed(ch.lvl)*100)+'%"></b></i></div><span class="dim" style="font-size:12px">XP '+Math.floor(ch.xp)+' / '+xpNeed(ch.lvl)+'</span></div>'+CREST+'</header><div class="body">'+
       '<p class="quote">'+(CLASS_QUOTE[ch.cls]||'')+'</p>'+
-      '<h4>Attributes</h4>'+bar('Health',p.maxhp,500,Math.ceil(p.hp)+'/'+p.maxhp)+bar('Damage',p.base,60,p.base.toFixed(1))+bar('Speed',p.spd,260,Math.round(p.spd))+bar('Recharge',1/p.cdm,2.4,'x'+(1/p.cdm).toFixed(2))+
+      '<h4>Attributes</h4>'+bar('Health',p.maxhp,500,Math.ceil(p.hp)+'/'+Math.round(p.maxhp))+bar('Damage',p.base,60,Math.round(p.base))+bar('Speed',p.spd,260,Math.round(p.spd))+bar('Recharge',1/p.cdm,2.4,'x'+(1/p.cdm).toFixed(2))+
       '<h4>Racial Gift</h4><div class="gift"><b>'+ra[0]+'</b> &middot; '+ra[1]+'<br><span class="dim">'+(RACE_LORE[ch.race]||'')+'</span></div>'+
-      '<h4>Abilities</h4><div class="abl">'+C.ab.map((a,s)=>a?'<span><kbd>'+(NET.on?['F','G','H']:i?[',','.','/']:['F','G','H'])[s]+'</kbd>'+a.n+'</span>':'').join('')+'</div>'+
+      '<h4>Abilities</h4><div class="abl">'+C.ab.map((a,s)=>a?'<span class="abtn" data-a="abinfo" data-cls="'+ch.cls+'" data-s="'+s+'" title="Click for details"><kbd>'+(NET.on?['F','G','H']:i?[',','.','/']:['F','G','H'])[s]+'</kbd>'+a.n+'</span>':'').join('')+'</div>'+
       bagBlock(p,i)+
       '<h4>Training</h4><div class="pips">'+up('Vitality',ch.up.vit)+up('Might',ch.up.mig)+up('Swiftness',ch.up.swi)+up('Focus',ch.up.foc)+'</div>'+
-      '<p class="dim" style="font-size:12px">Deepest floor reached: '+Math.max(ch.best,G.depth||0)+' &middot; Gold '+ch.gold+' &middot; Foes slain this run: '+p.kills+'</p></div></section>';});
+      '<p class="dim" style="font-size:12px">Deepest floor reached: '+Math.max(ch.best,G.depth||0)+' &middot; Gold '+Math.round(ch.gold)+' &middot; Foes slain this run: '+p.kills+'</p></div></section>';});
   const seen=new Set();G.players.forEach(p=>p.ch.lore.forEach(i=>seen.add(i)));
   h+='<section class="codex"><h3>Lore Codex ('+seen.size+'/'+LORE.length+')</h3><ul>';
   [...seen].sort((a,b)=>a-b).forEach(i=>{h+='<li>'+LORE[i]+'</li>';});if(!seen.size)h+='<li class="dim">Nothing yet. Chests and hidden rooms hold scraps of the old tales.</li>';
@@ -3393,7 +3405,7 @@ function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;try{
   requestAnimationFrame(frame);}
 // ---------- ITEMS: tiers, item bag, Epic class procs, Legendary on-use powers ----------
 const TIER=[{n:'Common',c:'#5fbf4a',g:25},{n:'Rare',c:'#4a8ae0',g:80},{n:'Epic',c:'#b06aff',g:250},{n:'Legendary',c:'#ff9a2a',g:800}];
-const BAGMAX=7;
+const BAGMAX=8;
 // raw stats at depth 8, per slot and tier
 const IBASE={ring:[{dmg:4},{dmg:7,crit:3},{dmg:10,crit:5},{dmg:14,crit:8,haste:6}],neck:[{hp:36},{hp:60,haste:3},{hp:85,haste:5},{hp:120,haste:8,regen:2}],
   weapon:[{dmg:5},{dmg:9,crit:2},{dmg:13,crit:4},{dmg:18,crit:7,haste:8}],armor:[{hp:40},{hp:66,dr:3},{hp:95,dr:5},{hp:130,dr:8,regen:2}]};
@@ -3465,10 +3477,13 @@ function giveItem(p,it){const ch=p.ch;if(!ch.bag)ch.bag=[];const cur=ch.items[it
     else{const g=sellItem(p,old);toast('Sold the old '+itemInfo(ch.cls,old).name+' for '+g+' gold.','#d8c8a0');}flair();return;}
   if(it.tier<2){ // raw-stat items: keep only real upgrades
     if(it.tier===cur.tier&&itemScore(it)>itemScore(cur)){const old=equipFresh(p,it);const g=sellItem(p,old);toast(p.ch.name+' upgrades to '+itemInfo(ch.cls,it).name+' (sold old for '+g+'g)',T.c,4);flair();return;}
+    if(canAsk()){if(ch.bag.length<BAGMAX)lootPrompt(p,it);else bagPrompt(p,it);return;}
     const g=sellItem(p,it);toast(T.n+' '+itemInfo(ch.cls,it).name+' sold for '+g+' gold.','#d8c8a0',3);return;}
+  if(ch.bag.length<BAGMAX&&canAsk()){lootPrompt(p,it);return;}
   if(ch.bag.length<BAGMAX){ch.bag.push(it);tierToast(p,it,'found');toast('Added to the item bag. Open the character sheet to change gear.',T.c,4);flair();return;}
   if(G.net||(G.players.length>0&&G.mode!=='play')){autoFull(p,it);return;}
   bagPrompt(p,it);}
+function canAsk(){return !G.net&&G.mode==='play';}
 function autoFull(p,it){const ch=p.ch;let w=null;for(const x of ch.bag){if(x.lock||x.tier>it.tier)continue;if(!w||x.tier<w.tier||(x.tier===w.tier&&itemScore(x)<itemScore(w)))w=x;}
   if(w){ch.bag.splice(ch.bag.indexOf(w),1);const g=sellItem(p,w);ch.bag.push(it);tierToast(p,it,'found');toast('Bag full: sold '+itemInfo(ch.cls,w).name+' for '+g+' gold.',TIER[w.tier].c);ring(p.x,p.y,80,TIER[it.tier].c);sfx('item');}
   else{const g=sellItem(p,it);toast('Bag full: sold the new '+itemInfo(ch.cls,it).name+' for '+g+' gold.','#d8c8a0');}}
@@ -3523,10 +3538,14 @@ function bagBlock(p,i){const ch=p.ch,bag=ch.bag||[];let sel='';const sk=G.selBag
   let h='<h4>Item bag <span class="dim">'+bag.length+' / '+BAGMAX+'</span></h4><div class="bgrid">';
   for(let k=0;k<BAGMAX;k++)h+=bag[k]?bagTile(ch,bag[k],i):'<div class="ptile bt empty"></div>';
   return h+'</div>'+(sel||'<div class="dim" style="font-size:11px;margin-top:4px">Click an item to equip, lock or sell it. Gear changes only here or on the pause screen.</div>');}
-function bagPrompt(p,it){G.bq={p,it};G.back='play';G.mode='sheet';const ch=p.ch;
+function bagPrompt(p,it){if(G.bq){(G.bqQ=G.bqQ||[]).push([p,it]);return;}G.bq={p,it};G.back='play';G.mode='sheet';const ch=p.ch;
   show('<div class="panel"><h2>Bag full</h2><p>'+esc(p.ch.name)+' found a new item but the bag is full.</p><div class="bagrow" style="max-width:420px">'+itemCard(ch.cls,it,{})+'</div><div class="row"><button class="btn" data-a="bq_sell">Sell new ('+TIER[it.tier].g+'g)</button><button class="btn alt" data-a="bq_leave">Leave it</button></div><h4>Or swap it for one in the bag</h4><div class="bagrow">'+
     ch.bag.map(x=>'<div>'+itemCard(ch.cls,x,{})+'<div class="xibt"><button class="btn alt" data-a="bq_swap" data-id="'+x.id+'"'+(x.lock?' disabled':'')+'>Swap with this (sell for '+TIER[x.tier].g+'g)</button></div></div>').join('')+'</div></div>');}
-function bqDone(){G.bq=null;ACT.resume();}
+function lootPrompt(p,it){if(G.bq){(G.bqQ=G.bqQ||[]).push([p,it]);return;}G.bq={p,it,loot:1};G.back='play';G.mode='sheet';const ch=p.ch,cur=ch.items[it.slot];
+  show('<div class="panel"><h2>Loot found</h2><p>'+esc(ch.name)+' found a new item. Keep it in the bag or sell it?</p><div class="bagrow" style="max-width:640px"><div><div class="dim" style="font-size:11px">New</div>'+itemCard(ch.cls,it,{})+'</div>'+(cur?'<div><div class="dim" style="font-size:11px">Currently worn</div>'+itemCard(ch.cls,cur,{eq:1})+'</div>':'')+'</div><div class="row"><button class="btn" data-a="lq_bag">Add to bag</button><button class="btn alt" data-a="lq_sell">Sell ('+TIER[it.tier].g+'g)</button></div><p class="dim" style="font-size:11px">Bag '+ch.bag.length+' / '+BAGMAX+'</p></div>');}
+ACT.lq_bag=()=>{const q=G.bq;if(!q||!q.loot)return;const ch=q.p.ch;if(ch.bag.length<BAGMAX){ch.bag.push(q.it);tierToast(q.p,q.it,'kept');}bqDone();};
+ACT.lq_sell=()=>{const q=G.bq;if(!q||!q.loot)return;const g=sellItem(q.p,q.it);toast('Sold '+itemInfo(q.p.ch.cls,q.it).name+' for '+g+' gold.','#d8c8a0',3);bqDone();};
+function bqDone(){G.bq=null;ACT.resume();while(G.bqQ&&G.bqQ.length&&!G.bq){const n=G.bqQ.shift();G.mode='play';giveItem(n[0],n[1]);}}
 ACT.bq_swap=d=>{const q=G.bq;if(!q)return;const ch=q.p.ch,i=ch.bag.findIndex(x=>x.id===d.id);if(i<0||ch.bag[i].lock)return;const o=ch.bag[i];ch.bag[i]=q.it;const g=sellItem(q.p,o);toast('Sold '+itemInfo(ch.cls,o).name+' for '+g+' gold.','#d8c8a0');tierToast(q.p,q.it,'kept');bqDone();};
 ACT.bq_sell=()=>{const q=G.bq;if(!q)return;const g=sellItem(q.p,q.it);toast('Sold for '+g+' gold.','#d8c8a0');bqDone();};
 ACT.bq_leave=()=>{if(!G.bq)return;bqDone();};
@@ -3738,7 +3757,7 @@ const WDRAW={
  paladin(g,t,v,K){const L=23;gShaft(g,-6,L,K,3);gBands(g,-2,L-3,t,K);const cx_=L+4,hr=6.4;
   if(t===0){gC(g,cx_,0,5,K.m2);for(const a of[0,1.57,3.14,4.71])gC(g,cx_+Math.cos(a)*5,Math.sin(a)*5,1.2,K.m);}
   else if(t===1){gC(g,cx_,0,3.4,K.m2);for(let i=0;i<6;i++){const a=i*1.047;gP(g,[[cx_+Math.cos(a-.3)*3,Math.sin(a-.3)*3],[cx_+Math.cos(a)*8,Math.sin(a)*8],[cx_+Math.cos(a+.3)*3,Math.sin(a+.3)*3]],K.m);}gC(g,cx_,0,1.6,K.gem);}
-  else if(t===2){gGlow(g,cx_+2,0,13,K.gem,.4);gP(g,[[L,-6.5],[L+11,-6.5],[L+11,6.5],[L,6.5]],K.m);gP(g,[[L+11,-4],[L+15,-2.4],[L+15,2.4],[L+11,4]],K.m2);for(const s of[-1,1]){gP(g,[[L+3,s*6.5],[L-1,s*11],[L+7,s*8]],K.tr);gP(g,[[L+9,s*6.5],[L+12,s*10],[L+13,s*6.5]],K.m2);}g.strokeStyle=K.tr;g.lineWidth=.7;g.strokeRect(L+1.4,-5,8,10);gGem(g,L+5.5,0,2.2,K);}
+  else if(t===2){g.save();g.translate(L+5,0);g.scale(.85,.85);g.translate(-(L+5),0);gGlow(g,cx_+2,0,13,K.gem,.4);gP(g,[[L,-6.5],[L+11,-6.5],[L+11,6.5],[L,6.5]],K.m);gP(g,[[L+11,-4],[L+15,-2.4],[L+15,2.4],[L+11,4]],K.m2);for(const s of[-1,1]){gP(g,[[L+3,s*6.5],[L-1,s*11],[L+7,s*8]],K.tr);gP(g,[[L+9,s*6.5],[L+12,s*10],[L+13,s*6.5]],K.m2);}g.strokeStyle=K.tr;g.lineWidth=.7;g.strokeRect(L+1.4,-5,8,10);gGem(g,L+5.5,0,2.2,K);g.restore();}
   else{gGlow(g,cx_+3,0,20,K.gem,.5);for(let i=0;i<16;i++){const a=i*.3927,r1=i%2?9.6:12.4;gP(g,[[cx_+3+Math.cos(a-.1)*5.6,Math.sin(a-.1)*5.6],[cx_+3+Math.cos(a)*r1,Math.sin(a)*r1],[cx_+3+Math.cos(a+.1)*5.6,Math.sin(a+.1)*5.6]],i%2?K.m2:K.m);}
     gC(g,cx_+3,0,6,K.m);g.strokeStyle=K.tr;g.lineWidth=.7;g.beginPath();g.arc(cx_+3,0,4.4,0,7);g.stroke();gGem(g,cx_+3,0,2.6,K);for(let i=0;i<8;i++){const a=i*.785+.39;gC(g,cx_+3+Math.cos(a)*8.4,Math.sin(a)*8.4,.7,K.gl);}gTassel(g,-5,0,K,t);}
   gL(g,-6,0,-1,0,3.4,K.tr);},
@@ -3800,7 +3819,7 @@ function gTeeth(g,x0,x1,y,dir,sz,col,n){const st=(x1-x0)/n;for(let i=0;i<n;i++){
 const WDEC={
  warrior(g,t,K){if(t<1)return;const L=27+t*1.2;gTeeth(g,11,L-3,-2.4-(t>2?.4:0),-1,1.8+t*.4,K.m2,4+t*2);g.strokeStyle=GOL;g.globalAlpha=.55;g.lineWidth=.9;g.beginPath();g.moveTo(10,.2);g.lineTo(L-2,.2);g.stroke();g.globalAlpha=1;},
  rogue(g,t,K){if(t<1)return;const L=16+t*.8;gTeeth(g,6,L,2.3,1,1.6+t*.3,K.m2,4+t*2);},
- paladin(g,t,K){if(t<1)return;const hx=27+(t>=2?8:0);for(const s of[-1,1])gP(g,[[hx-2,s*5],[hx+1,s*(9+t*2.4)],[hx+3,s*5]],K.m2);gP(g,[[hx+5+(t>=2?5:0),-2],[hx+11+t*2+(t>=2?5:0),0],[hx+5+(t>=2?5:0),2]],K.m2);},
+ paladin(g,t,K){if(t<1)return;if(t===2){g.save();g.translate(28,0);g.scale(.85,.85);g.translate(-28,0);}const hx=27+(t>=2?8:0);for(const s of[-1,1])gP(g,[[hx-2,s*5],[hx+1,s*(9+t*2.4)],[hx+3,s*5]],K.m2);gP(g,[[hx+5+(t>=2?5:0),-2],[hx+11+t*2+(t>=2?5:0),0],[hx+5+(t>=2?5:0),2]],K.m2);if(t===2)g.restore();},
  mage(g,t,K){if(t<1)return;const L=30;for(const a of[-1,1])gP(g,[[L-2,a*1.5],[L+3,a*(7+t*1.6)],[L+8,a*(5+t)],[L+4,a*3]],t>=2?K.m2:K.m);},
  druid(g,t,K){if(t<1)return;for(let x=-2;x<18;x+=5){const s=(x/5|0)%2?1:-1;gP(g,[[x,s*1.4],[x+1.4,s*(4+t*.5)],[x+2.6,s*1.4]],K.m2);}},
  warlock(g,t,K){if(t<1)return;for(let x=0;x<20;x+=5){const s=(x/5|0)%2?1:-1;gP(g,[[x,s*1.4],[x+1.4,s*(4+t*.6)],[x+2.6,s*1.4]],'#d8d0b8');}},
@@ -4105,7 +4124,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.0.2';
+const KOV_VER='1.0.3';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
