@@ -261,7 +261,7 @@ const EDEF = {
   imp:{n:'Ember Imp',hp:22,spd:118,dmg:8,r:9,col:'#ff6a2a',sc:16,xp:10,fly:1},
   b_ghor:{n:'Ghorrath, the Cinder Fiend',hp:1500,spd:62,dmg:27,r:34,col:'#ff7a2a',sc:2500,xp:800,boss:1}
 };
-const DWN='Durnholm';   // working name of the dwarven city biome (rename here)
+const DWN='Ironhearth Deep';   // working name of the dwarven city biome (rename here)
 const BIOMES = [{n:'Castle Valeron'},{n:'Elderwood'},{n:'Frostpeak'},{n:'Sunken Swamp'},{n:DWN}];
 // 4 zones x 3 floors each: floors 1-2 are the zone, floor 3 ends with the zone boss
 const STAGES = [
@@ -4335,7 +4335,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.1.0';
+const KOV_VER='1.1.1';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
