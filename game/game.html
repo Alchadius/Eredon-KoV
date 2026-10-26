@@ -256,9 +256,13 @@ const EDEF = {
   b_grumpy:{n:'Grumpy, Warlord of the Mire',hp:1500,spd:64,dmg:26,r:34,col:'#6a8a3a',sc:1600,xp:600,boss:1},
   b_ogre:{n:'Grumbash the Gatekeeper',hp:650,spd:58,dmg:26,r:32,col:'#8a9f3a',sc:500,xp:200,boss:1},
   b_drake:{n:'Vharazel, the Ancient Drake',hp:950,spd:70,dmg:24,r:36,col:'#a8452f',sc:900,xp:350,boss:1},
-  b_kal:{n:'Kaldoris the Undying',hp:1300,spd:75,dmg:22,r:22,col:'#5d3a8c',sc:2000,xp:700,boss:1}
+  b_kal:{n:'Kaldoris the Undying',hp:1300,spd:75,dmg:22,r:22,col:'#5d3a8c',sc:2000,xp:700,boss:1},
+  dwskel:{n:'Dwarven Skeleton',hp:62,spd:60,dmg:14,r:13,col:'#8a8a98',sc:24,xp:15},
+  imp:{n:'Ember Imp',hp:22,spd:118,dmg:8,r:9,col:'#ff6a2a',sc:16,xp:10,fly:1},
+  b_ghor:{n:'Ghorrath, the Cinder Fiend',hp:1500,spd:62,dmg:27,r:34,col:'#ff7a2a',sc:2500,xp:800,boss:1}
 };
-const BIOMES = [{n:'Castle Valeron'},{n:'Elderwood'},{n:'Frostpeak'},{n:'Sunken Swamp'}];
+const DWN='Durnholm';   // working name of the dwarven city biome (rename here)
+const BIOMES = [{n:'Castle Valeron'},{n:'Elderwood'},{n:'Frostpeak'},{n:'Sunken Swamp'},{n:DWN}];
 // 4 zones x 3 floors each: floors 1-2 are the zone, floor 3 ends with the zone boss
 const STAGES = [
   {n:'Castle Valeron: The Upper Dungeons',floor:'#2f2c34',floor2:'#34313b',wall:'#514c64',top:'#6e6884',dark:.82,mult:1.5,pool:['rat','rat','batling','spiderling','rat','batling','spiderling','rat']},
@@ -272,10 +276,13 @@ const STAGES = [
   {n:'The Frozen Caverns',floor:'#25324a',floor2:'#2a3750',wall:'#34507a',top:'#7ab8e8',dark:.9,mult:1,pool:['troll','iceskel','frostwolf','iceskel','bat','troll','direwolf']},
   {n:'The Sunken Swamp',floor:'#25322a',floor2:'#2a382e',wall:'#3d4e30',top:'#5a7240',dark:.86,mult:1,pool:['snake','orc','shaman','goblin','snake','shaman']},
   {n:'The Rotting Mire',floor:'#222c20',floor2:'#27322a',wall:'#38472a',top:'#546a3a',dark:.88,mult:1,pool:['snake','orc','shaman','orc','snake','shaman','goblin']},
-  {n:'Grumpy\'s Bog',floor:'#202a1e',floor2:'#252f24',wall:'#33422a',top:'#4e6234',dark:.9,mult:1,pool:['orc','shaman','snake','orc','shaman']}
+  {n:'Grumpy\'s Bog',floor:'#202a1e',floor2:'#252f24',wall:'#33422a',top:'#4e6234',dark:.9,mult:1,pool:['orc','shaman','snake','orc','shaman']},
+  {n:DWN+': The Sunken Gate',floor:'#2a2630',floor2:'#2f2a36',wall:'#403a4c',top:'#665c76',dark:.84,mult:1,pool:['dwskel','imp','dwskel','skeleton','imp','dwskel','bat']},
+  {n:DWN+': The Silent Forges',floor:'#2c2426',floor2:'#322a2c',wall:'#46383a',top:'#6e5a58',dark:.86,mult:1,pool:['dwskel','imp','dwskel','imp','dwskel','skeleton','imp']},
+  {n:DWN+': The Ember Throne',floor:'#2e1f20',floor2:'#352426',wall:'#4a2e2a',top:'#7a4a38',dark:.88,mult:1,pool:['dwskel','imp','imp','dwskel','imp','dwskel']}
 ];
-const BOSS_BY_ZONE=['b_rat','b_mother','b_icypaw','b_grumpy'],BOSS_LAP2=['b_kal','b_mother','b_drake','b_grumpy'];
-function stageOf(d){const z=Math.floor((d-1)/3),bi=z%4,st=(d-1)%3,lap=Math.floor(z/4);return{bi,st,lap,boss:st===2,idx:(d-1)%12,bt:(lap?BOSS_LAP2:BOSS_BY_ZONE)[bi]};}
+const BOSS_BY_ZONE=['b_rat','b_mother','b_icypaw','b_grumpy','b_ghor'],BOSS_LAP2=['b_kal','b_mother','b_drake','b_grumpy','b_ghor'];
+function stageOf(d){const z=Math.floor((d-1)/3),bi=z%5,st=(d-1)%3,lap=Math.floor(z/5);return{bi,st,lap,boss:st===2,idx:(d-1)%15,bt:(lap?BOSS_LAP2:BOSS_BY_ZONE)[bi]};}
 
 const NAMES = ['Bramblefoot','Sir Reginald','Thistle','Grakk','Willowmere','Dunstan','Pip','Ysolde','Borin','Mossback'];
 
@@ -292,8 +299,8 @@ const CHRON = [
 ];
 const CHRON_PAGES = CHRON.map(c=>'<canvas class="paint" data-sc="'+c[1]+'" width="700" height="276"></canvas><span class="ch">'+c[0]+'</span>'+c[2]);
 const INTRO = CHRON_PAGES.slice(5);
-const LSC={1:'cellar',2:'cellar',3:'ratking',4:'elder',5:'elder',6:'webs',7:'frost',8:'frost',9:'icecave',10:'swamp',11:'swamp',12:'grumpy',13:'ruins',14:'elder',15:'spire'},VSC={3:'ratking',6:'webs',9:'icecave',12:'grumpy',15:'freed'};
-function levelScene(d){return LSC[d]||['ruins','elder','frost','swamp'][stageOf(d).bi];}
+const LSC={1:'cellar',2:'cellar',3:'ratking',4:'elder',5:'elder',6:'webs',7:'frost',8:'frost',9:'icecave',10:'swamp',11:'swamp',12:'grumpy',13:'dgate',14:'dforge',15:'ghorrath',16:'ruins',17:'elder',18:'spire'},VSC={3:'ratking',6:'webs',9:'icecave',12:'grumpy',15:'dthrone',18:'freed'};
+function levelScene(d){return LSC[d]||['ruins','elder','frost','swamp','dforge'][stageOf(d).bi];}
 function sceneTag(id,cap,sm){return '<canvas class="paint"'+(sm?' style="width:min(100%,380px)"':'')+' data-sc="'+id+'" width="700" height="276"></canvas>'+(cap?'<span class="ch">'+cap+'</span>':'');}
 const DEPTH_STORY = {
   1:'The castle undercroft is damp, dark, and full of things that were buried for good reasons. Someone has left fresh torches burning. That is not comforting. At least the locals sound small.',
@@ -308,16 +315,20 @@ const DEPTH_STORY = {
   10:'Down from the peaks, the swamp swallows roads whole. Lanterns bob in the fog, but nobody is holding them. The orcs of the mire have dug in, and they have brought their shamans.',
   11:'The Rotting Mire bubbles. Marsh vipers slip through the reeds, and war drums beat out a rhythm that is somehow both threatening and deeply annoyed.',
   12:'Grumpy\'s Bog. Everyone in the swamp knows that name. Everyone in the swamp also knows not to say it twice. You are about to meet the reason.',
-  13:'Deeper still, the stonework changes. These halls were built long before Valeron. The rats here are bigger, and someone has been carving a name over and over in the walls.',
-  14:'The Elderwood has not forgotten you. The curse has had time to think of better tricks.',
-  15:'A black spire rises from the roots of the world. You can feel the Lich King\'s cold attention settle on you like a hand on the shoulder. Kaldoris waits at the heart of it, a crowned corpse every song swore was dead, standing quite comfortably in the one place Queen Emily could be.'
+  13:'Beyond the swamp the mountain opens like a mouth. A road of cut stone leads down to a vast sealed gate, and the dwarves who carved it are still here, though not in any way they would have chosen. Their helmets rattle. Their grudges, somehow, have survived.',
+  14:'The Silent Forges. Anvils the size of wagons sit cold in the dark, and the air tastes of old smoke. Something small and red keeps giggling just out of sight, and the lava below keeps answering.',
+  15:'The Ember Throne. Whatever the dwarves dug toward, they found it, or it found them. A crowned shape of cooled stone and living fire waits on the dwarf-kings\' seat, and the floor is beginning to glow.',
+  16:'Deeper still, the stonework changes. These halls were built long before Valeron. The rats here are bigger, and someone has been carving a name over and over in the walls.',
+  17:'The Elderwood has not forgotten you. The curse has had time to think of better tricks.',
+  18:'A black spire rises from the roots of the world. You can feel the Lich King\'s cold attention settle on you like a hand on the shoulder. Kaldoris waits at the heart of it, a crowned corpse every song swore was dead, standing quite comfortably in the one place Queen Emily could be.'
 };
 const VICTORY = {
   3:'The Rat King squeals, drops his rusty scepter, and vanishes into a drain with surprising dignity. His crown stays behind, along with a torn blue ribbon: royal silk. Queen Emily was here. The way down is open, and it smells a little better.',
   6:'Nyxara folds into herself, a mountain of legs settling into the dust. Her thousand children scatter into the dark. Wrapped in her silk is a small glass key and a scrap of parchment: "Follow the cold. -E."',
   9:'Icypaw shatters into a glittering drift, and for a moment the whole cavern sounds like bells. Behind his throne of ice, a message is scratched into the wall in a neat, royal hand: "Still alive. Hurry. -E." Queen Emily is close.',
   12:'Grumpy drops his axe, sits down heavily in the mud, and sighs the sigh of an orc who has been grumpy for four hundred years. "Fine," he grumbles. "Go on, then." Behind his chair, a door you swear was not there before swings slowly open.',
-  15:'The Lich King Kaldoris unravels into a long, tired sigh, his black crown clattering to the floor, as if he has been dying for centuries and is finally allowed to finish. In the dust lies a key, and a cell door at the far end of the hall that you swear was not there a moment ago. Queen Emily is waiting behind it, tapping her foot. "The Grand Cross sent you? Of course he did. You took your time." The queen is free, and Valeron will sing of it. But the Knights of Valor know better than to believe in "for good." Somebody brought Kaldoris back, and the deeper halls keep growing.'
+  15:'Ghorrath roars once, a sound like a furnace door slamming on the end of the world, and folds into a heap of cooling stone. The lava in the great hall sinks away, and for the first time in an age the dwarf-city is quiet. Somewhere above, very faintly, something that sounds like a hundred small hammers begins to tap in gratitude.',
+  18:'The Lich King Kaldoris unravels into a long, tired sigh, his black crown clattering to the floor, as if he has been dying for centuries and is finally allowed to finish. In the dust lies a key, and a cell door at the far end of the hall that you swear was not there a moment ago. Queen Emily is waiting behind it, tapping her foot. "The Grand Cross sent you? Of course he did. You took your time." The queen is free, and Valeron will sing of it. But the Knights of Valor know better than to believe in "for good." Somebody brought Kaldoris back, and the deeper halls keep growing.'
 };
 const LORE = [
   'A child\'s drawing, pinned inside a helm: a smiling knight beside a queen with a very large crown.',
@@ -388,7 +399,7 @@ function addXp(p,n){const ch=p.ch;if(ch.racial==='xp'&&n>0&&(!p.studyT||G.t-p.st
   while(ch.xp>=xpNeed(ch.lvl)){ch.xp-=xpNeed(ch.lvl);ch.lvl++;recalc(p);p.hp=p.maxhp;ring(p.x,p.y,70,'#ffd34a');toast(ch.name+' reached level '+ch.lvl+'!','#ffd34a');sfx('levelup');}}
 
 // ----- map -----
-function mapSize(d,bi){const lap=Math.floor((d-1)/12),B=[[84,58],[104,72],[100,70],[112,76]][bi]||[84,58],k=1+.08*lap;let w=Math.round(B[0]*k),h=Math.round(B[1]*k);if(d===1){w=76;h=52;}MW=Math.min(128,w);MH=Math.min(90,h);}
+function mapSize(d,bi){const lap=Math.floor((d-1)/15),B=[[84,58],[104,72],[100,70],[112,76],[104,72]][bi]||[84,58],k=1+.08*lap;let w=Math.round(B[0]*k),h=Math.round(B[1]*k);if(d===1){w=76;h=52;}MW=Math.min(128,w);MH=Math.min(90,h);}
 function genMap(depth,biome,seed,stg){
   if(seed!==undefined)RNG=mulberry(seed);
   mapSize(depth,biome);
@@ -404,9 +415,9 @@ function genMap(depth,biome,seed,stg){
   rooms.forEach(r=>{if(!r.boss&&r.w>=8&&r.h>=8&&RNG()<.32){r.round=1;for(let dy=0;dy<3;dy++)for(let dx=0;dx<3-dy;dx++){set(r.x+dx,r.y+dy,1);set(r.x+r.w-1-dx,r.y+dy,1);set(r.x+dx,r.y+r.h-1-dy,1);set(r.x+r.w-1-dx,r.y+r.h-1-dy,1);}}});
   // cross-shaped halls, organic bumps (wild zones) and recessed alcoves (castle)
   rooms.forEach(r=>{if(r.boss||r.round)return;
-    if(r.w>=11&&r.h>=9&&RNG()<(biome===0?.2:biome===2?.16:.1)){r.cross=1;const cw=Math.floor(r.w*.28),ch=Math.floor(r.h*.28);
+    if(r.w>=11&&r.h>=9&&RNG()<(biome===0||biome===4?.2:biome===2?.16:.1)){r.cross=1;const cw=Math.floor(r.w*.28),ch=Math.floor(r.h*.28);
       for(const [ax,ay] of [[r.x,r.y],[r.x+r.w-cw,r.y],[r.x,r.y+r.h-ch],[r.x+r.w-cw,r.y+r.h-ch]])for(let yy=ay;yy<ay+ch;yy++)for(let xx=ax;xx<ax+cw;xx++)set(xx,yy,1);}
-    else if(biome!==0){const nb=Math.round((r.w+r.h)*.5);for(let k=0;k<nb;k++){const side=RNG()*4|0,t=RNG();let bx,by;
+    else if(biome!==0&&biome!==4){const nb=Math.round((r.w+r.h)*.5);for(let k=0;k<nb;k++){const side=RNG()*4|0,t=RNG();let bx,by;
         if(side===0){bx=r.x+1+Math.floor(t*(r.w-2));by=r.y-1;}else if(side===1){bx=r.x+1+Math.floor(t*(r.w-2));by=r.y+r.h;}else if(side===2){bx=r.x-1;by=r.y+1+Math.floor(t*(r.h-2));}else{bx=r.x+r.w;by=r.y+1+Math.floor(t*(r.h-2));}
         if(get(bx,by)===1){set(bx,by,0);if(RNG()<.45){const dx=side===2?-1:side===3?1:0,dy=side===0?-1:side===1?1:0;if(get(bx+dx,by+dy)===1&&get(bx+dx*2,by+dy*2)===1)set(bx+dx,by+dy,0);}}}}
     else if(RNG()<.55){for(let a=0;a<(RNG()<.5?1:2);a++){const ax=r.x+2+Math.floor(RNG()*(r.w-6)),ay=r.y-3;let ok=ay>=3&&ax>=3&&ax+4<MW-3;for(let yy=ay-1;yy<r.y&&ok;yy++)for(let xx=ax-1;xx<=ax+3;xx++)if(get(xx,yy)!==1){ok=false;break;}
@@ -420,7 +431,7 @@ function genMap(depth,biome,seed,stg){
   const carve=(x1,y1,x2,y2)=>{if(wind){carveW(x1,y1,x2,y2);return;}let x=x1,y=y1;while(x!==x2){set(x,y,0);set(x,y+1,0);x+=Math.sign(x2-x);}while(y!==y2){set(x,y,0);set(x+1,y,0);y+=Math.sign(y2-y);}set(x,y,0);set(x+1,y,0);set(x,y+1,0);};
   for(let i=1;i<rooms.length;i++)carve(rooms[i-1].cx,rooms[i-1].cy,rooms[i].cx,rooms[i].cy);
   for(let i=0;i<Math.round(area/1100);i++){const a=pick(rooms),b=pick(rooms);if(a!==b)carve(a.cx,a.cy,b.cx,b.cy);}
-  const wetP=biome===3?.8:biome===1?.5:biome===2?.04:(biome===0&&stg===2)?.65:.2;
+  const wetP=biome===4?.5:biome===3?.8:biome===1?.5:biome===2?.04:(biome===0&&stg===2)?.65:.2;
   rooms.forEach((r,i)=>{if(i>0&&i<rooms.length-1&&!r.boss&&r.w>=8&&r.h>=7&&RNG()<wetP){
     if(biome===1||biome===3){const qx=RNG()<.5?-1:1,qy=RNG()<.5?-1:1,rx=Math.min(biome===3?3.6:2.6,(r.w-6)/2+1),ry=Math.min(biome===3?3:2.2,(r.h-5)/2+1),px=r.cx+qx*Math.max(2,Math.round(r.w*.22)),py=r.cy+qy*Math.max(2,Math.round(r.h*.22));
       for(let yy=Math.floor(py-ry-1);yy<=Math.ceil(py+ry+1);yy++)for(let xx=Math.floor(px-rx-1);xx<=Math.ceil(px+rx+1);xx++){if(xx<r.x+2||xx>r.x+r.w-3||yy<r.y+2||yy>r.y+r.h-3)continue;if(Math.abs(xx-r.cx)<=1||Math.abs(yy-r.cy)<=1)continue;
@@ -429,7 +440,7 @@ function genMap(depth,biome,seed,stg){
   // rivers with plank bridges
   const bridge=new Uint8Array(MW*MH);
   rooms.forEach((r,i)=>{if(i===0||i===rooms.length-1||r.boss||r.round||r.cross)return;
-    if(RNG()>(biome===1||biome===3?.42:biome===0?.12:0))return;
+    if(RNG()>(biome===1||biome===3?.42:biome===4?.4:biome===0?.12:0))return;
     const vert=r.w>=12,hor=!vert&&r.h>=12;if(!vert&&!hor)return;
     const off=RNG()<.5?2:-3;
     if(vert){const bx=r.cx+off;for(let yy=r.y;yy<r.y+r.h;yy++)for(let xx=bx;xx<=bx+1;xx++){if(get(xx,yy)!==0)continue;const br=yy>=r.cy-1&&yy<=r.cy+2;if(br){set(xx,yy,0);bridge[yy*MW+xx]=1;}else set(xx,yy,3);}}
@@ -453,7 +464,7 @@ function genMap(depth,biome,seed,stg){
   const seen=new Uint8Array(MW*MH),q=[start.y*MW+start.x];seen[q[0]]=1;
   while(q.length){const c=q.pop(),cx=c%MW,cy=(c/MW)|0;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=MW||ny>=MH)continue;const ni=ny*MW+nx;if(!seen[ni]&&g[ni]===0){seen[ni]=1;q.push(ni);}}}
   const ok=rooms.every(r=>seen[r.cy*MW+r.cx]);
-  if(ok){const placed=[];rooms.forEach((r,i)=>{if(i>0&&i<rooms.length-1&&!r.boss&&!r.round&&!r.river&&r.w>=10&&r.h>=8&&RNG()<.4){r.pillars=1;const col2=biome===0&&r.w>=12&&r.h>=9&&RNG()<.5;if(col2){r.colonnade=1;for(const [qx,qy] of [[-4,-3],[3,-3],[-4,2],[3,2]]){for(let a=0;a<2;a++)for(let b=0;b<2;b++){const xx=r.cx+qx+a,yy=r.cy+qy+b;if(g[yy*MW+xx]===0&&Math.abs(xx-r.cx)>1&&Math.abs(yy-r.cy)>1){g[yy*MW+xx]=1;placed.push(yy*MW+xx);}}}}else for(let yy=r.y+2;yy<r.y+r.h-2;yy+=3)for(let xx=r.x+2;xx<r.x+r.w-2;xx+=3){if(Math.abs(xx-r.cx)<=1||Math.abs(yy-r.cy)<=1)continue;if(g[yy*MW+xx]===0){g[yy*MW+xx]=1;placed.push(yy*MW+xx);}}}});
+  if(ok){const placed=[];rooms.forEach((r,i)=>{if(i>0&&i<rooms.length-1&&!r.boss&&!r.round&&!r.river&&r.w>=10&&r.h>=8&&RNG()<.4){r.pillars=1;const col2=(biome===0||biome===4)&&r.w>=12&&r.h>=9&&RNG()<.5;if(col2){r.colonnade=1;for(const [qx,qy] of [[-4,-3],[3,-3],[-4,2],[3,2]]){for(let a=0;a<2;a++)for(let b=0;b<2;b++){const xx=r.cx+qx+a,yy=r.cy+qy+b;if(g[yy*MW+xx]===0&&Math.abs(xx-r.cx)>1&&Math.abs(yy-r.cy)>1){g[yy*MW+xx]=1;placed.push(yy*MW+xx);}}}}else for(let yy=r.y+2;yy<r.y+r.h-2;yy+=3)for(let xx=r.x+2;xx<r.x+r.w-2;xx+=3){if(Math.abs(xx-r.cx)<=1||Math.abs(yy-r.cy)<=1)continue;if(g[yy*MW+xx]===0){g[yy*MW+xx]=1;placed.push(yy*MW+xx);}}}});
     if(placed.length){const sn=new Uint8Array(MW*MH),qq=[start.y*MW+start.x];sn[qq[0]]=1;while(qq.length){const c=qq.pop(),x0=c%MW,y0=(c/MW)|0;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x0+dx,ny=y0+dy;if(nx<0||ny<0||nx>=MW||ny>=MH)continue;const ni=ny*MW+nx;if(!sn[ni]&&g[ni]===0){sn[ni]=1;qq.push(ni);}}}
       if(!rooms.every(r=>sn[r.cy*MW+r.cx])||(secret&&!sn[Math.floor(secret.y/T)*MW+Math.floor(secret.x/T)]&&false)){placed.forEach(i=>g[i]=0);rooms.forEach(r=>r.pillars=0);}}}
   if(!ok){for(let i=0;i<g.length;i++)if(g[i]===3)g[i]=0;bridge.fill(0);rooms.forEach(r=>{r.river=0;});}
@@ -628,6 +639,18 @@ function updEnemy(e,dt){if(e.dead)return;e.t+=dt;e.flash-=dt;e.atk-=dt;if(e.atkT
     e.cdB-=dt;if(e.cdB<=0&&d<170){e.cdB=6.5;e.spin=1;e.spinTick=0;}
     if(e.spin>0){e.spin-=dt;e.spinTick-=dt;sp*=.4;if(e.spinTick<=0){e.spinTick=.3;e.atkT=.4;spFx('whirl',e.x,e.y,'#ff7a5a',104);hurtRing(e,104,e.dmg*.55,0);G.shake=Math.max(G.shake||0,4);}}
     if(!e.sumd&&e.hp<e.maxhp*.5){e.sumd=1;e.atkT=.6;toast('Grumpy bellows for his shamans!','#ff9a6a',3);summon(e,'shaman',2,4);}}
+  else if(ty==='dwskel'){e.cdA-=dt;if(e.cdA<=0&&d>80&&d<240){e.dash=.45;e.cdA=5.5;ring(e.x,e.y,e.r+8,'#9a9aa8');}if(e.dash>0){e.dash-=dt;sp*=2.8;}}
+  else if(ty==='imp'){const w=Math.sin(e.t*6);if(d<120){dx=-ux-uy*w*.5;dy=-uy+ux*w*.5;}else if(d<220){dx=-uy*w;dy=ux*w;}else{dx=ux-uy*w*.7;dy=uy+ux*w*.7;}
+    if(e.atk<=0&&d<300){e.atk=2.6;e.atkT=.35;sfx('bolt');G.proj.push({x:e.x,y:e.y,vx:ux*210,vy:uy*210,r:6,from:'e',dmg:e.dmg,life:1.5,col:'#ff7a2a',k:'fire',hit:[]});}}
+  else if(ty==='b_ghor'){const en=e.hp<e.maxhp*.5;if(d<120){dx=-ux*.45;dy=-uy*.45;}else if(d<230){dx=0;dy=0;}
+    e.cdA-=dt;if(e.cdA<=0&&d<310&&!(e.whipT>0)){e.cdA=en?2.6:3.4;e.whipT=.55;e.whipA=Math.atan2(uy,ux);e.atkT=.55;sfx('bolt');
+      for(let k=1;k<=8;k++)G.fx.push({k:'p',x:e.x+Math.cos(e.whipA)*31*k,y:e.y+Math.sin(e.whipA)*31*k,vx:0,vy:-20,t:.55,max:.55,col:'#ff9a2a',r:3});}
+    if(e.whipT>0){e.whipT-=dt;if(e.whipT<=0){const a=e.whipA,len=250;spFx('whip',e.x,e.y-10,'#ff7a2a',Math.round((a+Math.PI)*100));sfx('boom');G.shake=Math.max(G.shake||0,6);
+      for(const q of G.players){if(q.down)continue;const rx=q.x-e.x,ry=q.y-e.y,al=rx*Math.cos(a)+ry*Math.sin(a),pp=Math.abs(-rx*Math.sin(a)+ry*Math.cos(a));if(al>20&&al<len&&pp<(q.r||10)+16){hurt(q,e.dmg*1.15,e,false);q.slow=Math.max(q.slow||0,.8);}}
+      for(let k=1;k<=3;k++){const px=e.x+Math.cos(a)*len*k/3,py=e.y+Math.sin(a)*len*k/3;if(!blocked(px,py,6)){G.haz.push({x:px,y:py,r:34,t:3.2,tick:.3});spFx('lavapool',px,py,'#ff7a1a',34);}}}}
+    e.cdB-=dt;if(e.cdB<=0){e.cdB=en?4.8:6.8;e.atkT=.6;sfx('boom');(e.erupt=e.erupt||[]);const ps=G.players.filter(q=>!q.down);for(const q of ps)for(let k=0;k<(en?2:1);k++){const a2=Math.random()*6.28,r2=k?rnd(40,110):rnd(0,30),ex=q.x+Math.cos(a2)*r2,ey=q.y+Math.sin(a2)*r2;if(blocked(ex,ey,6))continue;e.erupt.push({x:ex,y:ey,t:.9});ring(ex,ey,40,'#ff5a1a');}}
+    if(e.erupt&&e.erupt.length){for(const q of e.erupt)q.t-=dt;const rdy=e.erupt.filter(q=>q.t<=0);if(rdy.length){e.erupt=e.erupt.filter(q=>q.t>0);for(const q of rdy){spFx('lavapool',q.x,q.y,'#ff7a1a',46);spFx('blast',q.x,q.y,'#ff8a2a',46);G.haz.push({x:q.x,y:q.y,r:38,t:3,tick:.3});for(const p of G.players){if(!p.down&&Math.hypot(p.x-q.x,p.y-q.y)<46+(p.r||10))hurt(p,e.dmg*.9,e,false);}}G.shake=Math.max(G.shake||0,5);}}
+    if(en&&!(e.impT>0)){e.impT=14;e.atkT=.6;toast('Ghorrath calls his ember imps!','#ff9a4a',3);summon(e,'imp',3,8);}if(e.impT>0)e.impT-=dt;}
   else if(ty==='bat'){const w=Math.sin(e.t*6);dx=ux-uy*w*.8;dy=uy+ux*w*.8;}
   else if(ty==='b_ogre'){e.cdA-=dt;if(e.cdA<=0&&d>90){e.dash=.7;e.cdA=4.5;ring(e.x,e.y,e.r+10,'#ff5a3a');}if(e.dash>0){e.dash-=dt;sp*=3.2;}}
   else if(ty==='b_drake'){if(d<170){dx=-ux*.6;dy=-uy*.6;}else if(d<300){dx=0;dy=0;}
@@ -753,6 +776,8 @@ const THEMES={
     prog:[0,5,2,6,0,3,5,4],mel:['4:4 7:4 9:4 8:2 7:2','7:4 6:4 4:4 5:4','6:4 7:4 9:4 11:4','10:4 9:4 7:4 6:4','7:8 9:4 11:4','12:6 11:2 10:4 9:4','9:4 7:4 9:4 12:4','11:6 10:2 8:4 4:4']},
   b3:{name:'swamp',mr:48,scale:[0,1,4,5,7,8,10],bpm:100,lead:'reed',drum:'sway',arp:'marimba',mix:1,
     prog:[0,1,0,6,3,1,0,4],mel:['r:2 7:3 8:3 7:2 4:3 r:3','r:2 8:3 9:3 8:2 5:3 r:3','7:3 8:3 9:2 10:3 9:3 r:2','11:3 10:3 9:2 8:3 7:5','r:2 10:3 11:3 12:2 11:3 10:3','9:3 8:3 7:2 8:3 9:5','7:4 9:4 11:4 9:4','10:3 9:3 8:2 7:3 4:5']},
+  b4:{name:'dwarfhall',mr:50,scale:[0,1,3,5,7,8,10],bpm:94,lead:'brass',drum:'taiko',arp:'harp',mix:1,
+    prog:[0,0,5,4,0,6,5,4],mel:['4:6 5:2 7:4 5:4','8:6 7:2 5:4 4:4','5:4 7:4 8:4 10:4','8:8 7:4 r:4','7:4 8:4 10:4 8:4','12:6 10:2 8:4 7:4','8:4 7:4 5:4 4:4','5:8 4:4 r:4']},
   boss:{name:'boss',mr:48,scale:[0,2,3,5,7,8,11],bpm:140,lead:'brass',drum:'war',arp:'ost',mix:1.1,
     prog:[0,0,5,4,0,3,5,4],mel:['7:3 7:1 9:2 7:2 10:4 9:2 7:2','11:3 10:1 9:2 8:2 7:8','12:3 11:1 9:2 7:2 9:4 11:2 9:2','13:4 11:4 8:4 10:4','7:3 7:1 9:2 7:2 10:4 9:2 7:2','12:3 10:1 12:2 14:2 12:4 10:4','14:4 12:4 11:4 9:4','13:2 14:2 13:2 11:2 13:4 r:4']},
   over:{name:'over',mr:57,scale:[0,2,3,5,7,8,10],bpm:52,lead:'flute',drum:'none',arp:'none',mix:.8,
@@ -970,7 +995,7 @@ function hudBoss(){const b=G.boss;if(!b||b.dead||!b.aggro)return;const w=340,x=V
   cx.lineWidth=2.5;cx.strokeStyle='#120d0a';hrr(x,y+18,w,13,6.5);cx.stroke();cx.lineWidth=1.3;cx.strokeStyle='#b98a2e';hrr(x,y+18,w,13,6.5);cx.stroke();cx.restore();cx.textAlign='left';}
 // ---------- ART 1: helpers, title scene, tiles, ambience, portraits ----------
 function fogSurge(){if(!G||G.bi!==1)return 0;const ph=((G.t||0)%36)/36;return ph>.72&&ph<.9?Math.sin((ph-.72)/.18*Math.PI):0}
-const OL='#14100f',TINTS=['9,6,16','4,11,7','9,9,14','4,11,9'];let ADT=.016;
+const OL='#14100f',TINTS=['9,6,16','4,11,7','9,9,14','4,11,9','16,6,4'];let ADT=.016;
 function shade(hex,k){const n=parseInt(hex.slice(1),16);let r=n>>16,g=(n>>8)&255,b=n&255;const f=k<0?0:255,a=Math.abs(k);return 'rgb('+Math.round(r+(f-r)*a)+','+Math.round(g+(f-g)*a)+','+Math.round(b+(f-b)*a)+')';}
 function ell(x,y,rx,ry,col){cx.fillStyle=col;cx.strokeStyle=OL;cx.lineWidth=1.5;cx.beginPath();cx.ellipse(x,y,rx,ry,0,0,7);cx.fill();cx.stroke();}
 function rct(x,y,w,h,col,r){cx.fillStyle=col;cx.strokeStyle=OL;cx.lineWidth=1.5;cx.beginPath();cx.roundRect(x,y,w,h,r===undefined?2:r);cx.fill();cx.stroke();}
@@ -1049,12 +1074,13 @@ function drawTile(tx,ty,lights){const b=G.biome,v=tile(tx,ty),x=tx*T,y=ty*T,h=ha
 // ambient particles: dust (castle), fireflies (forest), snow (mountain), wisps (swamp)
 function drawAmb(ox,oy,lights){if(!G.amb){G.amb=Array.from({length:60},()=>({x:Math.random()*(VW+80),y:Math.random()*(VH+80),ph:Math.random()*6,s:rnd(.4,1)}));}
   const bi=G.bi;for(const a of G.amb){a.ph+=ADT;let sx,sy;
-    if(bi===2&&G.stg!==2){a.x+=(-18+Math.sin(a.ph)*10)*ADT*a.s*3;a.y+=40*ADT*a.s;}else{a.x+=Math.sin(a.ph*.7+a.s*5)*14*ADT;a.y+=Math.cos(a.ph*.6+a.s*3)*10*ADT-(bi===0?4:0)*ADT;}
+    if(bi===2&&G.stg!==2){a.x+=(-18+Math.sin(a.ph)*10)*ADT*a.s*3;a.y+=40*ADT*a.s;}else if(bi===4){a.x+=Math.sin(a.ph*.8+a.s*4)*12*ADT;a.y-=(16+a.s*14)*ADT;}else{a.x+=Math.sin(a.ph*.7+a.s*5)*14*ADT;a.y+=Math.cos(a.ph*.6+a.s*3)*10*ADT-(bi===0?4:0)*ADT;}
     if(a.x<-40)a.x+=VW+80;if(a.x>VW+40)a.x-=VW+80;if(a.y<-40)a.y+=VH+80;if(a.y>VH+40)a.y-=VH+80;
     sx=a.x+Math.round(ox)-40;sy=a.y+Math.round(oy)-40;
     if(bi===0){cx.globalAlpha=.28*a.s;cx.fillStyle='#e8dcc0';cx.fillRect(sx,sy,2,2);}
     else if(bi===2&&G.stg!==2){cx.globalAlpha=.7;cx.fillStyle='#f4f8ff';cx.fillRect(sx,sy,2*a.s+1,2*a.s+1);}
     else if(bi===2){const p=.5+.5*Math.sin(a.ph*4);cx.globalAlpha=.25+.75*p;cx.fillStyle='#bfe8ff';cx.fillRect(sx,sy,2,2);if(p>.8){cx.fillRect(sx-2,sy,6,1);cx.fillRect(sx,sy-2,1,6)}}
+    else if(bi===4){const p=.5+.5*Math.sin(a.ph*4);cx.globalAlpha=.35+.65*p;cx.fillStyle=p>.6?'#ffd070':'#ff7a2a';cx.fillRect(sx,sy,2,2);if(p>.8)lights.push({x:sx,y:sy,r:18});}
     else{const p=.5+.5*Math.sin(a.ph*3);cx.globalAlpha=.3+.7*p;cx.fillStyle=bi===1?'#d8ff7a':'#7affb8';cx.beginPath();cx.arc(sx,sy,2,0,7);cx.fill();if(p>.5)lights.push({x:sx,y:sy,r:26+p*10});}
     cx.globalAlpha=1;}}
 
@@ -1285,6 +1311,16 @@ function floorTile(bi,x,y,h,tx,ty,b){
     if(h%6===0){cx.strokeStyle='#9ad8ff';cx.globalAlpha=.35;cx.lineWidth=2;cx.beginPath();cx.moveTo(x+4,y+24);cx.lineTo(x+26,y+8);cx.stroke();cx.globalAlpha=1;}
     if(h%11===0){cx.fillStyle='#4d4743';cx.beginPath();cx.ellipse(x+16,y+18,8,5,0,0,7);cx.fill();cx.fillStyle='#7b746c';cx.beginPath();cx.ellipse(x+15,y+16,7,3,0,0,7);cx.fill();}
     cx.fillStyle='#fff';cx.globalAlpha=.7;for(let i=0;i<2;i++)if(tr(h,40+i)>.6)cx.fillRect(x+tr(h,50+i)*28,y+tr(h,60+i)*28,1.5,1.5);cx.globalAlpha=1;}
+  else if(bi===4){ // dwarven flagstones with rune inlay and ember cracks
+    speck(x,y,h,14,'#fff',.04,2);speck(x,y,h+5,14,'#000',.14,2);
+    cx.fillStyle='#000';cx.globalAlpha=.5;cx.fillRect(x,y,T,1.5);cx.fillRect(x,y,1.5,T);cx.globalAlpha=.2;cx.fillRect(x,y+T-2,T,2);cx.fillRect(x+T-2,y,2,T);
+    cx.fillStyle='#fff';cx.globalAlpha=.08;cx.fillRect(x+2,y+2,T-4,1);cx.fillRect(x+2,y+2,1,T-4);cx.globalAlpha=.3;cx.strokeStyle='#000';cx.lineWidth=1;cx.strokeRect(x+5.5,y+5.5,T-11,T-11);cx.globalAlpha=1;
+    if(h%6===0){cx.strokeStyle='#ff7a1a';cx.lineWidth=1.4;cx.globalAlpha=.8;cx.beginPath();cx.moveTo(x+4+h%7,y+2);cx.lineTo(x+12,y+11+h%5);cx.lineTo(x+9,y+19);cx.lineTo(x+18,y+30);cx.stroke();cx.strokeStyle='#ffd070';cx.lineWidth=.6;cx.stroke();cx.globalAlpha=1;}
+    if(h%31===0){cx.strokeStyle='#d9a93a';cx.globalAlpha=.55;cx.lineWidth=1.2;cx.beginPath();cx.arc(x+16,y+16,9,0,7);cx.moveTo(x+16,y+7);cx.lineTo(x+16,y+25);cx.moveTo(x+10,y+13);cx.lineTo(x+22,y+19);cx.stroke();cx.globalAlpha=1;}
+    if(h%41===0){cx.fillStyle='#d8d0c0';cx.fillRect(x+8,y+16,12,2.5);cx.beginPath();cx.arc(x+22,y+19,3,0,7);cx.fill();}
+    if(h%23===0){cx.fillStyle='#2a2430';cx.fillRect(x+10,y+12,12,3);cx.fillRect(x+13,y+15,6,8);cx.fillStyle='#8a8a98';cx.fillRect(x+9,y+10,14,2.5);}
+    if(h%19===0){blob(x+16,y+16,14,'#ff6a1a',.18);}
+    if(h%9===0){cx.fillStyle='#000';cx.globalAlpha=.25;cx.beginPath();cx.ellipse(x+16,y+18,10,6,0,0,7);cx.fill();cx.globalAlpha=1;}}
   else{ // swamp mud
     blob(x+16,y+16,22,'#0e1a10',.4);speck(x,y,h,14,'#000',.14,2);speck(x,y,h+3,10,'#6a8a4a',.08,2);
     if(h%5===0){cx.fillStyle='#0f1c13';cx.beginPath();cx.ellipse(x+16,y+18,11,6,0,0,7);cx.fill();cx.fillStyle='#9ad8c8';cx.globalAlpha=.25;cx.fillRect(x+10,y+16,7,1.2);cx.globalAlpha=1;}
@@ -1320,6 +1356,15 @@ function wallTile(bi,x,y,h,tx,ty,b,v){
       cx.fillStyle='#fff';cx.globalAlpha=.12;cx.beginPath();cx.moveTo(x,y+T);cx.lineTo(x+8,y+4);cx.lineTo(x+20,y+10);cx.lineTo(x+T,y+2);cx.lineTo(x+T,y+T);cx.fill();cx.globalAlpha=1;
       if(h%3===0){cx.fillStyle='#eef6ff';cx.beginPath();cx.moveTo(x,y);cx.lineTo(x+T,y);cx.lineTo(x+T,y+5);for(let i=6;i>=0;i--)cx.lineTo(x+i*5.4,y+5+tr(h,i)*5);cx.fill();}
       if(h%5===0){cx.fillStyle='#cfeaff';for(let i=0;i<2;i++){const ix=x+6+i*14;cx.beginPath();cx.moveTo(ix,y+9);cx.lineTo(ix+3,y+9);cx.lineTo(ix+1.5,y+17+i*3);cx.fill();}}}
+    else if(bi===4){ // dwarven masonry
+      cx.fillStyle=shade(b.wall,-.15);cx.fillRect(x,y,T,T);
+      for(let r=0;r<2;r++){const yy=y+r*16,off=r?0:11;for(let k=-1;k<3;k++){const bx=x+off+k*22,w=21;if(bx+w<x||bx>x+T)continue;const x0=Math.max(bx,x),x1=Math.min(bx+w,x+T),sh=(tr(h,r*5+k+30)-.5)*.2;
+          cx.fillStyle=shade(b.wall,sh);cx.fillRect(x0,yy+1,x1-x0,14);cx.fillStyle='#fff';cx.globalAlpha=.13;cx.fillRect(x0,yy+1,x1-x0,1.5);cx.fillRect(x0,yy+1,1.5,14);cx.globalAlpha=.4;cx.fillStyle='#000';cx.fillRect(x0,yy+14,x1-x0,1.5);cx.fillRect(x1-1.5,yy+1,1.5,14);cx.globalAlpha=1;}}
+      cx.fillStyle='#000';cx.globalAlpha=.5;cx.fillRect(x,y+15,T,1.5);cx.fillRect(x,y+T-1.5,T,1.5);cx.globalAlpha=1;
+      if(h%5===0){cx.strokeStyle='#ff9a3a';cx.globalAlpha=.75;cx.lineWidth=1.5;cx.lineCap='round';cx.beginPath();cx.moveTo(x+16,y+4);cx.lineTo(x+16,y+12);cx.moveTo(x+12,y+7);cx.lineTo(x+16,y+4);cx.lineTo(x+20,y+7);cx.moveTo(x+12,y+10);cx.lineTo(x+20,y+10);cx.stroke();cx.lineCap='butt';cx.globalAlpha=1;}
+      if(h%7===0){cx.strokeStyle='#d9a93a';cx.globalAlpha=.6;cx.lineWidth=1.2;cx.beginPath();cx.moveTo(x+2,y+24);cx.lineTo(x+T-2,y+24);cx.stroke();cx.globalAlpha=1;}
+      if(h%11===0){cx.strokeStyle='#000';cx.globalAlpha=.5;cx.beginPath();cx.moveTo(x+12,y+2);cx.lineTo(x+16,y+11);cx.lineTo(x+11,y+19);cx.stroke();cx.globalAlpha=1;}
+      if(h%17===0){blob(x+16,y+20,8,'#ff6a1a',.25);}}
     else{ // swamp roots
       cx.fillStyle='#202c18';cx.fillRect(x,y,T,T);
       cx.fillStyle='#2f4224';cx.beginPath();cx.arc(x+8,y+10,9,0,7);cx.arc(x+22,y+14,10,0,7);cx.fill();cx.fillStyle='#3d5530';cx.beginPath();cx.arc(x+10,y+8,5,0,7);cx.arc(x+22,y+11,5.5,0,7);cx.fill();
@@ -1333,7 +1378,7 @@ function wallTile(bi,x,y,h,tx,ty,b,v){
   if(h%13===0&&openB){cx.fillStyle='#2a1c10';cx.fillRect(x+14,y+T-14,4,10);cx.fillStyle='#5a4a3a';cx.fillRect(x+12,y+T-16,8,3);}}
 function renderTile(tx,ty){if(tx<0||ty<0||tx>=MW||ty>=MH)return;const b=G.biome,v=tile(tx,ty),x=tx*T,y=ty*T,h=hash(tx,ty),bi=G.bi,c=G.tcx;
   const old=cx;cx=c;c.clearRect(x,y,T,T);c.save();c.beginPath();c.rect(x,y,T,T);c.clip();
-  if(v===1||v===2)wallTile(bi,x,y,h,tx,ty,b,v);else{floorTile(bi,x,y,h,tx,ty,b);if(v===3){c.fillStyle='#0b1e2c';c.fillRect(x,y,T,T);}}
+  if(v===1||v===2)wallTile(bi,x,y,h,tx,ty,b,v);else{floorTile(bi,x,y,h,tx,ty,b);if(v===3){c.fillStyle=bi===4?'#5a1204':'#0b1e2c';c.fillRect(x,y,T,T);}}
   if(typeof tileFinish==='function')tileFinish(tx,ty,v,x,y,b,bi);
   c.restore();cx=old;}
 function buildTiles(){const c=document.createElement('canvas');c.width=MW*T;c.height=MH*T;G.tc=c;G.tcx=c.getContext('2d');
@@ -1343,7 +1388,11 @@ function drawTiles(x0,x1,y0,y1,lights){
   if(!G.tc)buildTiles();else if(G.tcN!==(G.opened||[]).length)refreshTiles();
   cx.drawImage(G.tc,x0*T,y0*T,(x1-x0+1)*T,(y1-y0+1)*T,x0*T,y0*T,(x1-x0+1)*T,(y1-y0+1)*T);
   for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=tile(tx,ty);if(v===0)continue;const x=tx*T,y=ty*T,h=hash(tx,ty);
-    if(v===3){const w=cx.createLinearGradient(x,y,x,y+T);w.addColorStop(0,G.bi===3?'#25503a':'#1f5a80');w.addColorStop(1,G.bi===3?'#173a2a':'#15405e');cx.fillStyle=w;cx.fillRect(x,y,T,T);
+    if(v===3&&G.bi===4){const w=cx.createLinearGradient(x,y,x,y+T);w.addColorStop(0,'#ffb03a');w.addColorStop(.5,'#e8541a');w.addColorStop(1,'#9a2208');cx.fillStyle=w;cx.fillRect(x,y,T,T);
+      const s=Math.sin(G.t*1.6+tx*1.1+ty*.7);cx.fillStyle='#ffe58a';cx.globalAlpha=.55;cx.fillRect(x+4+s*4,y+8,12,2);cx.fillRect(x+12-s*4,y+20,14,2);cx.globalAlpha=.3+.25*Math.sin(G.t*2.4+h);cx.fillStyle='#fff0b0';cx.fillRect(x+3+(h%9),y+13,6,1.5);cx.globalAlpha=.35;cx.fillStyle='#5a1204';cx.fillRect(x+(h%11),y+(h%5)*5,9,5);cx.globalAlpha=1;
+      if(tile(tx,ty-1)!==3){cx.fillStyle='#ffe08a';cx.globalAlpha=.6;cx.fillRect(x,y,T,2);cx.globalAlpha=1;}if(tile(tx,ty+1)!==3){cx.fillStyle='#000';cx.globalAlpha=.35;cx.fillRect(x,y+T-2,T,2);cx.globalAlpha=1;}
+      if(h%4===0)lights.push({x:x+16,y:y+16,r:110});}
+    else if(v===3){const w=cx.createLinearGradient(x,y,x,y+T);w.addColorStop(0,G.bi===3?'#25503a':'#1f5a80');w.addColorStop(1,G.bi===3?'#173a2a':'#15405e');cx.fillStyle=w;cx.fillRect(x,y,T,T);
       const s=Math.sin(G.t*2+tx*1.3+ty)*3;cx.fillStyle='#bfe8f8';cx.globalAlpha=.4;cx.fillRect(x+4+s,y+9,10,1.5);cx.fillRect(x+14-s,y+21,12,1.5);cx.globalAlpha=.18+.12*Math.sin(G.t*3+h);cx.fillRect(x+2,y+3+(h%6),T-4,1);cx.globalAlpha=1;
       if(tile(tx,ty-1)!==3){cx.fillStyle='#d8f0f8';cx.globalAlpha=.5;cx.fillRect(x,y,T,2);cx.globalAlpha=1;}if(tile(tx,ty+1)!==3){cx.fillStyle='#000';cx.globalAlpha=.3;cx.fillRect(x,y+T-2,T,2);cx.globalAlpha=1;}
       if(G.bi===3&&h%3===0){cx.fillStyle='#3f7a3a';cx.beginPath();cx.ellipse(x+12,y+14,6,3,0,0,7);cx.fill();cx.fillStyle='#e8a0c8';cx.fillRect(x+11,y+12,3,2);}}
@@ -1487,7 +1536,11 @@ const RTHEMES=[
  [{n:'bog',w:[['moss',3],['lantern',1]],f:[['lily',4],['reeds',5]],d:1.1},
   {n:'camp',w:[['totem',3],['lantern',2],['moss',1]],f:[['totem',2],['bones',2],['crate',1],['rib',1]],d:.9},
   {n:'graveyard',w:[['moss',2],['lantern',1]],f:[['rib',3],['bones',4],['glowmush',2]],d:1},
-  {n:'thicket',w:[['moss',3]],f:[['reeds',5],['glowmush',2],['lily',2]],d:1.3}]];
+  {n:'thicket',w:[['moss',3]],f:[['reeds',5],['glowmush',2],['lily',2]],d:1.3}],
+ [{n:'forge',w:[['brazier',4],['statue',1],['banner',1]],f:[['rack',3],['crate',2],['barrel',1],['rubble',2]],d:1},
+  {n:'barracks',w:[['banner',3],['brazier',2],['statue',1]],f:[['rack',3],['bones',3],['barrel',2]],d:1},
+  {n:'tomb',w:[['statue',3],['brazier',2],['shrine',1]],f:[['bones',4],['rubble',3]],d:1.1},
+  {n:'hall',w:[['statue',3],['banner',2],['brazier',3]],f:[['rubble',2],['table',2],['bones',1]],d:.7}]];
 function ewpick(R,list){let t=0;for(const q of list)t+=q[1];let r=R()*t;for(const q of list){r-=q[1];if(r<=0)return q[0];}return list[0][0];}
 function envBuild(){const bi=G.bi,env=G.env={anim:[],lights:[],shafts:[],R:envRng((G.depth*7919)^0x5bd1)},R=env.R,old=cx;cx=G.tcx;cx.save();
   const rooms=G.rooms,okFloor=(tx,ty)=>tile(tx,ty)===0&&!(G.bridge&&G.bridge[ty*MW+tx])&&!envSpecial(tx,ty),TH=RTHEMES[bi]||RTHEMES[0];
@@ -1519,7 +1572,7 @@ function envGlow(ox,oy){if(!ENV_ON||!G.env)return;const bi=G.bi,t=G.t;
   cx.restore();
 }
 function envFog(ox,oy){if(!ENV_ON||!G.env)return;const bi=G.bi,t=G.t;
-  const tint=['#8a7aa8','#7aa890','#cfe4ff','#8aa868'][bi];if(!FOGT||FOGT.bi!==bi){FOGT=envFogTex(tint);FOGT.bi=bi;}
+  const tint=['#8a7aa8','#7aa890','#cfe4ff','#8aa868','#a8706a'][bi];if(!FOGT||FOGT.bi!==bi){FOGT=envFogTex(tint);FOGT.bi=bi;}
   cx.save();cx.globalAlpha=bi===2?.22:.16;for(let k=0;k<2;k++){const sp=k?9:5,px=((t*sp+ox*(.3+k*.2))%1024+1024)%1024,py=((oy*(.25+k*.15))%512+512)%512;for(let x=-px-512*(k?1:0);x<VW;x+=1024)for(let y=-py;y<VH;y+=512)cx.drawImage(FOGT,x,y,1024,512);}cx.restore();}
 
 function envSpecial(tx,ty){if(!G||!G.rooms)return false;for(const r of G.rooms)if((r.vault||r.shrine)&&tx>=r.cx-4&&tx<=r.cx+4&&ty>=r.cy-3&&ty<=r.cy+3)return true;return false;}
@@ -1638,7 +1691,7 @@ function drawCorpse(e){const a=G.t-(e.dt||0),boss=!!e.d.boss,dur=boss?1.5:.6;if(
   cx.restore();
   if(boss&&a>1.0){const q=(a-1.0)/.5;cx.save();cx.globalAlpha=Math.max(0,1-q);cx.strokeStyle='#fff2c0';cx.lineWidth=4*(1-q)+1;cx.beginPath();cx.ellipse(e.x,e.y+r*.6,r*(1+q*4.5),r*(.5+q*2.2),0,0,7);cx.stroke();cx.restore();}}
 // ===== detailed spell & racial effects (drawn at world position, additive glow) =====
-const FXLIFE={spin:.55,shards:.8,blast:.6,notes:1.1,whirl:.6,cry:.8,aegis:1,bubble:.9,wings:1,bones:.9,smoke:.7,vines:.8,hamimp:.5,smimp:.5,arrimp:.3,shaimp:.5,noteimp:.45,dagimp:.3,stone:.6,thorn:.45,eye:.5,foot:.35,luck:.9,study:.8,mind:.6,claws:.35,slash:.28,eswipe:.26,ebite:.28,eslam:.5,epoison:.5,stench:4.5,curse:2,summon:.7};
+const FXLIFE={spin:.55,shards:.8,blast:.6,notes:1.1,whirl:.6,cry:.8,aegis:1,bubble:.9,wings:1,bones:.9,smoke:.7,vines:.8,hamimp:.5,smimp:.5,arrimp:.3,shaimp:.5,noteimp:.45,dagimp:.3,stone:.6,thorn:.45,eye:.5,foot:.35,luck:.9,study:.8,mind:.6,claws:.35,slash:.28,eswipe:.26,ebite:.28,eslam:.5,epoison:.5,stench:4.5,lavapool:4.5,whip:.5,curse:2,summon:.7};
 function fgl(x,y,r,c,al){if(r<=0||al<=0)return;const g=cx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,ca(c,al));g.addColorStop(.4,ca(c,al*.42));g.addColorStop(1,ca(c,0));cx.fillStyle=g;cx.beginPath();cx.arc(x,y,r,0,7);cx.fill();}
 function fadd(fn){cx.save();cx.globalCompositeOperation='lighter';fn();cx.restore();}
 function fring(x,y,r,c,w,al,ry){cx.strokeStyle=ca(c,al);cx.lineWidth=w;cx.beginPath();cx.ellipse(x,y,Math.max(.1,r),Math.max(.1,r*(ry||1)),0,0,7);cx.stroke();}
@@ -1646,6 +1699,11 @@ function fstar(x,y,r,c,al,n,rot){cx.fillStyle=ca(c,al);cx.beginPath();for(let i=
 function frn(i,s){const v=Math.sin((i+s)*127.1+311.7)*43758.5453;return v-Math.floor(v);}
 function drawFx2(f,u,a){const c=f.col,x=f.x,y=f.y,R=f.r,s=f.sd||0,T=Math.PI*2;
   switch(f.ty){
+  case'lavapool':{const fi=Math.min(1,(1-a)*6),fo=Math.min(1,a*2.5),al=fi*fo;cx.save();cx.globalAlpha=.8*al;const g=cx.createRadialGradient(x,y,R*.1,x,y,R);g.addColorStop(0,'#ffe58a');g.addColorStop(.45,'#ff8a1a');g.addColorStop(.85,'#b02a08');g.addColorStop(1,'rgba(90,20,4,0)');cx.fillStyle=g;cx.beginPath();cx.ellipse(x,y+4,R,R*.7,0,0,T);cx.fill();cx.globalAlpha=.5*al;cx.fillStyle='#fff0b0';for(let i=0;i<4;i++){const b=(frn(i,s)*6.28)+u*2;cx.beginPath();cx.arc(x+Math.cos(b)*R*.45,y+4+Math.sin(b)*R*.3,2+frn(i+9,s)*2,0,T);cx.fill();}cx.restore();fadd(()=>fgl(x,y,R*1.5,'#ff6a1a',.28*al));return true;}
+  case'whip':{const ang=R/100-Math.PI,len=250,al=Math.min(1,a*2.2),n=14;cx.save();cx.lineCap='round';
+    const pts=[];for(let i=0;i<=n;i++){const k=i/n*Math.min(1,u*2.6+.15),w=Math.sin(k*9-u*14)*(1-k)*18;pts.push([x+Math.cos(ang)*len*k-Math.sin(ang)*w,y+Math.sin(ang)*len*k+Math.cos(ang)*w]);}
+    for(const[wd,col]of[[9,'rgba(255,90,20,'+.35*al+')'],[4.5,'rgba(255,160,50,'+al+')'],[1.8,'rgba(255,245,190,'+al+')']]){cx.strokeStyle=col;cx.lineWidth=wd;cx.beginPath();pts.forEach((p,i)=>i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));cx.stroke();}
+    const e=pts[pts.length-1];fadd(()=>fgl(e[0],e[1],34,'#ffb03a',.7*al));cx.restore();return true;}
   case'stench':{const fi=Math.min(1,(1-a)*5),fo=Math.min(1,a*3),al=fi*fo;cx.save();cx.globalAlpha=.34*al;const g=cx.createRadialGradient(x,y,R*.1,x,y,R*1.05);g.addColorStop(0,'#a8c840');g.addColorStop(.7,'#6a8a28');g.addColorStop(1,'rgba(90,120,30,0)');cx.fillStyle=g;cx.beginPath();cx.ellipse(x,y+6,R*1.05,R*.72,0,0,T);cx.fill();cx.restore();
     for(let i=0;i<9;i++){const q=(u*3+i/9)%1,an=i*.7+s,d=R*(.2+frn(i,s)*.7);cx.fillStyle='rgba(150,190,60,'+.28*al*(1-q)+')';cx.beginPath();cx.arc(x+Math.cos(an)*d,y+Math.sin(an)*d*.6-q*30,4+q*9,0,T);cx.fill();}
     for(let i=0;i<4;i++){const q=(u*2+i/4)%1,an=i*1.6+s;cx.strokeStyle='rgba(190,230,90,'+.5*al*(1-q)+')';cx.lineWidth=2;cx.beginPath();const px=x+Math.cos(an)*R*.55,py=y+Math.sin(an)*R*.35;cx.moveTo(px,py);cx.bezierCurveTo(px+7,py-12*q-6,px-7,py-22*q-10,px+2,py-34*q-14);cx.stroke();}return true;}
@@ -2574,8 +2632,60 @@ const _bt2=MODELS.bat;MODELS.bat=(v)=>{const m=_bt2(v);const b=m.g.children[0];c
   if(head){for(const s of[-1,1]){cone(head,'#f0ead8',[s*.14,-.34,.52],[.05,.4,.05],[PI,0,0]);add(head,BOX,'#1a0a0a',[s*.24,.22,.42],[.02,.3,.02],[0,0,s*.5])}}
   recolor(m.g,lerpTo('#06040a',.2));return m};
 const _rt2=MODELS.rat;MODELS.rat=(v)=>{const m=_rt2(v);const head=[];m.g.traverse(o=>{});return m};
+// ---- Durnholm: dwarven skeleton, ember imp, Ghorrath the Cinder Fiend ----
+wrapV('skeleton',(v,m)=>{if(v!=='dwarf')return;const b=m.g.children[0];
+  recolor(m.g,lerpTo('#7a7a9a',.35));m.g.scale.set(1.28,.8,1.28);
+  cone(b,'#d9c8a0',[0,2.28,.46],[.3,.8,.2],[PI,0,0]);for(const s of[-1,1])limb(b,[s*.16,2.35,.5],[s*.2,1.6,.58],.05,'#b8a888');
+  for(const s of[-1,1]){cone(b,'#c9a23a',[s*.52,3.14,0],[.1,.42,.1],[0,0,-s*.9],{metal:1});sph(b,'#6a6a78',[s*.62,2.2,0],[.3,.22,.3],{metal:1});}
+  add(b,CYL,'#c9a23a',[0,2.66,.34],[.3,.05,.3],[PI/2,0,0],{metal:1});
+  add(b,BOX,'#8a5a2a',[0,1.35,.42],[.5,.12,.06],[0,0,0],{metal:.5});sph(b,'#d9a93a',[0,1.35,.46],.08,{metal:1});});
+MODELS.imp=()=>{const g=new T.Group(),b=new T.Group();g.add(b);const sk='#d8452a',dk='#8a2210',lt='#ff8a4a';
+  sph(b,sk,[0,1.35,0],[.5,.62,.44]);sph(b,lt,[0,1.25,.3],[.3,.4,.2]);
+  const head=new T.Group();head.position.set(0,2.05,.08);b.add(head);sph(head,sk,[0,0,0],[.42,.4,.38]);sph(head,dk,[0,-.1,.32],[.2,.14,.12]);
+  for(const s of[-1,1]){cone(head,'#2a1210',[s*.22,.42,0],[.1,.5,.1],[0,0,-s*.45]);cone(head,dk,[s*.4,.1,0],[.08,.3,.06],[0,0,-s*1.2]);eye(head,'#ffe060',[s*.16,.06,.32],.09);cone(head,'#fff2c8',[s*.08,-.2,.38],[.035,.12,.035],[PI,0,0]);}
+  const arms=[];for(const s of[-1,1]){const A=new T.Group();A.position.set(s*.42,1.65,0);b.add(A);limb(A,[0,0,0],[s*.28,-.42,.14],.09,sk);limb(A,[s*.28,-.42,.14],[s*.2,-.8,.36],.08,sk);sph(A,dk,[s*.2,-.84,.38],.11);arms.push([A,s]);}
+  glow(arms[1][0],'#ff8a2a',.9,[.2,-.86,.4]);sph(arms[1][0],'#ffb03a',[.2,-.88,.42],.09,{glow:1});
+  const wings=[];for(const s of[-1,1]){const w=new T.Group();w.position.set(s*.25,1.65,-.22);b.add(w);const wi=new T.Group();wi.scale.x=s;w.add(wi);ext(wi,[[0,0],[.9,.5],[1.5,.2],[1.3,-.2],[.9,-.1],[.6,-.5],[.2,-.3]],.04,dk,{two:1,sharp:1});wings.push([w,s]);}
+  const tail=[];let prev=b;for(let i=0;i<4;i++){const t=new T.Group();t.position.set(0,i?0:1.0,i?-.38:-.32);prev.add(t);limb(t,[0,0,0],[0,-.08,-.4],.07-i*.012,sk);prev=t;tail.push(t);}
+  cone(prev,'#ff9a2a',[0,-.1,-.5],[.12,.36,.12],[-PI/2,0,0],{glow:1});glow(prev,'#ff8a2a',.9,[0,-.1,-.6]);
+  for(const s of[-1,1]){limb(b,[s*.2,1.0,0],[s*.24,.35,.12],.1,sk);sph(b,dk,[s*.24,.3,.2],[.12,.07,.16]);}
+  glow(b,'#ff6a2a',2.2,[0,1.4,0]);
+  return{g,H:2.8,fr:1.8,upd(t,o){o=o||{};const a=AP(o),ph=t*3;b.position.y=.25+sn(ph)*.12;wings.forEach(([w,s])=>w.rotation.z=s*(.5+sn(ph*3)*.5));arms[0][0].rotation.x=a>0?-1.4*sn(a*PI):sn(ph)*.15;arms[1][0].rotation.x=a>0?-1.8*sn(a*PI):sn(ph+1)*.15;tail.forEach((q,i)=>q.rotation.y=sn(ph*.8+i*.7)*.4);head.rotation.x=a>0?-.2*sn(a*PI):sn(ph*.5)*.05}}};
+MODELS.b_ghor=()=>{const g=new T.Group(),b=new T.Group();g.add(b);const ob='#6a4448',ob2='#3a2428',lava='#ff8a2a';
+  // legs and hooves
+  const legs=[];for(const s of[-1,1]){const l=new T.Group();l.position.set(s*.85,2.5,0);b.add(l);limb(l,[0,0,0],[s*.1,-1.2,.2],.62,ob);limb(l,[s*.1,-1.2,.2],[0,-2.3,-.1],.5,ob2);sph(l,ob2,[0,-2.45,.2],[.7,.3,.9]);cone(l,'#1a1012',[0,-2.5,.95],[.2,.5,.2],[PI/2,0,0]);for(let i=0;i<3;i++)add(l,BOX,lava,[(i-1)*.22,-.2-i*.3,.55],[.05,.4,.03],[0,0,.2*(i-1)],{glow:1});legs.push([l,s]);}
+  // pelvis, belt of embers
+  sph(b,ob2,[0,2.7,0],[1.25,.6,.9]);for(let i=0;i<9;i++){const a=(i/9-.5)*PI*1.3;cone(b,'#ff9a2a',[Math.sin(a)*1.15,2.55,Math.cos(a)*.8],[.12,.35,.1],[PI,0,0],{glow:1});}
+  // torso
+  sph(b,ob,[0,3.9,0],[1.5,1.65,1.05]);sph(b,ob2,[0,3.3,.25],[1.1,.9,.8]);
+  sph(b,lava,[0,4.05,.9],.4,{glow:1});glow(b,'#ff7a1a',3,[0,4.05,1.1]);
+  for(const [p,q] of[[[-.9,5.0,.8],[-.5,4.4,.95]],[[-.5,4.4,.95],[-.7,3.6,.9]],[[.9,5.0,.8],[.5,4.4,.95]],[[.5,4.4,.95],[.7,3.6,.9]],[[0,3.7,.95],[0,3.0,.9]],[[-.6,3.2,.9],[.6,3.2,.9]]])limb(b,p,q,.07,lava,{glow:1});
+  // back plates / cinder mantle (no wings: a crest of cooled rock spikes lit from within)
+  for(let i=0;i<7;i++){const y=5.3-i*.45,x=(i%2?.35:-.35)*(1-i*.08);cone(b,ob2,[x,y,-.85],[.28,.9-i*.06,.22],[-.7,0,x]);cone(b,lava,[x,y+.05,-.8],[.12,.55-i*.04,.1],[-.7,0,x],{glow:1});}
+  // shoulders
+  for(const s of[-1,1]){sph(b,ob2,[s*1.75,5.0,0],[.85,.7,.8]);for(let i=0;i<3;i++)cone(b,'#1a1012',[s*(1.5+i*.3),5.6-i*.05,(i-1)*.3],[.16,.75,.16],[0,0,-s*(.3+i*.2)]);glow(b,'#ff7a1a',1.4,[s*1.75,5.2,.3]);}
+  // head
+  const head=new T.Group();head.position.set(0,5.95,.25);b.add(head);sph(head,ob,[0,0,0],[.78,.82,.72]);sph(head,ob2,[0,-.28,.5],[.55,.4,.4]);
+  const jaw=new T.Group();jaw.position.set(0,-.5,.2);head.add(jaw);sph(jaw,ob2,[0,-.1,.3],[.5,.18,.42]);for(let i=0;i<5;i++)cone(jaw,'#f0e0b0',[-.3+i*.15,.1,.62],[.05,.2,.05],[0,0,0],{glow:1});
+  for(const s of[-1,1]){eye(head,'#ffd860',[s*.32,.12,.6],.13);add(head,BOX,'#0a0608',[s*.34,.32,.6],[.34,.06,.05],[0,0,s*.45]);
+    cone(head,'#1a1012',[s*.55,.55,0],[.26,1.35,.22],[0,0,-s*.95]);cone(head,'#1a1012',[s*1.12,1.02,0],[.16,.9,.14],[0,0,s*.55]);cone(head,lava,[s*.55,.45,.06],[.1,.9,.08],[0,0,-s*.95],{glow:1});}
+  for(let i=0;i<5;i++)cone(head,'#2a1a1e',[(i-2)*.22,.8-Math.abs(i-2)*.05,-.1],[.1,.4+.12*(i===2),.1]);
+  glow(head,'#ff7a1a',2.4,[0,0,.5]);
+  // left arm: clenched ember fist
+  const L=new T.Group();L.position.set(-1.8,5.0,0);b.add(L);limb(L,[0,0,0],[-.45,-1.2,.3],.5,ob);limb(L,[-.45,-1.2,.3],[-.2,-2.2,.9],.42,ob2);sph(L,ob2,[-.2,-2.35,1.0],.55);sph(L,lava,[-.2,-2.35,1.4],.28,{glow:1});glow(L,'#ff8a2a',1.6,[-.2,-2.35,1.4]);
+  // right arm: the lava whip
+  const R=new T.Group();R.position.set(1.8,5.0,0);b.add(R);limb(R,[0,0,0],[.5,-1.1,.3],.5,ob);limb(R,[.5,-1.1,.3],[.4,-2.0,.9],.42,ob2);sph(R,ob2,[.4,-2.15,1.0],.5);
+  add(R,CYL,'#2a1810',[.4,-2.15,1.35],[.12,.9,.12],[PI/2,0,0]);
+  limb(R,[.15,-.2,.5],[.45,-.9,.75],.05,lava,{glow:1});limb(L,[-.2,-.2,.5],[-.4,-1.0,.7],.05,lava,{glow:1});limb(R,[.3,-1.3,.75],[.4,-1.9,.95],.045,lava,{glow:1});limb(L,[-.3,-1.4,.8],[-.2,-2.0,1.0],.045,lava,{glow:1});
+  const whip=new T.Group();whip.position.set(.4,-2.15,1.8);R.add(whip);const seg=[];let prev=whip;
+  for(let i=0;i<9;i++){const sgm=new T.Group();sgm.position.set(0,0,i?.85:0);prev.add(sgm);const r=.17-i*.012;limb(sgm,[0,0,0],[0,0,.85],r,'#ff9a3a',{glow:1});sph(sgm,'#ffd070',[0,0,.85],r*1.5,{glow:1});seg.push(sgm);prev=sgm;}
+  glow(prev,'#ffb03a',1.6,[0,0,.9]);glow(whip,'#ff8a2a',1.4,[0,0,.3]);
+  return{g,H:7.2,fr:4.3,upd(t,o){o=o||{};const mv=o.mv,a=AP(o),ph=t*2;legs.forEach(([l,s])=>l.rotation.x=mv?sn(ph+(s>0?0:PI))*.45:0);b.position.y=mv?Math.abs(sn(ph))*.12:Math.abs(sn(t*2))*.07;
+    head.rotation.x=a>0?.18*sn(a*PI):sn(t)*.04;jaw.rotation.x=a>0?.4*sn(a*PI):.05+Math.abs(sn(t*2))*.05;
+    R.rotation.x=a>0?SW(a)*.45:-.25+sn(ph)*.05;R.rotation.z=a>0?0:.1;L.rotation.x=-.35+sn(ph+1)*.06;
+    seg.forEach((q,i)=>{const lash=a>0?(a<.4?-.1:sn((a-.4)/.6*PI)*.9):0;q.rotation.y=(a>0?lash*.25:sn(ph*1.5-i*.6)*.35)*((i%2)?1:-1);q.rotation.x=a>0?(a<.4?-.35:.25):(.18+sn(ph*1.2-i*.5)*.25)});}}};
 const SPEC={rat:{gh:26,yaw:.7,N:12,P:TAU},mouse:{model:'rat',var:'mouse',gh:16,yaw:.7,N:12,P:TAU},batling:{model:'bat',var:'ling',gh:24,yaw:.3,N:12,P:4*PI/9},spiderling:{model:'spider',var:'ling',gh:22,yaw:.35,N:12,P:TAU},iceskel:{model:'skeleton',var:'ice',gh:58,yaw:.5,N:12,P:TAU},shaman:{gh:44,yaw:.5,N:12,P:TAU},shwolf:{model:'wolf',var:'ghost',gh:38,yaw:1.0,N:12,P:TAU},b_rat:{gh:100,yaw:.5,N:10,P:TAU},b_mother:{model:'spider',var:'mother',gh:124,yaw:.35,N:12,P:TAU},b_icypaw:{gh:112,yaw:.5,N:10,P:TAU},b_grumpy:{gh:118,yaw:.5,N:12,P:TAU},bat:{gh:42,yaw:.3,N:12,P:4*PI/9},wolf:{gh:34,yaw:1.0,N:12,P:TAU},direwolf:{model:'wolf',var:'dire',gh:68,yaw:1.0,N:12,P:TAU},frostwolf:{model:'wolf',var:'frost',gh:46,yaw:1.0,N:12,P:TAU},spider:{gh:38,yaw:.35,N:12,P:TAU},skeleton:{gh:58,yaw:.5,N:12,P:TAU},ogre:{gh:80,yaw:.5,N:10,P:TAU},troll:{gh:72,yaw:.5,N:10,P:TAU},
- b_ogre:{gh:96,yaw:.5,N:10,P:TAU},b_drake:{gh:112,yaw:.95,N:12,P:TAU},b_kal:{gh:90,yaw:.5,N:10,P:TAU},bear:{gh:46,yaw:1.0,N:8,P:TAU},owl:{gh:30,yaw:.3,N:8,P:TAU/12},goblin:{gh:38,yaw:.5,N:12,P:TAU},snake:{gh:36,yaw:.8,N:12,P:TAU},orc:{gh:68,yaw:.5,N:12,P:TAU}};
+ b_ogre:{gh:96,yaw:.5,N:10,P:TAU},b_drake:{gh:112,yaw:.95,N:12,P:TAU},b_kal:{gh:90,yaw:.5,N:10,P:TAU},dwskel:{model:'skeleton',var:'dwarf',gh:50,yaw:.5,N:12,P:TAU},imp:{gh:36,yaw:.4,N:12,P:TAU},b_ghor:{gh:150,yaw:.5,N:12,P:TAU},bear:{gh:46,yaw:1.0,N:8,P:TAU},owl:{gh:30,yaw:.3,N:8,P:TAU/12},goblin:{gh:38,yaw:.5,N:12,P:TAU},snake:{gh:36,yaw:.8,N:12,P:TAU},orc:{gh:68,yaw:.5,N:12,P:TAU}};
 const MOD={},CAM={},CACHE={};
 function cam(type){if(CAM[type])return CAM[type];const S=SPEC[type],m=MOD[type]||(MOD[type]=MODELS[SPEC[type].model||type](SPEC[type].var)),k=S.gh/m.H,W=Math.ceil(2*m.fr*k)+6,c=new T.OrthographicCamera(-W/2/k,W/2/k,W/2/k,-W/2/k,.1,100);
   const d=new T.Vector3(.5,.55,.9).normalize(),cy=m.H*.5;c.position.set(d.x*30,cy+d.y*30,d.z*30);c.lookAt(0,cy,0);c.updateMatrixWorld(true);c.updateProjectionMatrix();
@@ -3135,6 +3245,48 @@ freed(A){const {P,C,E,RING,burst,star,L,dove,g}=A;gClip(A);
   P([310,70,316,58,320,66,324,58,330,70],'#f6d457',{nf:0,lw:1.6});
   P([80,200,100,200,100,176,80,176],'#f0c24a',{nf:0,lw:1.6});C(90,166,8,'#f0c24a',{nf:0,lw:1.6});C(90,166,3,'#3a2a58',{nf:0,lw:1});
   dove(120,60,1);dove(520,70,.9);dove(560,120,.7);[[40,30],[600,30],[60,120],[580,170]].forEach(s=>star(s[0],s[1],7,'#fff6c0'));g.restore();}
+});
+
+// ===== Durnholm scenes: the dwarven city and its fire-lit boss =====
+Object.assign(GLASS,{
+dgate(A){const {P,C,E,burst,L,star,g}=A;gClip(A);
+  burst(320,216,[[40,'#ffe2a8','#ffd48a'],[110,'#e8843a','#d87430'],[200,'#8a3a22','#7a3220'],[320,'#3a1a1c','#301618'],[900,'#140a0e','#0e0709']],24,-Math.PI,0);
+  P([0,216,0,120,90,70,170,104,250,40,320,20,390,40,470,104,550,70,640,120,640,216],'#2a2430',{nf:3});
+  P([230,216,230,112,248,78,320,56,392,78,410,112,410,216],'#4a4050',{nf:2});P([252,216,252,118,320,86,388,118,388,216],'#1a0e10',{nf:0,lw:2});
+  P([268,216,268,126,320,100,372,126,372,216],'#ff8a2a',{nf:0,glow:.5,lw:1.5});P([286,216,286,134,320,116,354,134,354,216],'#ffd070',{nf:0,lw:1});
+  [[262,100],[300,70],[340,70],[378,100]].forEach(q=>{L([q[0],q[1],q[0],q[1]+16],1.6,'#ffb03a');L([q[0]-5,q[1]+4,q[0],q[1],q[0]+5,q[1]+4],1.4,'#ffb03a');});
+  gRace(A,170,214,1.5,'dwarf',{c:'#6a6a7a',c2:'#8a8a9a'});gRace(A,470,214,1.5,'dwarf',{c:'#6a6a7a',c2:'#8a8a9a'});
+  [[110,150],[530,150]].forEach(q=>{L([q[0],q[1]-24,q[0],q[1]-4],1.2,'#2a2430');C(q[0],q[1],7,'#ff9a2a',{nf:0,glow:.8,lw:1.6});});
+  [[60,40],[600,50],[20,120],[620,110]].forEach(s=>star(s[0],s[1],6,'#ffd8a0'));g.restore();},
+dforge(A){const {P,C,E,burst,L,star,g}=A;gClip(A);
+  burst(320,190,[[30,'#fff0b0','#ffe48a'],[90,'#ffa83a','#f09030'],[180,'#b8401a','#a83818'],[300,'#4a1a14','#3a1410'],[900,'#140a0a','#0e0707']],24,-Math.PI,0);
+  P([0,150,640,150,640,216,0,216],'#e8541a',{nf:3});P([0,172,640,172,640,216,0,216],'#ff8a2a',{nf:3});P([0,196,640,196,640,216,0,216],'#ffd070',{nf:3});
+  [[60,30],[210,24],[430,24],[580,30]].forEach(q=>{P([q[0]-14,150,q[0]-12,10,q[0]+12,10,q[0]+14,150],'#3a3240',{nf:2});P([q[0]-20,4,q[0]+20,4,q[0]+20,14,q[0]-20,14],'#5a5068',{nf:0,lw:1.6});});
+  P([250,160,260,130,380,130,390,160],'#2a2430',{nf:1});P([230,126,410,126,420,136,220,136],'#5a5068',{nf:0,lw:1.8});P([262,160,262,190,378,190,378,160],'#2a2430',{nf:0,lw:1.6});
+  P([440,160,448,70,456,160],'#7a5028',{nf:0,lw:1.4});P([424,60,480,60,480,78,424,78],'#8a8a9a',{nf:0,lw:1.6});
+  [[130,140],[500,140]].forEach(q=>{P([q[0]-12,q[1]+20,q[0]-8,q[1],q[0]+8,q[1],q[0]+12,q[1]+20],'#2a2430',{nf:0,lw:1.5});C(q[0],q[1]-6,9,'#ffb03a',{nf:0,glow:.8,lw:1.4});});
+  P([310,114,316,98,322,112],'#d8452a',{nf:0,lw:1.3});C(316,96,5,'#d8452a',{nf:0,lw:1.2});C(314,95,1.3,'#ffe060',{nf:0,lw:.6});C(319,95,1.3,'#ffe060',{nf:0,lw:.6});
+  [[40,80],[600,90],[300,60],[200,100]].forEach(s=>star(s[0],s[1],5,'#ffc878'));g.restore();},
+ghorrath(A){const {P,C,E,burst,L,star,g}=A;gClip(A);
+  burst(320,150,[[34,'#fff0b0','#ffe48a'],[90,'#ff9a2a','#f08820'],[170,'#a82a12','#982210'],[290,'#3a0e0c','#2e0a0a'],[900,'#0c0506','#080304']],26,-Math.PI,Math.PI);
+  P([220,216,230,150,260,110,320,90,380,110,410,150,420,216],'#2a1a1e',{nf:2});
+  P([200,110,236,60,262,100,320,70,378,100,404,60,440,110,420,140,380,126,320,118,260,126,220,140],'#3a2428',{nf:2});
+  P([250,70,226,10,262,40,290,0,300,50],'#1a1012',{nf:0,lw:1.6});P([390,70,414,10,378,40,350,0,340,50],'#1a1012',{nf:0,lw:1.6});
+  P([320,26,300,60,340,60],'#ff7a1a',{nf:0,glow:.4,lw:1.2});
+  P([272,92,306,100,300,112,268,108],'#ffe060',{nf:0,glow:.8,lw:1.3});P([368,92,334,100,340,112,372,108],'#ffe060',{nf:0,glow:.8,lw:1.3});
+  P([290,132,350,132,340,146,300,146],'#ff6a1a',{nf:0,glow:.6,lw:1.3});
+  L([320,150,320,200],2,'#ffb03a');L([300,160,320,176,340,160],1.6,'#ff9a2a');C(320,168,9,'#ffd070',{nf:0,glow:1,lw:1.4});
+  L([430,150,520,110,560,140,600,90],3,'#ff9a2a');L([430,150,520,110,560,140,600,90],1.2,'#fff0b0');C(600,90,6,'#ffd070',{nf:0,glow:1,lw:1});
+  P([0,196,640,196,640,216,0,216],'#e8541a',{nf:3});
+  [[60,40],[110,150],[560,40],[600,170],[30,100]].forEach(s=>star(s[0],s[1],5,'#ffc878'));g.restore();},
+dthrone(A){const {P,C,E,burst,L,star,g}=A;gClip(A);
+  burst(320,200,[[40,'#fff0c8','#ffe4a8'],[110,'#e8a04a','#d89040'],[200,'#6a3a28','#5a3022'],[320,'#2a1618','#201012'],[900,'#0e0809','#0a0607']],24,-Math.PI,0);
+  P([0,196,640,196,640,216,0,216],'#3a2c30',{nf:3});
+  P([250,196,250,60,290,40,350,40,390,60,390,196],'#4a4050',{nf:2});P([240,200,400,200,400,186,240,186],'#5a5068',{nf:0,lw:1.8});P([270,60,320,24,370,60],'#5a5068',{nf:1});
+  L([300,60,312,100,296,130,316,176],2.2,'#ff8a2a');L([300,60,312,100,296,130,316,176],.8,'#ffe58a');
+  P([300,180,308,160,316,176,324,158,332,180],'#e8c24a',{nf:0,lw:1.4});
+  [[120,170],[520,170]].forEach(q=>{P([q[0]-10,q[1]+30,q[0]-8,q[1],q[0]+8,q[1],q[0]+10,q[1]+30],'#2a2430',{nf:0,lw:1.5});C(q[0],q[1]-8,8,'#ffd070',{nf:0,glow:.7,lw:1.4});});
+  [[50,60],[600,50],[160,100],[500,90]].forEach(s=>star(s[0],s[1],6,'#fff0c0'));g.restore();}
 });
 // ---------- UI + FLOW ----------
 const LOGO_SRC=''; // paste a data: URI or published image path here to use your own Knights of Valor logo
@@ -4183,7 +4335,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.0.5';
+const KOV_VER='1.1.0';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
