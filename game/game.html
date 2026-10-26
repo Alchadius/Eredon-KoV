@@ -3866,7 +3866,7 @@ function rebindKey(code){const t=REBIND;REBIND=null;if(code!=='Escape'){const sl
 function kbtn(id,code){return '<button class="btn alt kb'+(REBIND===id?' wait':'')+'" data-a="kb" data-k="'+id+'">'+(REBIND===id?'Press a key...':esc(keyName(code)))+'</button>';}
 function settingsScreen(){let h='<div class="panel"><h2>Settings &amp; Controls</h2><p class="dim">Click a key, then press the new one. If it is already used, the two swap. Esc cancels.</p><div class="sheet">';
   for(let p=0;p<(COOP?2:1);p++){h+='<section><h3>'+(p?'Hero 2 (second player, same keyboard)':'Hero 1')+'</h3><div class="krow">';ROLES.forEach(([r,n])=>{h+='<span>'+n+'</span>'+kbtn(p+'.'+r,kget(p,r));});h+='</div></section>';}
-  h+='<section><h3>General</h3><div class="krow">';GROLES.forEach(([g,n])=>{h+='<span>'+n+'</span>'+kbtn(g,KEYS[g]);});h+='<span>Pause (also)</span><kbd class="fix">Esc</kbd></div><h3 style="margin-top:12px">Audio</h3><div class="row"><button class="btn alt" data-a="setmus">Music: '+(AU.on.m?'on':'off')+'</button><button class="btn alt" data-a="setsfx">Effects: '+(AU.on.s?'on':'off')+'</button></div><div class="vrow"><label for="musvol">Music volume</label><input type="range" id="musvol" min="0" max="100" step="1" value="'+Math.round(AU.vol*100)+'"><b id="musvolv">'+Math.round(AU.vol*100)+'%</b></div><p class="dim" style="margin-top:8px">Online games use the Hero 1 keys; Hero 2 keys also work as a second way to move and cast.</p></section></div>'+
+  h+='<section><h3>General</h3><div class="krow">';GROLES.forEach(([g,n])=>{h+='<span>'+n+'</span>'+kbtn(g,KEYS[g]);});h+='<span>Pause (also)</span><kbd class="fix">Esc</kbd></div><h3 style="margin-top:12px">Audio</h3><div class="row"><button class="btn alt" data-a="setmus">Music: '+(AU.on.m?'on':'off')+'</button><button class="btn alt" data-a="setsfx">Effects: '+(AU.on.s?'on':'off')+'</button></div><div class="vrow"><label for="musvol">Music volume</label><input type="range" id="musvol" min="0" max="100" step="1" value="'+Math.round(AU.vol*100)+'"><b id="musvolv">'+Math.round(AU.vol*100)+'%</b></div><p class="dim" style="margin-top:8px">Online games use the Hero 1 keys; Hero 2 keys also work as a second way to move and cast.</p></section>'+(typeof deskSettings==='function'?deskSettings():'')+'</div>'+
     '<div class="row"><button class="btn alt" data-a="kreset">Reset to Defaults</button><button class="btn" data-a="setback">Back</button></div></div>';
   show(h);}
 ACT.settings=()=>{SEL.from=G&&G.mode==='pause'?'pause':'title';REBIND=null;settingsScreen();};
@@ -4105,9 +4105,9 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.0.0';
+const KOV_VER='1.0.1';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
-let KOVROOM=null,deskMenu=null,deskLobbyExtra=null;
+let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
 if(!DESK)return;
 const CFG=Object.assign({broker:'wss://0.peerjs.com/peerjs?key=peerjs',stun:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},window.kovDesk.cfg||{});
@@ -4123,17 +4123,17 @@ const findF=id=>FD.friends.find(f=>slug(f.name,f.num)===id);
 const parseTag=s=>{const m=String(s||'').trim().match(/^([A-Za-z0-9]{2,12})\s*#\s*(\d{4})$/);return m?{name:m[1],num:m[2]}:null;};
 
 // ---------- matchmaker (PeerJS-cloud compatible signaling socket) ----------
-const BR={ws:null,ok:false,err:'',hb:0,retry:0,timer:0,reqs:{},on:false};
-function brStatusText(){if(!FD.me)return'';if(BR.ok)return'Online as '+label(FD.me);if(BR.err==='taken')return'That name is already online on another PC.';return BR.on?'Connecting to the matchmaker...':'Offline';}
+const BR={ws:null,ok:false,err:'',hb:0,retry:0,timer:0,reqs:{},on:false,fails:0};
+function brStatusText(){if(!FD.me)return'';if(BR.ok)return'Online as '+label(FD.me)+' (friends can reach you)';if(BR.err==='taken')return'Your name still looks online from a moment ago. Retrying...';if(BR.fails>=2)return'Cannot reach the matchmaker service. Check your internet or firewall. Retrying...';return BR.on?'Connecting to the matchmaker...':'Offline';}
 function brConnect(){if(!FD.me||BR.ws)return;BR.on=true;const id=myId(),tok=Math.random().toString(36).slice(2,14);let ws;
   try{ws=new WebSocket(CFG.broker+(CFG.broker.includes('?')?'&':'?')+'id='+id+'&token='+tok+'&version=1.5.4');}catch(e){BR.err='fail';brLater();return;}
   BR.ws=ws;ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data);}catch(e){return;}brMsg(m);};
-  ws.onclose=()=>{clearInterval(BR.hb);BR.ok=false;if(BR.ws===ws)BR.ws=null;if(BR.err!=='taken')brLater();hubRefresh();};
+  ws.onclose=()=>{clearInterval(BR.hb);const was=BR.ok;BR.ok=false;if(BR.ws===ws)BR.ws=null;if(!was&&BR.err!=='taken')BR.fails++;brLater();hubRefresh();};
   ws.onerror=()=>{};}
-function brLater(){clearTimeout(BR.timer);BR.retry=Math.min(BR.retry+1,6);BR.timer=setTimeout(brConnect,Math.min(30000,2000*BR.retry));}
+function brLater(){clearTimeout(BR.timer);BR.retry=Math.min(BR.retry+1,6);BR.timer=setTimeout(()=>{BR.timer=0;brConnect();},BR.err==='taken'?8000:Math.min(30000,2000*BR.retry));}
 function brSend(dst,type,payload){if(!BR.ok||!BR.ws||BR.ws.readyState!==1)return false;try{BR.ws.send(JSON.stringify({type,dst,payload}));return true;}catch(e){return false;}}
 function brMsg(m){
-  if(m.type==='OPEN'){BR.ok=true;BR.err='';BR.retry=0;clearInterval(BR.hb);BR.hb=setInterval(()=>{try{BR.ws.send(JSON.stringify({type:'HEARTBEAT'}));}catch(e){}},5000);hubRefresh();pollFriends();return;}
+  if(m.type==='OPEN'){BR.ok=true;BR.err='';BR.retry=0;BR.fails=0;clearInterval(BR.hb);BR.hb=setInterval(()=>{try{BR.ws.send(JSON.stringify({type:'HEARTBEAT'}));}catch(e){}},5000);hubRefresh();pollFriends();return;}
   if(m.type==='ID-TAKEN'){BR.err='taken';try{BR.ws.close();}catch(e){}hubRefresh();return;}
   if(m.type==='EXPIRE'){const r=BR.reqs[m.src];if(r){Object.values(r).forEach(x=>x(null,'offline'));BR.reqs[m.src]={};}return;}
   const p=m.payload;if(!p||typeof p!=='object'||typeof m.src!=='string')return;
@@ -4149,15 +4149,15 @@ const FST={};   // id -> {on:bool,at:ms,info}
 function statusInfo(){return{ver:KOV_VER,host:(typeof NET!=='undefined'&&NET.on&&NET.host)?{n:Math.min(4,Object.keys(HR&&HR.members||{}).length+1),play:NET.phase==='play'?1:0}:null};}
 async function pingFriend(f){const id=slug(f.name,f.num);
   try{const r=await brRequest(id,{kv:'ping',from:FD.me},6000);FST[id]={on:true,at:Date.now(),info:r.st||{}};}catch(e){FST[id]={on:false,at:Date.now(),info:{}};}
-  if(f.st==='sent'&&FST[id].on){brRequest(id,{kv:'freq',from:FD.me},6000).catch(()=>{});}
   hubRefresh();}
+function sendFreq(f){if(f.st!=='sent')return;const id=slug(f.name,f.num);brRequest(id,{kv:'freq',from:FD.me},6000).then(()=>{FST[id]=Object.assign(FST[id]||{info:{}},{on:true,at:Date.now()});hubRefresh();}).catch(()=>{});}
 let pollT=0;
-function pollFriends(){clearTimeout(pollT);if(!BR.ok)return;FD.friends.filter(f=>f.st!=='recv').forEach(f=>pingFriend(f));pollT=setTimeout(pollFriends,hubOpen()?7000:30000);}
+function pollFriends(){clearTimeout(pollT);if(!BR.ok){pollT=setTimeout(pollFriends,4000);return;}FD.friends.filter(f=>f.st!=='recv').forEach(f=>{pingFriend(f);sendFreq(f);});pollT=setTimeout(pollFriends,hubOpen()?7000:30000);}
 function onSignal(src,p){
   const f=findF(src);
   if(p.kv==='ping'){if(f&&f.st!=='recv')brSend(src,'ANSWER',{kv:'pong',rid:p.rid,st:statusInfo()});return;}
   if(p.kv==='freq'){const fr=p.from&&typeof p.from==='object'?{name:cleanName(p.from.name),num:String(p.from.num||'')}:null;if(!fr||!fr.name||!/^\d{4}$/.test(fr.num)||slug(fr.name,fr.num)!==src)return;
-    if(f){if(f.st!=='ok'){f.st='ok';saveFD();}brSend(src,'ANSWER',{kv:'ack',rid:p.rid});if(f.st==='ok')brSend(src,'OFFER',{kv:'facc',from:FD.me});}
+    if(f){if(f.st==='recv'){brSend(src,'ANSWER',{kv:'ack',rid:p.rid});hubRefresh();return;}if(f.st!=='ok'){f.st='ok';saveFD();}brSend(src,'ANSWER',{kv:'ack',rid:p.rid});brSend(src,'OFFER',{kv:'facc',from:FD.me});}
     else if(FD.friends.length<60){FD.friends.push({name:fr.name,num:fr.num,st:'recv'});saveFD();brSend(src,'ANSWER',{kv:'ack',rid:p.rid});deskBanner(label(fr)+' wants to be your friend.','Open Friends',()=>deskOpenHub());}
     hubRefresh();return;}
   if(p.kv==='facc'){if(f&&f.st!=='ok'){f.st='ok';saveFD();deskBanner(label(f)+' accepted your friend request.');pingFriend(f);}hubRefresh();return;}
@@ -4287,7 +4287,7 @@ function friendRows(){
   const hosting=typeof NET!=='undefined'&&NET.on&&NET.host;
   return FD.friends.map((f,i)=>{const id=slug(f.name,f.num),s=FST[id],on=s&&s.on,info=s&&s.info||{};let t,b='';
     if(f.st==='recv'){t='wants to be your friend';b='<button class="btn" data-a="faccept" data-i="'+i+'">Accept</button><button class="btn alt" data-a="fremove" data-i="'+i+'">Decline</button>';}
-    else{t=f.st==='sent'?(on?'request sent...':'request pending'):(on?'online':'offline');
+    else{t=f.st==='sent'?(on?'request sent, waiting for them to accept':'request pending (they must be online to get it)'):(on?'online':'offline');
       if(on&&info.host){t='hosting '+(+info.host.n||1)+'/4'+(info.host.play?' (in a run)':'');if(info.ver&&info.ver!==KOV_VER)t+=' (different version)';else if(f.st==='ok'&&!info.host.play&&(+info.host.n||1)<4)b+='<button class="btn" data-a="fjoin" data-i="'+i+'">Join</button>';}
       if(on&&hosting&&f.st==='ok')b+='<button class="btn alt" data-a="finvite" data-i="'+i+'">Invite</button>';
       b+='<button class="btn alt" data-a="fremove" data-i="'+i+'" title="Remove">&times;</button>';}
@@ -4310,7 +4310,7 @@ function fmsg(t){const e=document.getElementById('fmsg');if(e)e.textContent=t;}
 ACT.fadd=()=>{const e=document.getElementById('fadd'),t=parseTag(e&&e.value);if(!t){fmsg('Type a friend ID like Alice#1234.');return;}
   const id=slug(t.name,t.num);if(id===myId()){fmsg('That is you.');return;}
   const f=findF(id);if(f){fmsg('Already on your list.');return;}if(FD.friends.length>=60){fmsg('Friends list is full.');return;}
-  FD.friends.push({name:t.name,num:t.num,st:'sent'});saveFD();e.value='';fmsg('Request sent. They need to accept it when they are online.');hubRefresh();pollFriends();};
+  FD.friends.push({name:t.name,num:t.num,st:'sent'});saveFD();e.value='';fmsg(BR.ok?'Request sent. Your friend must be online and open Play Online to accept it.':'Saved, but you are not connected to the matchmaker yet. It will send when you are online.');hubRefresh();pollFriends();};
 ACT.faccept=d=>{const f=FD.friends[+d.i];if(!f||f.st!=='recv')return;f.st='ok';saveFD();brSend(slug(f.name,f.num),'OFFER',{kv:'facc',from:FD.me});hubRefresh();pingFriend(f);};
 ACT.fremove=d=>{const f=FD.friends[+d.i];if(!f)return;FD.friends.splice(+d.i,1);saveFD();hubRefresh();};
 ACT.fcopy=()=>{try{navigator.clipboard.writeText(label(FD.me));fmsg('Copied '+label(FD.me));}catch(e){}};
@@ -4335,6 +4335,10 @@ function vRender(){if(!vEl){vEl=document.createElement('div');vEl.style.cssText=
   else if(upd&&upd.error&&upd.manual){const s=document.createElement('span');s.textContent=upd.error;vEl.appendChild(s);}}
 async function checkUpdate(manual){try{upd=await window.kovDesk.checkUpdate();}catch(e){upd={error:'Could not check for updates.'};}vRender();return upd;}
 async function doUpdate(){if(G&&G.players&&!G.over){if(!confirm('Updating will close the current run. Continue?'))return;}if(vEl)vEl.innerHTML='<span>Updating... the game will restart.</span>';try{const r=await window.kovDesk.applyUpdate();if(r&&r.error){upd={error:r.error,manual:1};vRender();}}catch(e){upd={error:'Update failed.',manual:1};vRender();}}
+function updText(){if(!upd)return'Checking for updates...';if(upd.available)return'A new version is ready: v'+upd.latest;if(upd.error)return upd.error;return'You have the latest version.';}
+deskSettings=function(){return'<section><h3>Game Version</h3><p style="margin:4px 0">Eredon KoV <b>v'+KOV_VER+'</b></p><p class="dim" id="updst" style="margin:4px 0">'+esc(updText())+'</p><div class="row"><button class="btn alt" data-a="updcheck">Check for Updates</button>'+(upd&&upd.available?'<button class="btn" data-a="updapply">Update to v'+esc(String(upd.latest))+'</button>':'')+'</div></section>';};
+ACT.updcheck=async()=>{upd=null;settingsScreen();await checkUpdate(true);if(document.getElementById('updst'))settingsScreen();};
+ACT.updapply=()=>{doUpdate();};
 vRender();checkUpdate();setInterval(checkUpdate,15*60*1000);
 if(FD.me)brConnect();
 window.__kovP2P={deskJoin,BR,FD,slug,label,leaveRoom,get HR(){return HR;},FST,pollFriends,brConnect};
