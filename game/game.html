@@ -72,6 +72,11 @@ label{font-size:14px;color:var(--parch-dim);display:flex;gap:8px;align-items:cen
 .gift{background:#0006;border:1px solid #4a3a2a;border-radius:4px;padding:6px 8px;font-size:13px;line-height:1.35}.gift b{color:var(--gold)}
 .abtn{cursor:pointer}.abtn:hover{border-color:var(--gold)!important;background:#0009!important}.upn{font-family:var(--display);color:var(--gold);font-size:14px}
 .abcard{position:fixed;inset:0;z-index:9999;background:#000a;display:flex;align-items:center;justify-content:center;padding:16px}.abc{max-width:420px;width:100%;background:#1c1510;border:2px solid var(--hc,#e8b84a);border-radius:8px;padding:16px 20px;box-shadow:0 8px 40px #000}.abc h3{margin:0;font-family:var(--display);color:var(--gold);font-size:22px}.abc .abk{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#b8a888;margin-bottom:8px}.abc p{font-size:14px;line-height:1.4;margin:8px 0}.abm{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#b8a888}.abm b{color:#fff4d0}
+.codexbar{grid-column:1/-1;display:flex;justify-content:center;margin:6px 0}.codexbtn{display:flex;align-items:center;gap:12px;background:linear-gradient(#3a2418,#24150e);border:2px solid #b8862a;border-radius:8px;color:#f4e4b0;padding:8px 22px;cursor:pointer;font-family:var(--display);box-shadow:0 3px 14px #000a}.codexbtn:hover{border-color:#ffd96a;transform:translateY(-1px)}.codexbtn span{font-size:20px;color:var(--gold);letter-spacing:.08em}.codexbtn small{font-family:serif;font-size:12px;color:#c8b890}
+.bookov{position:fixed;inset:0;z-index:9999;background:radial-gradient(#000a,#000e);display:flex;align-items:center;justify-content:center;padding:12px;perspective:1600px}.book{width:min(940px,100%);max-height:100%}.bkcover{background:linear-gradient(135deg,#6a2418,#3a120c);border:3px solid #b8862a;border-radius:10px;padding:14px;box-shadow:0 14px 60px #000}.bkpages{display:flex;background:#cdb98a;border-radius:4px;box-shadow:inset 0 0 30px #7a5a2a;min-height:min(460px,62vh);position:relative;transform-origin:center;backface-visibility:hidden}.bkpages:before{content:'';position:absolute;left:50%;top:0;bottom:0;width:26px;margin-left:-13px;background:linear-gradient(90deg,transparent,#5a3a1a55,transparent);pointer-events:none}.bkside{flex:1;background:linear-gradient(#efe2bf,#dcc795);color:#2a1c10;padding:22px 30px;display:flex}.bkside.bkl{border-radius:4px 0 0 4px}.bkside.bkr{border-radius:0 4px 4px 0}.bkp{width:100%;position:relative;display:flex;flex-direction:column;justify-content:center}.bkp p{font-family:Georgia,serif;font-size:18px;line-height:1.5;margin:0}.bkn{position:absolute;bottom:-10px;left:0;right:0;text-align:center;font-family:var(--display);font-size:13px;color:#6a4a22}.bko{text-align:center;font-size:26px;color:#8a5a22;margin-bottom:10px}
+.bkbar{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:12px}.bkt{font-family:var(--display);font-size:13px;color:#e8d8a8}
+.bkpages.out-n{transform-origin:left center;transition:transform .24s ease-in;transform:rotateY(-80deg);opacity:.5}.bkpages.out-p{transform-origin:right center;transition:transform .24s ease-in;transform:rotateY(80deg);opacity:.5}.bkpages.in-n{animation:bkin-n .26s ease-out}.bkpages.in-p{animation:bkin-p .26s ease-out}@keyframes bkin-n{from{transform:rotateY(80deg);transform-origin:left center;opacity:.5}to{transform:none;opacity:1}}@keyframes bkin-p{from{transform:rotateY(-80deg);transform-origin:right center;opacity:.5}to{transform:none;opacity:1}}
+@media(max-width:719px){.bkpages:before{display:none}.bkside{padding:18px 20px}.bkp p{font-size:16px}}
 .abl{display:flex;gap:6px;flex-wrap:wrap}.abl span{background:#0006;border:1px solid #6a4a22;border-radius:3px;padding:3px 7px;font-size:13px}.abl kbd{font-family:var(--display);color:var(--ink);background:var(--gold);border-radius:2px;padding:0 5px;margin-right:5px;font-size:11px}
 .slots{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .slot{display:flex;gap:7px;align-items:center;background:#0006;border:1px dashed #4a3a2a;border-radius:4px;padding:5px;min-width:0;font-size:12px;line-height:1.25}
@@ -3258,9 +3263,24 @@ function sheetHTML(){let h='<div class="panel"><h2>Roll of the Knights of Valor<
       '<h4>Training</h4><div class="pips">'+up('Vitality',ch.up.vit)+up('Might',ch.up.mig)+up('Swiftness',ch.up.swi)+up('Focus',ch.up.foc)+'</div>'+
       '<p class="dim" style="font-size:12px">Deepest floor reached: '+Math.max(ch.best,G.depth||0)+' &middot; Gold '+Math.round(ch.gold)+' &middot; Foes slain this run: '+p.kills+'</p></div></section>';});
   const seen=new Set();G.players.forEach(p=>p.ch.lore.forEach(i=>seen.add(i)));
-  h+='<section class="codex"><h3>Lore Codex ('+seen.size+'/'+LORE.length+')</h3><ul>';
-  [...seen].sort((a,b)=>a-b).forEach(i=>{h+='<li>'+LORE[i]+'</li>';});if(!seen.size)h+='<li class="dim">Nothing yet. Chests and hidden rooms hold scraps of the old tales.</li>';
-  return h+'</ul></section></div><div class="row"><button class="btn" data-a="resume">Resume</button></div></div>';}
+  window.KOV_SEEN=[...seen].sort((a,b)=>a-b);
+  h+='<div class="codexbar"><button class="codexbtn" data-a="codex"><svg viewBox="0 0 48 48" width="44" height="44"><path d="M6 10c7-3 13-2 18 2v28c-5-4-11-5-18-2z" fill="#7a2a1c" stroke="#e8b84a" stroke-width="2"/><path d="M42 10c-7-3-13-2-18 2v28c5-4 11-5 18-2z" fill="#9a3a24" stroke="#e8b84a" stroke-width="2"/><path d="M11 17c4-1 8-.5 10 1M11 23c4-1 8-.5 10 1M27 18c2-1.500 6-2 10-1M27 24c2-1.500 6-2 10-1" stroke="#f4e4b0" stroke-width="1.500" fill="none"/></svg><span>Codex</span><small>'+seen.size+' / '+LORE.length+' pages found</small></button></div>';
+  return h+'</div><div class="row"><button class="btn" data-a="resume">Resume</button></div></div>';}
+function codexPage(i,n){const f=KOV_SEEN.includes(i);return'<div class="bkp"><div class="bkn">'+(i+1)+'</div>'+(f?'<div class="bko">&#10086;</div><p>'+LORE[i]+'</p>':'<div class="bko dim">&#10086;</div><p class="dim" style="text-align:center;font-style:italic">This page has not been found yet.<br>Chests and hidden rooms hold scraps of the old tales.</p>')+'</div>';}
+ACT.codex=()=>{const old=document.getElementById('bookov');if(old)old.remove();
+  const seen=window.KOV_SEEN||[],total=LORE.length;let sp=0,busy=false;
+  const one=()=>window.innerWidth<720,per=()=>one()?1:2,spreads=()=>Math.ceil(total/per());
+  // open on the first spread that has a found page
+  const first=seen.length?seen[0]:0;sp=Math.floor(first/per());
+  const el=document.createElement('div');el.id='bookov';el.className='bookov';document.body.appendChild(el);
+  const draw=()=>{const a=sp*per(),pages=[a,a+1].slice(0,per()).filter(x=>x<total);
+    el.innerHTML='<div class="book"><div class="bkcover"><div class="bkpages">'+pages.map((x,k)=>'<div class="bkside '+(k?'bkr':'bkl')+'">'+codexPage(x)+'</div>').join('')+'</div></div><div class="bkbar"><button class="btn alt" data-b="prev"'+(sp<=0?' disabled':'')+'>&larr; Prev</button><span class="bkt">Lore Codex &middot; '+seen.length+' / '+total+' found &middot; page '+(sp+1)+' of '+spreads()+'</span><button class="btn alt" data-b="next"'+(sp>=spreads()-1?' disabled':'')+'>Next &rarr;</button><button class="btn" data-b="close">Close</button></div></div>';};
+  const flip=dir=>{if(busy)return;const n=sp+dir;if(n<0||n>=spreads())return;busy=true;const pg=el.querySelector('.bkpages');pg.classList.add(dir>0?'out-n':'out-p');
+    setTimeout(()=>{sp=n;draw();const pg2=el.querySelector('.bkpages');pg2.classList.add(dir>0?'in-n':'in-p');setTimeout(()=>{busy=false;},260);},240);try{sfx('ui');}catch(_){}};
+  const close=()=>{el.remove();document.removeEventListener('keydown',key,true);};
+  const key=e=>{if(e.key==='ArrowRight'){flip(1);}else if(e.key==='ArrowLeft'){flip(-1);}else if(e.key==='Escape'){close();}else return;e.stopPropagation();e.preventDefault();};
+  el.addEventListener('click',e=>{const b=e.target.closest('[data-b]');if(b){if(b.disabled)return;const k=b.dataset.b;if(k==='prev')flip(-1);else if(k==='next')flip(1);else close();}else if(e.target===el)close();});
+  document.addEventListener('keydown',key,true);draw();};
 // ---------- class / race / gender emblem icons (character creation) — painted medallions ----------
 const ICON_RACE={human:'#e8b84a',dwarf:'#d8844a',elf:'#6ad88a',halfling:'#8ac860',orc:'#7aa858',goblin:'#a8c83a'};
 const ICON_BG={warrior:'#5a1c18',paladin:'#5a4a18',priest:'#4a4a62',ranger:'#1c4220',mage:'#2c2468',druid:'#4a3418',bard:'#5a1c40',warlock:'#34124a',rogue:'#22222e',human:'#4a3a18',dwarf:'#4a2a14',elf:'#1c4a2c',halfling:'#2c4a1c',orc:'#2c4220',goblin:'#3a4a14',m:'#1c3250',f:'#501c3a'};
@@ -4124,7 +4144,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.0.3';
+const KOV_VER='1.0.4';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
