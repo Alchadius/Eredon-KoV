@@ -531,6 +531,7 @@ function genMap(depth,biome,seed,stg){
 function tile(x,y){return(x<0||y<0||x>=MW||y>=MH)?1:G.g[y*MW+x];}
 function blocked(x,y,r,fly){for(const [ox,oy] of [[-r,-r],[r,-r],[-r,r],[r,r]]){const v=tile(Math.floor((x+ox)/T),Math.floor((y+oy)/T));if(v===1||v===2||(v===3&&!fly))return true;}return false;}
 function moveE(e,dx,dy,fly){if(e.d&&e.d.ghost){const nx=e.x+dx,ny=e.y+dy;if(nx>T*1.5&&ny>T*1.5&&nx<(MW-1.5)*T&&ny<(MH-1.5)*T){e.x=nx;e.y=ny;}return;}const r=Math.min(e.r,14);if(!blocked(e.x+dx,e.y,r,fly))e.x+=dx;if(!blocked(e.x,e.y+dy,r,fly))e.y+=dy;}
+function cpos(r){let best=null;for(let i=0;i<60;i++){const x=ri(r.x,r.x+r.w-1),y=ri(r.y,r.y+r.h-1);if(G.g[y*MW+x]!==0)continue;let w=0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]])if(G.g[(y+dy)*MW+x+dx]!==0)w++;if(w>=2)return{x:x*T+16,y:y*T+16};if(w&&!best)best={x:x*T+16,y:y*T+16};}return best||rpos(r);}
 function rpos(r){for(let i=0;i<30;i++){const x=ri(r.x+1,r.x+r.w-2),y=ri(r.y+1,r.y+r.h-2);if(G.g[y*MW+x]===0)return{x:x*T+16,y:y*T+16};}return{x:r.cx*T+16,y:r.cy*T+16};}
 function crackNear(x,y,rad){const t0=Math.floor((x-rad)/T),t1=Math.floor((x+rad)/T),u0=Math.floor((y-rad)/T),u1=Math.floor((y+rad)/T);
   for(let ty=u0;ty<=u1;ty++)for(let tx=t0;tx<=t1;tx++)if(tile(tx,ty)===2&&Math.hypot(tx*T+16-x,ty*T+16-y)<rad+16){G.g[ty*MW+tx]=0;(G.opened||(G.opened=[])).push(ty*MW+tx);
@@ -557,8 +558,8 @@ function startLevel(depth,seed){
     if(r.vault){G.pick.push({k:'chest',vault:true,x:r.cx*T+16-22,y:r.cy*T+16,open:false,secret:false,t:0});G.pick.push({k:'chest',vault:true,x:r.cx*T+16+22,y:r.cy*T+16,open:false,secret:false,t:0});}
     if(r.shrine)G.pick.push({k:'shrine',x:r.cx*T+16,y:r.cy*T+16,open:false,t:0});});
   G.total=G.enemies.length;
-  const cr=rooms[ri(1,Math.max(1,L-1))];const cp=rpos(cr);G.pick.push({k:'chest',x:cp.x,y:cp.y,open:false,secret:false,t:0});
-  for(let k=0;k<Math.floor(rooms.length/8);k++){const cr2=rooms[ri(1,Math.max(1,L-1))],cp2=rpos(cr2);G.pick.push({k:'chest',x:cp2.x,y:cp2.y,open:false,secret:false,t:0});}
+  const far=Math.max(1,Math.floor(L/2));if(Math.random()<.65){const cr=rooms[ri(far,Math.max(far,L-1))];const cp=cpos(cr);G.pick.push({k:'chest',x:cp.x,y:cp.y,open:false,secret:false,t:0});}
+  for(let k=0;k<Math.floor(rooms.length/12);k++){const cr2=rooms[ri(far,Math.max(far,L-1))],cp2=cpos(cr2);G.pick.push({k:'chest',x:cp2.x,y:cp2.y,open:false,secret:false,t:0});}
   if(G.secret){G.pick.push({k:'chest',x:G.secret.x,y:G.secret.y,open:false,secret:true,t:0});}
   G.curStory=null;
 }
@@ -636,7 +637,7 @@ function updPick(dt){const np=[];G.pick=G.pick.filter(o=>{o.t+=dt;
       for(let i=0;i<(o.vault?7:4);i++)np.push({k:'gold',x:o.x+rnd(-22,22),y:o.y+rnd(-22,22),v:ri(3,6)+G.depth*1.2,t:0});
       if(Math.random()<(o.secret?.7:o.vault?.45:.08))np.push({k:'item',src:o.secret?'secret':'chest',x:o.x,y:o.y+20,t:0});
       if(Math.random()<(o.secret?.5:o.vault?.4:.12))np.push({k:'potion',pt:rollPotion(),x:o.x-18,y:o.y+18,t:0});
-      if(o.secret||Math.random()<.35)giveLore(p);
+      if(o.secret?Math.random()<.6:Math.random()<.1)giveLore(p);
       if(o.secret)G.score+=250;
       return true;}}
   return true;}).concat(np);}
@@ -4896,7 +4897,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.10.8';
+const KOV_VER='1.10.9';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
