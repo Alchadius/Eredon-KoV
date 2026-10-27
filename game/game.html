@@ -168,7 +168,7 @@ const CLASSES = {
     ab:[{id:'fireball',n:'Fireball',cd:.8},null,{id:'freeze',n:'Frost Nova',cd:12}]},
   druid:{name:'Druid',col:'#e0802a',hp:110,spd:150,dmg:10,desc:'Bear claws up close. Owl form slows everything nearby.',
     ab:[{id:'claw',n:'Bear Claws',cd:.5},null,{id:'owl',n:'Owl Form',cd:14}]},
-  bard:{name:'Bard',col:'#8c8c9c',hp:90,spd:155,dmg:8,desc:'Distracting notes pull enemies off allies. A lute song heals the party.',
+  bard:{name:'Bard',col:'#4fd8b4',hp:90,spd:155,dmg:8,desc:'Distracting notes pull enemies off allies. A lute song heals the party.',
     ab:[{id:'note',n:'Sour Note',cd:.6},null,{id:'song',n:'Healing Ballad',cd:12}]},
   warlock:{name:'Warlock',col:'#5a2d7a',hp:85,spd:145,dmg:12,desc:'Shadow bolts, and skeleton minions that wall off the horde.',
     ab:[{id:'bolt',n:'Shadow Bolt',cd:.6},null,{id:'skel',n:'Raise Skeletons',cd:12}]},
@@ -4896,7 +4896,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.10.5';
+const KOV_VER='1.10.6';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
