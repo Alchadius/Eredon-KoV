@@ -1,8 +1,8 @@
 {
- "ver": "1.10.7",
+ "ver": "1.10.8",
  "shell": "1.0.0",
  "files": {
-  "game.html": "d59582b0bc7b5974d18ad2698f2a27ce9dcf483070bdeef213dfbc4e8671981b",
+  "game.html": "7080ff29432b1005b1c2c9b885993e6a26b8680c1217bbaad0f5ea3a55e49104",
   "three.min.js": "9274bbcec8d96168626c732b5d31c775aa8cfb7eaa0599bec0c175908a2c1ce2"
  }
 }

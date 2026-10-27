@@ -538,8 +538,8 @@ function crackNear(x,y,rad){const t0=Math.floor((x-rad)/T),t1=Math.floor((x+rad)
     if(!G.foundSecret){G.foundSecret=true;toast('A hidden passage crumbles open!','#c79bff');sfx('crack');}}}
 
 // ----- level setup -----
-function spawnEnemy(type,x,y){const d=EDEF[type],np=G.players.length,sc=(1+.2*(G.depth-1))*(1+.6*(np-1)),hp=Math.round(d.hp*sc);
-  return{id:(G.eid=(G.eid||0)+1),type,d,x,y,r:d.r,hp,maxhp:hp,dmg:d.dmg*(1+.12*(G.depth-1)),spd:d.spd,atk:rnd(0,1),frozen:0,slow:0,taunt:null,tauntT:0,aggro:false,dead:false,t:rnd(0,6),cdA:rnd(1.5,3),cdB:rnd(3,6),dash:0,flash:0};}
+function spawnEnemy(type,x,y){const d=EDEF[type],np=G.players.length,sc=(1+.2*(G.depth-1))*(1+.6*(np-1)),hp=Math.round(d.hp*sc*(d.boss?1.18:1.12));
+  return{id:(G.eid=(G.eid||0)+1),type,d,x,y,r:d.r,hp,maxhp:hp,dmg:d.dmg*(1+.12*(G.depth-1))*(d.boss?1.12:1.08),spd:d.spd,atk:rnd(0,1),frozen:0,slow:0,taunt:null,tauntT:0,aggro:false,dead:false,t:rnd(0,6),cdA:rnd(1.5,3),cdB:rnd(3,6),dash:0,flash:0};}
 function startLevel(depth,seed){
   const SG=stageOf(depth),bi=SG.bi,M=genMap(depth,bi,seed,SG.st),np=G.players.length;
   Object.assign(G,{depth,biome:STAGES[SG.idx],bi,stg:SG.st,haz:[],tq:[],zn:[],g:M.g,bridge:M.bridge,rooms:M.rooms,stairs:M.stairs,secret:M.secret,enemies:[],proj:[],fx:[],pick:[],traps:[],minions:[],
@@ -571,12 +571,12 @@ function hitE(e,amt,p,crit,kb){if(e.dead)return;if(e.frozen>0||e.slow>0)amt*=1.4
   G.fx.push({k:'txt',x:e.x,y:e.y-e.r,t:.7,max:.7,s:amt+(crit?'!':''),col:crit?'#ffd34a':'#fff'});if(e.hp<=0)killE(e,p);}
 function killE(e,p){e.dead=true;e.dt=G.t;G.kills++;if(e.type==='cheesegolem'){spFx('summon',e.x,e.y,'#e8b830',40);for(let i=0;i<3;i++)G.enemies.push(Object.assign(spawnEnemy('rat',e.x+rnd(-18,18),e.y+rnd(-18,18)),{aggro:true}));}if(e.type==='icegolem'){spFx('shards',e.x,e.y,'#8ad8ff',90);hurtRing(e,70,e.dmg*.8,.8);}if(!e.rev&&!e.sum&&REVIVABLE.indexOf(e.type)>=0){(G.bones=G.bones||[]).push({x:e.x,y:e.y,t:G.t,d:G.depth,type:e.type});if(G.bones.length>12)G.bones.shift();}if(e.type==='lavaslug'){G.haz.push({x:e.x,y:e.y,r:30,t:3,tick:.4});spFx('stench',e.x,e.y,'#ff7a2a',30);}if(e.type==='mothwisp'){G.haz.push({x:e.x,y:e.y,r:42,t:4,tick:.4});spFx('sporecloud',e.x,e.y,'#b8ff9a',42);}const k=p||e.lastHit||G.players.find(q=>!q.down)||G.players[0];killHook(e,k);
   const gm=k.ch.racial==='gold'?1.35:1;G.score+=Math.round(e.d.sc*gm);k.score+=Math.round(e.d.sc*gm);k.kills++;
-  G.players.forEach(q=>{if(!q.down)addXp(q,e.d.xp*(q===k?1:.6));});
-  for(let i=0;i<(e.d.boss?6:1);i++)if(e.d.boss||Math.random()<.5)G.pick.push({k:'gold',x:e.x+rnd(-20,20),y:e.y+rnd(-20,20),v:Math.round((ri(1,3)+G.depth*.8)*gm*(e.d.boss?2:1)),t:0});
+  G.players.forEach(q=>{if(!q.down)addXp(q,e.d.xp*.7*(q===k?1:.6));});
+  for(let i=0;i<(e.d.boss?6:1);i++)if(e.d.boss||Math.random()<.35)G.pick.push({k:'gold',x:e.x+rnd(-20,20),y:e.y+rnd(-20,20),v:Math.round((ri(1,3)+G.depth*.8)*gm*(e.d.boss?2:1)),t:0});
   if(Math.random()<.09)G.pick.push({k:'heart',x:e.x,y:e.y,t:0});
   for(let i=0;i<(e.d.boss?1:Math.random()<.01?1:0);i++)G.pick.push({k:'potion',pt:rollPotion(),x:e.x+rnd(-14,14),y:e.y+rnd(-14,14),t:0});
   const luck=k.ch.racial==='luck'?1.4:1;
-  if(Math.random()<(e.d.boss?.4:.007*luck*(1+G.depth*.03))){G.pick.push({k:'item',src:e.d.boss?'boss':'kill',x:e.x,y:e.y,t:0});if(k.ch.racial==='luck')spFx('luck',e.x,e.y,'#ffe27a',0);toast('Something rare glints in the dust...','#c79bff');}
+  if(Math.random()<(e.d.boss?.3:.005*luck*(1+G.depth*.03))){G.pick.push({k:'item',src:e.d.boss?'boss':'kill',x:e.x,y:e.y,t:0});if(k.ch.racial==='luck')spFx('luck',e.x,e.y,'#ffe27a',0);toast('Something rare glints in the dust...','#c79bff');}
   for(let i=0;i<6;i++)G.fx.push({k:'p',x:e.x,y:e.y,vx:rnd(-110,110),vy:rnd(-110,110),t:.6,max:.6,col:e.d.col,r:3});spFx('death',e.x,e.y,e.d.col,e.r);
   sfx('kill');
   if(e.type==='shwolf'){spFx('curse',e.x,e.y,'#9a78ff',64);for(const q of G.players)if(!q.down&&Math.hypot(q.x-e.x,q.y-e.y)<72)q.slow=Math.max(q.slow||0,2);}
@@ -621,7 +621,7 @@ function nextLore(){const have=new Set();G.players.forEach(q=>q.ch.lore.forEach(
 function giveLore(p){const i=nextLore();if(i<0)return;G.players.forEach(q=>{if(!q.ch.lore.includes(i))q.ch.lore.push(i);});toast('Lore found: '+LORE[i],'#e8d9a0',9);}
 function updPick(dt){const np=[];G.pick=G.pick.filter(o=>{o.t+=dt;
   for(const p of G.players){if(p.down)continue;const d=dist(p,o);
-    if(o.k==='gold'&&d<26){const gv=Math.max(1,Math.round(o.v));p.ch.gold+=gv;G.score+=gv;sfx('gold');return false;}
+    if(o.k==='gold'&&d<26){const gv=Math.max(1,Math.round(o.v*.75));p.ch.gold+=gv;G.score+=gv;sfx('gold');return false;}
     if(o.k==='heart'&&d<26){p.hp=Math.min(p.maxhp,p.hp+p.maxhp*.25);ring(o.x,o.y,30,'#ff7a8a');sfx('heart');return false;}
     if(o.k==='item'&&d<28){takeItem(p,o.src);return false;}
     if(o.k==='potion'&&d<26&&givePotion(p,o.pt)){sfx('item');return false;}
@@ -634,7 +634,7 @@ function updPick(dt){const np=[];G.pick=G.pick.filter(o=>{o.t+=dt;
       return true;}
     if(o.k==='chest'&&!o.open&&d<30){o.open=true;sfx('chest');
       for(let i=0;i<(o.vault?7:4);i++)np.push({k:'gold',x:o.x+rnd(-22,22),y:o.y+rnd(-22,22),v:ri(3,6)+G.depth*1.2,t:0});
-      if(Math.random()<(o.secret?.8:o.vault?.55:.1))np.push({k:'item',src:o.secret?'secret':'chest',x:o.x,y:o.y+20,t:0});
+      if(Math.random()<(o.secret?.7:o.vault?.45:.08))np.push({k:'item',src:o.secret?'secret':'chest',x:o.x,y:o.y+20,t:0});
       if(Math.random()<(o.secret?.5:o.vault?.4:.12))np.push({k:'potion',pt:rollPotion(),x:o.x-18,y:o.y+18,t:0});
       if(o.secret||Math.random()<.35)giveLore(p);
       if(o.secret)G.score+=250;
@@ -4219,7 +4219,7 @@ function itemInfo(cls,it){let name,fx=null,cd=0;const si=SLOTS.indexOf(it.slot);
   return{name,fx,cd};}
 function itemScore(it){const s=itemStats(it);return(s.dmg||0)*1.5+(s.hp||0)*.25+(s.crit||0)*3+(s.haste||0)*3+(s.dr||0)*4+(s.regen||0)*5+it.tier*6;}
 function mkItem(cls,depth,tier){tier=tier|0;const slot=pick(SLOTS);return{id:uid(),slot,tier,lvl:Math.max(1,depth|0),r:+(.9+RNG()*.2).toFixed(2),lock:0,fav:0,cls};}
-const TW={chest:[70,26,3.6,.4],secret:[38,46,14.5,1.5],kill:[78,20,1.8,.2],boss:[45,49,5.6,.4]};
+const TW={chest:[78,19,2.7,.3],secret:[46,42,11,1],kill:[84,15,1.3,.15],boss:[52,43,4.3,.3]};
 function rollTier(src,luck,depth){const w=(TW[src]||TW.chest).slice(),bn=(1+.03*(depth||1))*(luck||1);w[2]*=bn;w[3]*=bn;const tot=w[0]+w[1]+w[2]+w[3];let r=Math.random()*tot;for(let i=0;i<4;i++){r-=w[i];if(r<0)return i;}return 0;}
 
 // ----- sanitising / conversion of saved or received items -----
@@ -4896,7 +4896,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.10.7';
+const KOV_VER='1.10.8';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
