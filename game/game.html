@@ -1388,7 +1388,7 @@ function drawWorld(){const sh=G.shake||0;G.shake=Math.max(0,sh-ADT*40);
   if(G.players.some(p=>p.flash>0)){cx.fillStyle='rgba(180,20,20,.12)';cx.fillRect(0,0,VW,VH);}}
 // ---------- ART 3: heroes (tabards, armor, races), druid beast forms, weapons ----------
 const ROBES={priest:1,mage:1,warlock:1,druid:1},CAPES={warrior:1,paladin:1,ranger:1,rogue:1,bard:1,warlock:1};
-const ARMOR={warrior:'#8d98a4',paladin:'#d6d0c0',priest:'#efe9d8',ranger:'#4f7a3a',mage:'#4a3aa0',druid:'#7a5a32',bard:'#7a3558',warlock:'#3a2058',rogue:'#34343f'};
+const ARMOR={warrior:'#8d98a4',paladin:'#d6d0c0',priest:'#efe9d8',ranger:'#4f7a3a',mage:'#2f62c8',druid:'#7a5a32',bard:'#7a3558',warlock:'#3a2058',rogue:'#34343f'};
 const TAB='#6b4220',GOLD='#f2c94c';
 function line(x1,y1,x2,y2,col,w){cx.lineCap='round';cx.strokeStyle=OL;cx.lineWidth=w+1.6;cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke();cx.strokeStyle=col;cx.lineWidth=w;cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke();cx.lineCap='butt';}
 function drawWeapon(k,col,p,ang,sw){
@@ -2049,7 +2049,7 @@ const SP_RACE={
   elf:{tw:5,leg:10,skin:'#f6ecd8',hair:['#f2e4a0','#d8dce8','#c89a4a','#7a5a8a'],fr:[5.5,7.2]},
   halfling:{tw:5.4,leg:5,skin:'#eebb90',hair:['#7a4a24','#2a1a10','#c8903a','#8a2a1a'],fr:[6.4,6.4],hs:1.1}
 };
-const SP_CLS={warrior:'#7c8aa0',paladin:'#aab6c8',mage:'#5a3fa0',ranger:'#3f7a3a',rogue:'#3a3548',priest:'#e8e2d2',druid:'#6a5a30',bard:'#7a3558',warlock:'#3a2058'};
+const SP_CLS={warrior:'#7c8aa0',paladin:'#aab6c8',mage:'#2f62c8',ranger:'#3f7a3a',rogue:'#3a3548',priest:'#e8e2d2',druid:'#6a5a30',bard:'#7a3558',warlock:'#3a2058'};
 const SP_ST={u:.86,hs:1.1,d:3,tex:1};
 const SP_TEX={cloth:'cloth',cloth2:'cloth',tab:'cloth',white:'cloth',green:'cloth',dark:'cloth',steel:'steel',steel2:'steel',leather:'leather',leather2:'leather',hair:'hair',wood:'wood',gold:'gold',blue:'cloth',red:'cloth',moss:'cloth'};
 function spMats(Rc,cls,vr){const M={skin:Rc.skin,hair:Rc.hair[vr%4],steel:'#9aa8bc',steel2:'#6f7d92',gold:'#e8b84a',tab:'#7a4a24',leather:'#6a4326',leather2:'#4a2c18',cloth:SP_CLS[cls],white:'#f1ece0',wood:'#8a5a2c',red:'#b23a3a',blue:'#2f56a0',dark:'#2a2530',green:'#3f7a3a',moss:'#5a8a3a',blade:'#d6e0ee',lip:'#a24a3a',blush:'#ff8a7a',bone:'#e0d8c0'};
@@ -2204,7 +2204,7 @@ const RACE={
  elf:{skin:'#e6d8c0',eye:'#18b8c8',bw:.86,leg:1.16,hx:.9,hy:1.1,hz:.95},
  halfling:{skin:'#dc9e74',eye:'#3a7a2a',bw:.96,leg:.62,hx:1.06,hy:1.04,hz:1.04}};
 const HAIR={human:['#6a4426','#c9a04a','#2e2018','#a8441e'],dwarf:['#c0601a','#6a3a1c','#8a8a90','#2a2018'],elf:['#ecd878','#e8e8f0','#4a3a6a','#2a2030'],halfling:['#6a3e1c','#c8903a','#2a1a10','#a04a22']};
-const CLS={warrior:'#6e7a8e',paladin:'#bcc2cc',mage:'#5a3fa0',ranger:'#3f7a3a',rogue:'#3a3548',priest:'#f2ecda',druid:'#4e7a38',bard:'#6e2850',warlock:'#2d1f45'};
+const CLS={warrior:'#6e7a8e',paladin:'#bcc2cc',mage:'#2f62c8',ranger:'#3f7a3a',rogue:'#3a3548',priest:'#f2ecda',druid:'#4e7a38',bard:'#6e2850',warlock:'#2d1f45'};
 const GOLD='#f2c94c',STYC={shade:'toon',head:1.2,outline:.085,mood:.95,eye:.86,smirk:0};
 const SW=88,SH=100,FEETY=84,K=13,RPX=3,WW=100,WH=64,KW=16.5,WAX=22,WAY=32;
 const renderer=new T.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});renderer.setPixelRatio(1);renderer.setClearColor(0x000000,0);
@@ -4896,7 +4896,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.10.6';
+const KOV_VER='1.10.7';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
