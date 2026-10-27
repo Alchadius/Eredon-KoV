@@ -142,6 +142,9 @@ label{font-size:14px;color:var(--parch-dim);display:flex;gap:8px;align-items:cen
 .ptile.t2{box-shadow:0 0 10px #b06aff66}.ptile.t3{box-shadow:0 0 14px #ff9a2a77}.ptile.sel{outline:2px solid #fff;outline-offset:2px}.ptile.empty{border-style:dashed;opacity:.6}
 .bgrid{display:grid;grid-template-columns:repeat(4,52px);gap:8px;justify-content:center}.btile{width:52px;height:52px;position:relative}.btile.empty{opacity:.35;border-style:dashed;cursor:default}.blk{position:absolute;right:1px;top:-1px;font-size:10px;font-style:normal}
 .bgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}.ptile.bt{width:auto;height:46px}.ptile.bt svg{width:20px;height:20px}.ptile.bt.empty{opacity:.45;min-height:46px}
+.hero header{background:linear-gradient(90deg,#0007,#0003),linear-gradient(90deg,var(--hc,#6b4220),#1a1412 85%)}
+.hero header h3{color:#fff4d0;text-shadow:0 1px 3px #000,0 0 8px #000b}.hero header .rank{color:#f0e2b8;text-shadow:0 1px 3px #000,0 0 6px #000b}.hero header .dim,.hero header span.dim{color:#f4ead0;text-shadow:0 1px 3px #000,0 0 6px #000b}
+.hero .abl{justify-content:center}.hero .abl span.abtn{background:#14100c!important;border:1px solid #8a6a2a;color:#f6ecd0;padding:4px 9px}.hero .abl span.abtn:hover{background:#241a12!important}.hero .abl kbd{background:#2a2018;color:#ffe27a;border:1px solid #8a6a2a;border-radius:3px;padding:0 5px;margin-right:2px;font-size:11px}
 </style>
 <div id="app">
   <div id="stage">
@@ -4893,7 +4896,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.10.3';
+const KOV_VER='1.10.4';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
