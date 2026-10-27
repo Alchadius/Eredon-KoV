@@ -142,7 +142,7 @@ label{font-size:14px;color:var(--parch-dim);display:flex;gap:8px;align-items:cen
 .ptile.t2{box-shadow:0 0 10px #b06aff66}.ptile.t3{box-shadow:0 0 14px #ff9a2a77}.ptile.sel{outline:2px solid #fff;outline-offset:2px}.ptile.empty{border-style:dashed;opacity:.6}
 .bgrid{display:grid;grid-template-columns:repeat(4,52px);gap:8px;justify-content:center}.btile{width:52px;height:52px;position:relative}.btile.empty{opacity:.35;border-style:dashed;cursor:default}.blk{position:absolute;right:1px;top:-1px;font-size:10px;font-style:normal}
 .bgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}.ptile.bt{width:auto;height:46px}.ptile.bt svg{width:20px;height:20px}.ptile.bt.empty{opacity:.45;min-height:46px}
-.hero header{background:linear-gradient(90deg,#0007,#0003),linear-gradient(90deg,var(--hc,#6b4220),#1a1412 85%)}
+.hero header{background:linear-gradient(90deg,#0003,#0001),linear-gradient(90deg,var(--hc,#6b4220),#1a1412 85%)}
 .hero header h3{color:#fff4d0;text-shadow:0 1px 3px #000,0 0 8px #000b}.hero header .rank{color:#f0e2b8;text-shadow:0 1px 3px #000,0 0 6px #000b}.hero header .dim,.hero header span.dim{color:#f4ead0;text-shadow:0 1px 3px #000,0 0 6px #000b}
 .hero .abl{justify-content:center}.hero .abl span.abtn{background:#14100c!important;border:1px solid #8a6a2a;color:#f6ecd0;padding:4px 9px}.hero .abl span.abtn:hover{background:#241a12!important}.hero .abl kbd{background:#2a2018;color:#ffe27a;border:1px solid #8a6a2a;border-radius:3px;padding:0 5px;margin-right:2px;font-size:11px}
 </style>
@@ -156,23 +156,23 @@ label{font-size:14px;color:var(--parch-dim);display:flex;gap:8px;align-items:cen
 <script src="three.min.js"></script><script>
 // ---------- DATA: classes, races, items, enemies, biomes, lore ----------
 const CLASSES = {
-  warrior:{name:'Warrior',col:'#b8423a',hp:120,spd:150,dmg:11,desc:'Front-line brawler. Slash, whirlwind, and a roar that fires up the party.',
+  warrior:{name:'Warrior',col:'#b8925a',hp:120,spd:150,dmg:11,desc:'Front-line brawler. Slash, whirlwind, and a roar that fires up the party.',
     ab:[{id:'slash',n:'Slash',cd:.45},{id:'whirl',n:'Whirlwind',cd:6},{id:'scream',n:'War Cry',cd:14}]},
-  paladin:{name:'Paladin',col:'#e8c95a',hp:130,spd:140,dmg:10,desc:'Hurls holy hammers and wraps allies in blessed armor.',
+  paladin:{name:'Paladin',col:'#e86aa8',hp:130,spd:140,dmg:10,desc:'Hurls holy hammers and wraps allies in blessed armor.',
     ab:[{id:'hammer',n:'Holy Hammer',cd:.7},null,{id:'guard',n:'Aegis Prayer',cd:14}]},
   priest:{name:'Priest',col:'#e9e9f2',hp:90,spd:145,dmg:9,desc:'Smites foes with light that mends the wounded. Shields the party.',
     ab:[{id:'smite',n:'Healing Smite',cd:.6},null,{id:'ward',n:'Ward',cd:14}]},
   ranger:{name:'Ranger',col:'#4f8f4a',hp:95,spd:160,dmg:10,desc:'Long-range arrows and snare traps. Crits slowed targets.',
     ab:[{id:'arrow',n:'Longshot',cd:.4},null,{id:'trap',n:'Snare Trap',cd:8}]},
-  mage:{name:'Mage',col:'#6a5acd',hp:80,spd:145,dmg:12,desc:'Fireballs that burst, and a frost nova that locks down the room.',
+  mage:{name:'Mage',col:'#3a7ae0',hp:80,spd:145,dmg:12,desc:'Fireballs that burst, and a frost nova that locks down the room.',
     ab:[{id:'fireball',n:'Fireball',cd:.8},null,{id:'freeze',n:'Frost Nova',cd:12}]},
-  druid:{name:'Druid',col:'#8a6a3a',hp:110,spd:150,dmg:10,desc:'Bear claws up close. Owl form slows everything nearby.',
+  druid:{name:'Druid',col:'#e0802a',hp:110,spd:150,dmg:10,desc:'Bear claws up close. Owl form slows everything nearby.',
     ab:[{id:'claw',n:'Bear Claws',cd:.5},null,{id:'owl',n:'Owl Form',cd:14}]},
-  bard:{name:'Bard',col:'#8a3560',hp:90,spd:155,dmg:8,desc:'Distracting notes pull enemies off allies. A lute song heals the party.',
+  bard:{name:'Bard',col:'#8c8c9c',hp:90,spd:155,dmg:8,desc:'Distracting notes pull enemies off allies. A lute song heals the party.',
     ab:[{id:'note',n:'Sour Note',cd:.6},null,{id:'song',n:'Healing Ballad',cd:12}]},
   warlock:{name:'Warlock',col:'#5a2d7a',hp:85,spd:145,dmg:12,desc:'Shadow bolts, and skeleton minions that wall off the horde.',
     ab:[{id:'bolt',n:'Shadow Bolt',cd:.6},null,{id:'skel',n:'Raise Skeletons',cd:12}]},
-  rogue:{name:'Rogue',col:'#3a3a48',hp:90,spd:175,dmg:10,desc:'Fast dagger throws. Vanish, then hit for double.',
+  rogue:{name:'Rogue',col:'#e8c93a',hp:90,spd:175,dmg:10,desc:'Fast dagger throws. Vanish, then hit for double.',
     ab:[{id:'dagger',n:'Throwing Dagger',cd:.35},null,{id:'vanish',n:'Vanish',cd:12}]}
 };
 const RACES = {
@@ -4896,7 +4896,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.10.4';
+const KOV_VER='1.10.5';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
