@@ -895,13 +895,13 @@ function update(dt){if(!G||G.mode!=='play')return;dt=Math.min(dt,.05);G.t+=dt;G.
   if(G.open&&al.length&&al.every(p=>Math.hypot(p.x-G.stairs.x,p.y-G.stairs.y)<80)){G.stairT+=dt;if(G.stairT>.8)G.mode='levelDone';}else G.stairT=0;
 }
 // ---------- AUDIO: synthesized effects + procedural music (no files needed) ----------
-const AU={ctx:null,master:null,mus:null,fx:null,noise:null,on:{m:true,s:true},vol:.62,musVol:null,theme:null,step:0,next:0,timer:null,fight:0,fightTarget:0,last:{},mel:4};
-try{const s=JSON.parse(localStorage.getItem('kov_audio')||'null');if(s){AU.on.m=s.m!==false;AU.on.s=s.s!==false;if(typeof s.v==='number'&&s.v>=0&&s.v<=1)AU.vol=s.v;}}catch(e){}
-function auSave(){try{localStorage.setItem('kov_audio',JSON.stringify({m:AU.on.m,s:AU.on.s,v:AU.vol}));}catch(e){}}
+const AU={ctx:null,master:null,mus:null,fx:null,noise:null,on:{m:true,s:true},vol:.62,musVol:null,theme:null,step:0,next:0,timer:null,fight:0,fightTarget:0,last:{},mel:4,mvol:1};
+try{const s=JSON.parse(localStorage.getItem('kov_audio')||'null');if(s){AU.on.m=s.m!==false;AU.on.s=s.s!==false;if(typeof s.v==='number'&&s.v>=0&&s.v<=1)AU.vol=s.v;if(typeof s.mv==='number'&&s.mv>=0&&s.mv<=1)AU.mvol=s.mv;}}catch(e){}
+function auSave(){try{localStorage.setItem('kov_audio',JSON.stringify({m:AU.on.m,s:AU.on.s,v:AU.vol,mv:AU.mvol}));}catch(e){}}
 function auInit(){if(AU.ctx){if(AU.ctx.state==='suspended')AU.ctx.resume();return true;}
   const C=typeof window!=='undefined'&&(window.AudioContext||window.webkitAudioContext);if(!C)return false;
   try{const c=AU.ctx=new C();const comp=c.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=6;
-    AU.master=c.createGain();AU.master.gain.value=.85;AU.musVol=c.createGain();AU.musVol.gain.value=AU.on.m?AU.vol*.8:0;AU.musVol.connect(AU.master);AU.mus=c.createGain();AU.mus.connect(AU.musVol);AU.fx=c.createGain();AU.fx.gain.value=AU.on.s?.9:0;
+    AU.master=c.createGain();AU.master.gain.value=.85*AU.mvol;AU.musVol=c.createGain();AU.musVol.gain.value=AU.on.m?AU.vol*.8:0;AU.musVol.connect(AU.master);AU.mus=c.createGain();AU.mus.connect(AU.musVol);AU.fx=c.createGain();AU.fx.gain.value=AU.on.s?.9:0;
     AU.fx.connect(AU.master);AU.master.connect(comp);comp.connect(c.destination);
     const b=c.createBuffer(1,c.sampleRate,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;AU.noise=b;
     if(AU.theme)startMusic();return true;}catch(e){AU.ctx=null;return false;}}
@@ -1031,6 +1031,7 @@ THEMES.menu_new=THEMES.title; // saved: the composed flute-and-harp menu theme, 
 function musicPlay(name){if(!THEMES[name])name='title';if(AU.theme===name&&AU.timer)return;AU.theme=name;AU.step=0;if(AU.ctx)startMusic();}
 function musicStop(){AU.theme=null;if(AU.timer){clearInterval(AU.timer);AU.timer=null;}}
 function newBus(){const c=AU.ctx,o=AU.mus;if(o){try{o.gain.cancelScheduledValues(c.currentTime);o.gain.setValueAtTime(o.gain.value,c.currentTime);o.gain.linearRampToValueAtTime(0,c.currentTime+.4);}catch(e){}setTimeout(()=>{try{o.disconnect();}catch(e){}},900);}AU.mus=c.createGain();AU.mus.connect(AU.musVol);}
+function setMaster(v){AU.mvol=Math.max(0,Math.min(1,v));auSave();if(AU.ctx&&AU.master)AU.master.gain.setTargetAtTime(.85*AU.mvol,AU.ctx.currentTime,.03);}
 function setVol(v){AU.vol=Math.max(0,Math.min(1,v));auSave();if(AU.ctx&&AU.on.m)AU.musVol.gain.setTargetAtTime(AU.vol*.8,AU.ctx.currentTime,.03);}
 function startMusic(){if(AU.timer)clearInterval(AU.timer);newBus();AU.next=AU.ctx.currentTime+.15;AU.timer=setInterval(musicTick,60);}
 function musicTick(){const c=AU.ctx;if(!c||!AU.theme)return;AU.fight+=(AU.fightTarget-AU.fight)*.08;const th=THEMES[AU.theme];
@@ -4644,7 +4645,7 @@ function rebindKey(code){const t=REBIND;REBIND=null;if(code!=='Escape'){const sl
 function kbtn(id,code){return '<button class="btn alt kb'+(REBIND===id?' wait':'')+'" data-a="kb" data-k="'+id+'">'+(REBIND===id?'Press a key...':esc(keyName(code)))+'</button>';}
 function settingsScreen(){let h='<div class="panel"><h2>Settings &amp; Controls</h2><p class="dim">Click a key, then press the new one. If it is already used, the two swap. Esc cancels.</p><div class="sheet">';
   for(let p=0;p<(COOP?2:1);p++){h+='<section><h3>'+(p?'Hero 2 (second player, same keyboard)':'Hero 1')+'</h3><div class="krow">';ROLES.forEach(([r,n])=>{h+='<span>'+n+'</span>'+kbtn(p+'.'+r,kget(p,r));});h+='</div></section>';}
-  h+='<section><h3>General</h3><div class="krow">';GROLES.forEach(([g,n])=>{h+='<span>'+n+'</span>'+kbtn(g,KEYS[g]);});h+='<span>Pause (also)</span><kbd class="fix">Esc</kbd></div><h3 style="margin-top:12px">Audio</h3><div class="row"><button class="btn alt" data-a="setmus">Music: '+(AU.on.m?'on':'off')+'</button><button class="btn alt" data-a="setsfx">Effects: '+(AU.on.s?'on':'off')+'</button></div><div class="vrow"><label for="musvol">Music volume</label><input type="range" id="musvol" min="0" max="100" step="1" value="'+Math.round(AU.vol*100)+'"><b id="musvolv">'+Math.round(AU.vol*100)+'%</b></div><p class="dim" style="margin-top:8px">Online games use the Hero 1 keys; Hero 2 keys also work as a second way to move and cast.</p></section>'+(typeof deskSettings==='function'?deskSettings():'')+'</div>'+
+  h+='<section><h3>General</h3><div class="krow">';GROLES.forEach(([g,n])=>{h+='<span>'+n+'</span>'+kbtn(g,KEYS[g]);});h+='<span>Pause (also)</span><kbd class="fix">Esc</kbd></div><h3 style="margin-top:12px">Audio</h3><div class="row"><button class="btn alt" data-a="setmus">Music: '+(AU.on.m?'on':'off')+'</button><button class="btn alt" data-a="setsfx">Effects: '+(AU.on.s?'on':'off')+'</button></div><div class="vrow"><label for="mastervol">Master volume</label><input type="range" id="mastervol" min="0" max="100" step="1" value="'+Math.round(AU.mvol*100)+'"><b id="mastervolv">'+Math.round(AU.mvol*100)+'%</b></div><div class="vrow"><label for="musvol">Music volume</label><input type="range" id="musvol" min="0" max="100" step="1" value="'+Math.round(AU.vol*100)+'"><b id="musvolv">'+Math.round(AU.vol*100)+'%</b></div><p class="dim" style="margin-top:8px">Online games use the Hero 1 keys; Hero 2 keys also work as a second way to move and cast.</p></section>'+(typeof deskSettings==='function'?deskSettings():'')+'</div>'+
     '<div class="row"><button class="btn alt" data-a="kreset">Reset to Defaults</button><button class="btn" data-a="setback">Back</button></div></div>';
   show(h);}
 ACT.settings=()=>{SEL.from=G&&G.mode==='pause'?'pause':'title';REBIND=null;settingsScreen();};
@@ -4652,7 +4653,7 @@ ACT.kb=d=>{REBIND=d.k;settingsScreen();};
 ACT.kreset=()=>{REBIND=null;applyKeys(JSON.parse(KDEF));saveKeys();settingsScreen();};
 ACT.setmus=()=>{auInit();setAudio('m',!AU.on.m);settingsScreen();};ACT.setsfx=()=>{auInit();setAudio('s',!AU.on.s);settingsScreen();};
 ACT.setback=()=>{REBIND=null;if(SEL.from==='pause')pauseScreen();else if(SEL.from==='coop'){SEL.from=null;SEL.coop=true;charsScreen();}else titleScreen();};
-ov.addEventListener('input',e=>{if(e.target.id==='musvol'){auInit();setVol(+e.target.value/100);const v=document.getElementById('musvolv');if(v)v.textContent=Math.round(AU.vol*100)+'%';}});
+ov.addEventListener('input',e=>{if(e.target.id==='mastervol'){auInit();setMaster(+e.target.value/100);const v=document.getElementById('mastervolv');if(v)v.textContent=Math.round(AU.mvol*100)+'%';}if(e.target.id==='musvol'){auInit();setVol(+e.target.value/100);const v=document.getElementById('musvolv');if(v)v.textContent=Math.round(AU.vol*100)+'%';}});
 // live key hint strip
 let hintSig='';
 function renderHints(){const el=document.getElementById('hint');if(!el)return;const two=!NET.on&&COOP,k=n=>'<kbd>'+esc(keyName(n))+'</kbd>',pl=(p,l)=>'<span><b>'+l+'</b> '+['u','l','d','r'].map(r=>k(CTRL[p][r])).join('')+' move &middot; '+k(CTRL[p].a[0])+' primary &middot; '+k(CTRL[p].a[1])+' secondary &middot; '+k(CTRL[p].a[2])+' utility &middot; '+k(CTRL[p].lg)+' legendary &middot; '+k(CTRL[p].po)+' potion</span>';
@@ -4883,7 +4884,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.8.0';
+const KOV_VER='1.9.0';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
