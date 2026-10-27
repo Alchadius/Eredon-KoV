@@ -3901,11 +3901,14 @@ ACT.abinfo=d=>{const C=CLASSES[d.cls],a=C&&C.ab[+d.s],CI=CLASS_INFO[d.cls]||{ab:
   const el=document.createElement('div');el.id='abcard';el.className='abcard';
   el.innerHTML='<div class="abc" style="--hc:'+C.col+'"><h3>'+esc(a.n)+'</h3><div class="abk">'+esc(C.name)+' &middot; '+keys[+d.s]+'</div><p>'+(CI.ab[+d.s]&&CI.ab[+d.s]!=='\u2014'?CI.ab[+d.s]:C.desc)+'</p><div class="abm"><span>Recharge <b>'+a.cd+'s</b></span><span>Role <b>'+esc(CI.role||'')+'</b></span><span>Range <b>'+esc(CI.range||'')+'</b></span></div>'+(CI.tip?'<p class="dim"><b>Tip:</b> '+esc(CI.tip)+'</p>':'')+'<div class="row"><button class="btn" data-x="1">Close</button></div></div>';
   el.addEventListener('click',()=>el.remove());document.body.appendChild(el);};
-ACT.csheet=d=>{const c=byId(d.id);if(!c)return;const sv=G;let h;
-  G={players:[makePlayer(c,0)],depth:0,view:1,selBag:null,selSlot:null,mode:'view'};
+let CSEL={id:null,bag:null,slot:null};
+ACT.csheet=d=>{const c=byId(d.id);if(!c)return;if(CSEL.id!==d.id)CSEL={id:d.id,bag:null,slot:null};const sc0=ov.querySelector('.panel'),st0=d.keep&&sc0?sc0.scrollTop:0;const sv=G;let h;
+  G={players:[makePlayer(c,0)],depth:0,view:1,selBag:CSEL.bag?'0:'+CSEL.bag:null,selSlot:CSEL.slot?'0:'+CSEL.slot:null,mode:'view'};
   try{h=sheetHTML();}finally{G=sv;}
-  h=h.replace(/ data-a="(bagsel|slotsel)"/g,'').replace(/<button class="btn" data-a="resume">Resume<\/button>/,'<button class="btn" data-a="chars">Back to roster</button>');
-  show(h);paintPortraits();};
+  h=h.replace(/ data-a="bagsel"/g,' data-a="rbag"').replace(/ data-a="slotsel"/g,' data-a="rslot"').replace(/<div class="xibt">.*?<\/div>/g,'').replace(/Click an item to equip, lock or sell it\. Gear changes only here or on the pause screen\./,'Click an item to see its details. Gear is changed in-game or on the pause screen.').replace(/<button class="btn" data-a="resume">Resume<\/button>/,'<button class="btn" data-a="chars">Back to roster</button>');
+  show(h);paintPortraits();if(d.keep){const sc=ov.querySelector('.panel');if(sc)sc.scrollTop=st0;}};
+ACT.rbag=d=>{CSEL.bag=CSEL.bag===d.id?null:d.id;CSEL.slot=null;ACT.csheet({id:CSEL.id,keep:1});};
+ACT.rslot=d=>{CSEL.slot=CSEL.slot===d.slot?null:d.slot;CSEL.bag=null;ACT.csheet({id:CSEL.id,keep:1});};
 function RG(s){return s.race+(s.g==='f'?'|f':'');}
 function createScreen(back,go){const s=SEL.h[0],C=CLASSES[s.cls],R=RACES[s.race];const sc=ov.querySelector('.panel'),st=sc?sc.scrollTop:0;
   let h='<div class="panel create"><h2>Create Your Hero</h2><div class="cbox cprev"><canvas class="pt big2" width="112" height="134" data-pc="'+s.cls+'" data-pr="'+RG(s)+'"></canvas><div><input type="text" id="nm0" maxlength="16" placeholder="Name (or leave blank for a random one)" value="'+esc(s.name)+'"><h3 style="margin-top:8px">'+(s.g==='f'?'Female ':'Male ')+R.name+' '+C.name+'</h3><p class="dim">'+C.desc+'</p><p class="dim">Racial gift, rolled at birth: <b style="color:var(--gold)">'+R.opts.map(o=>RACIALS[o][0]).join(' or ')+'</b></p><p class="dim" style="font-style:italic">'+(RACE_LORE[s.race]||'')+'</p></div></div>';
@@ -3953,7 +3956,7 @@ ACT.retry=()=>{const ch=G.players.map(p=>p.ch);hide();beginRun(ch,false);};ACT.t
 const SLOT_SVG={ring:'<svg viewBox="0 0 24 24"><circle cx="12" cy="15" r="6" fill="none" stroke="#e8b84a" stroke-width="2.4"/><path d="M12 3l3 4h-6z" fill="#c79bff"/></svg>',neck:'<svg viewBox="0 0 24 24"><path d="M4 4q8 14 16 0" fill="none" stroke="#e8b84a" stroke-width="2"/><path d="M12 14l3 4-3 4-3-4z" fill="#c79bff"/></svg>',weapon:'<svg viewBox="0 0 24 24"><path d="M5 19L18 5l1 1-12 15z" fill="#dfe6ee"/><path d="M3 17l4 4M2 22l3-3" stroke="#e8b84a" stroke-width="2.2"/></svg>',armor:'<svg viewBox="0 0 24 24"><path d="M5 4h14v8c0 5-4 8-7 9-3-1-7-4-7-9z" fill="#8d98a4" stroke="#e8b84a" stroke-width="1.4"/><path d="M11 6h2v12h-2zM7 10h10v2H7z" fill="#e8b84a"/></svg>'};
 const CREST='<svg class="crest" viewBox="0 0 34 42"><path d="M2 2h30v22c0 9-8 14-15 17C10 38 2 33 2 24z" fill="#6b4220" stroke="#f2c94c" stroke-width="2"/><path d="M15 8h4v24h-4zM8 16h18v4H8z" fill="#f2c94c"/></svg>';
 function rankOf(l){let r=RANKS[0][1];for(const x of RANKS)if(l>=x[0])r=x[1];return r;}
-function sheetHTML(){let h='<div class="panel"><h2>Roll of the Knights of Valor</h2><div class="sheet">';
+function sheetHTML(){let h='<div class="panel"><h2>Character sheet</h2><div class="sheet">';
   G.players.forEach((p,i)=>{const ch=p.ch,C=CLASSES[ch.cls],ra=RACIALS[ch.racial]||['',''],R=RACES[ch.race]||RACES.human;
     const bar=(l,v,m,t)=>'<div class="stat"><span>'+l+'</span><i><b style="width:'+Math.min(100,v/m*100)+'%"></b></i><em>'+t+'</em></div>';
     const up=(n,v)=>'<span>'+n+' <b class="upn">'+v+'</b></span>';
@@ -4886,7 +4889,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.10.1';
+const KOV_VER='1.10.2';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
