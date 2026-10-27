@@ -1115,16 +1115,16 @@ function hudRing(px,py,r,th,p){const f=Math.max(0,Math.min(1,p.hp/p.maxhp)),a0=-
   cx.lineWidth=1.3;cx.strokeStyle='#d4a63c';cx.beginPath();cx.arc(px,py,r+th/2+2,0,7);cx.stroke();}
 // full plate: ring portrait, name, vigor, renown, ability tiles, coin
 function hudPlate(p,i,x,y,ctl){
-  const W=272,cl=CLASSES[p.cls],tx=x+70,rx=x+W-10,cxr=x+31,cyr=y+31;
+  const W=272,cl=CLASSES[p.cls],tx=x+70,rx=x+W-10,cxr=x+31,cyr=y+35;
   cx.save();
-  cx.globalAlpha=.9;const g=cx.createLinearGradient(0,y+5,0,y+57);g.addColorStop(0,'#2e241b');g.addColorStop(1,'#18120e');cx.fillStyle=g;hrr(x+36,y+5,W-36,52,8);cx.fill();
-  cx.globalAlpha=1;cx.lineWidth=3;cx.strokeStyle='#120d0a';hrr(x+36,y+5,W-36,52,8);cx.stroke();cx.lineWidth=1.4;cx.strokeStyle='#b98a2e';hrr(x+36,y+5,W-36,52,8);cx.stroke();
+  cx.globalAlpha=.9;const g=cx.createLinearGradient(0,y+5,0,y+57);g.addColorStop(0,'#2e241b');g.addColorStop(1,'#18120e');cx.fillStyle=g;hrr(x+36,y+5,W-36,60,8);cx.fill();
+  cx.globalAlpha=1;cx.lineWidth=3;cx.strokeStyle='#120d0a';hrr(x+36,y+5,W-36,60,8);cx.stroke();cx.lineWidth=1.4;cx.strokeStyle='#b98a2e';hrr(x+36,y+5,W-36,60,8);cx.stroke();
   hudRing(cxr,cyr,25,5,p);
   cx.save();if(p.down)cx.globalAlpha=.45;cx.drawImage(hudIcon(p.cls),cxr-22,cyr-22,44,44);cx.restore();
   // level pill
   cx.font='800 11px '+HN;cx.textAlign='center';const lw=cx.measureText('Lv '+p.ch.lvl).width+10;
-  const pg=cx.createLinearGradient(0,y+49,0,y+61);pg.addColorStop(0,'#f6d77a');pg.addColorStop(1,'#c8962c');cx.fillStyle=pg;hrr(cxr-lw/2,y+49,lw,12,6);cx.fill();cx.lineWidth=1.5;cx.strokeStyle='#120d0a';cx.stroke();
-  cx.fillStyle='#120d0a';cx.fillText('Lv '+p.ch.lvl,cxr,y+58.5);
+  const pg=cx.createLinearGradient(0,y+53,0,y+65);pg.addColorStop(0,'#f6d77a');pg.addColorStop(1,'#c8962c');cx.fillStyle=pg;hrr(cxr-lw/2,y+53,lw,12,6);cx.fill();cx.lineWidth=1.5;cx.strokeStyle='#120d0a';cx.stroke();
+  cx.fillStyle='#120d0a';cx.fillText('Lv '+p.ch.lvl,cxr,y+62.5);
   // name + vigor
   cx.textAlign='left';cx.font='800 16px '+HF;hot(p.ch.name,tx,y+21,'#f6ecd0');
     cx.textAlign='right';
@@ -1132,11 +1132,12 @@ function hudPlate(p,i,x,y,ctl){
   else{const sh=p.b&&p.b.shield?Math.ceil(p.b.shield.v):0;let t=Math.ceil(p.hp)+' / '+p.maxhp;cx.font='800 14px '+HN;
     if(sh){const sw=cx.measureText('+'+sh).width;hot('+'+sh,rx,y+21,'#9ad0ff');hot(t,rx-sw-6,y+21,'#ff8a72');}else hot(t,rx,y+21,p.hp<p.maxhp*.3?'#ff7a62':'#ffd0c0');}
   // renown strip
-  cx.fillStyle='#0c0806';hrr(tx,y+27,rx-tx,5,2.5);cx.fill();
-  const xf=Math.max(0,Math.min(1,p.ch.xp/xpNeed(p.ch.lvl)));if(xf>0){const xg=cx.createLinearGradient(0,y+27,0,y+32);xg.addColorStop(0,'#ffe27a');xg.addColorStop(1,'#c8962c');cx.fillStyle=xg;hrr(tx,y+27,Math.max(5,(rx-tx)*xf),5,2.5);cx.fill();}
-  cx.lineWidth=1;cx.strokeStyle='#5a4620';hrr(tx,y+27,rx-tx,5,2.5);cx.stroke();
+  const XW=120,XB=tx+20,XY=y+27;cx.textAlign='left';cx.font='800 10px '+HN;hot('XP',tx,XY+5.5,'#d8b45a');
+  cx.fillStyle='#0c0806';hrr(XB,XY,XW,5,2.5);cx.fill();
+  const xf=Math.max(0,Math.min(1,p.ch.xp/xpNeed(p.ch.lvl)));if(xf>0){const xg=cx.createLinearGradient(0,XY,0,XY+5);xg.addColorStop(0,'#ffe27a');xg.addColorStop(1,'#c8962c');cx.fillStyle=xg;hrr(XB,XY,Math.max(5,XW*xf),5,2.5);cx.fill();}
+  cx.lineWidth=1;cx.strokeStyle='#5a4620';hrr(XB,XY,XW,5,2.5);cx.stroke();
   // ability tiles
-  let bx=tx;
+  const nT=cl.ab.filter(Boolean).length+(p.use?1:0)+(p.ch.potion?1:0);cx.save();cx.translate((rx-(nT*28-6))-tx,3);let bx=tx;
   cl.ab.forEach((a,s)=>{if(!a)return;const cd=p.cds[s]>0?Math.min(1,p.cds[s]/(a.cd*p.cdm)):0,ty=y+36,S=22;
     const tg=cx.createLinearGradient(0,ty,0,ty+S);tg.addColorStop(0,'#3a2e22');tg.addColorStop(1,'#1c1510');cx.fillStyle=tg;hrr(bx,ty,S,S,5);cx.fill();
     cx.save();hrr(bx,ty,S,S,5);cx.clip();if(p.down)cx.globalAlpha=.4;abGlyph(a.id,bx+2.5,ty+2.5,17);cx.globalAlpha=1;
@@ -1164,10 +1165,11 @@ function hudPlate(p,i,x,y,ctl){
     cx.textAlign='right';cx.font='800 11px '+HN;hot('x'+pt.n,bx+S+1,ty+S+1,'#fff');
     const kn=ctl&&ctl.po?keyName(ctl.po):'';if(kn){cx.font='800 10px '+HN;cx.textAlign='center';const kw=Math.max(11,cx.measureText(kn).width+6);cx.fillStyle='#eadfc4';hrr(bx+S-kw+4,ty-5,kw,11,3);cx.fill();cx.lineWidth=1;cx.strokeStyle='#120d0a';cx.stroke();cx.fillStyle='#120d0a';cx.fillText(kn,bx+S-kw/2+4,ty+3.5);}
     bx+=S+6;}
+  cx.restore();
   // coin pill (this hero's own gold)
-  const gs=Math.round(p.ch.gold).toLocaleString();cx.font='800 14px '+HN;const gw=cx.measureText(gs).width,pw=gw+30,px=rx-pw;
-  cx.fillStyle='#0c0806';hrr(px,y+37,pw,20,10);cx.fill();cx.lineWidth=1;cx.strokeStyle='#5a4620';cx.stroke();
-  hudCoin(px+11,y+47,7);cx.textAlign='right';cx.fillStyle='#ffe27a';cx.fillText(gs,rx-7,y+52);
+  const gs=Math.round(p.ch.gold).toLocaleString();cx.font='800 14px '+HN;const gw=cx.measureText(gs).width,pw=gw+30,px=tx;
+  cx.fillStyle='#0c0806';hrr(px,y+39,pw,20,10);cx.fill();cx.lineWidth=1;cx.strokeStyle='#5a4620';cx.stroke();
+  hudCoin(px+11,y+49,7);cx.textAlign='right';cx.fillStyle='#ffe27a';cx.fillText(gs,px+pw-7,y+54);
   cx.restore();cx.textAlign='left';}
 // compact plate for other online heroes
 function hudMini(p,x,y){const W=212,cl=CLASSES[p.cls],cxr=x+15,cyr=y+17;cx.save();
@@ -4884,7 +4886,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.9.0';
+const KOV_VER='1.10.0';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
