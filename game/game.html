@@ -158,22 +158,22 @@ label{font-size:14px;color:var(--parch-dim);display:flex;gap:8px;align-items:cen
 const CLASSES = {
   warrior:{name:'Warrior',col:'#b8925a',hp:120,spd:150,dmg:11,desc:'Front-line brawler. Slash, whirlwind, and a roar that fires up the party.',
     ab:[{id:'slash',n:'Slash',cd:.45},{id:'whirl',n:'Whirlwind',cd:6},{id:'scream',n:'War Cry',cd:14}]},
-  paladin:{name:'Paladin',col:'#e86aa8',hp:130,spd:140,dmg:10,desc:'Hurls holy hammers and wraps allies in blessed armor.',
-    ab:[{id:'hammer',n:'Holy Hammer',cd:.7},null,{id:'guard',n:'Aegis Prayer',cd:14}]},
+  paladin:{name:'Paladin',col:'#e86aa8',hp:130,spd:140,dmg:10,desc:'Swings a blessed hammer, hurls it, and wraps allies in armor.',
+    ab:[{id:'hsmash',n:'Hammer Swing',cd:.6},{id:'hammer',n:'Holy Hammer',cd:5},{id:'guard',n:'Aegis Prayer',cd:14}]},
   priest:{name:'Priest',col:'#e9e9f2',hp:90,spd:145,dmg:9,desc:'Smites foes with light that mends the wounded. Shields the party.',
-    ab:[{id:'smite',n:'Healing Smite',cd:.6},null,{id:'ward',n:'Ward',cd:14}]},
+    ab:[{id:'smite',n:'Healing Smite',cd:.6},{id:'sanct',n:'Sanctuary Circle',cd:11},{id:'ward',n:'Ward',cd:14}]},
   ranger:{name:'Ranger',col:'#4f8f4a',hp:95,spd:160,dmg:10,desc:'Long-range arrows and snare traps. Crits slowed targets.',
-    ab:[{id:'arrow',n:'Longshot',cd:.4},null,{id:'trap',n:'Snare Trap',cd:8}]},
+    ab:[{id:'arrow',n:'Longshot',cd:.4},{id:'multi',n:'Multishot',cd:5},{id:'trap',n:'Snare Trap',cd:8}]},
   mage:{name:'Mage',col:'#3a7ae0',hp:80,spd:145,dmg:12,desc:'Fireballs that burst, and a frost nova that locks down the room.',
-    ab:[{id:'fireball',n:'Fireball',cd:.8},null,{id:'freeze',n:'Frost Nova',cd:12}]},
+    ab:[{id:'fireball',n:'Fireball',cd:.8},{id:'chain',n:'Chain Lightning',cd:5},{id:'freeze',n:'Frost Nova',cd:12}]},
   druid:{name:'Druid',col:'#e0802a',hp:110,spd:150,dmg:10,desc:'Bear claws up close. Owl form slows everything nearby.',
-    ab:[{id:'claw',n:'Bear Claws',cd:.5},null,{id:'owl',n:'Owl Form',cd:14}]},
+    ab:[{id:'claw',n:'Bear Claws',cd:.5},{id:'vines',n:'Thorn Vines',cd:6},{id:'owl',n:'Owl Form',cd:14}]},
   bard:{name:'Bard',col:'#4fd8b4',hp:90,spd:155,dmg:8,desc:'Distracting notes pull enemies off allies. A lute song heals the party.',
-    ab:[{id:'note',n:'Sour Note',cd:.6},null,{id:'song',n:'Healing Ballad',cd:12}]},
+    ab:[{id:'note',n:'Sour Note',cd:.6},{id:'chord',n:'Discordant Chord',cd:7},{id:'song',n:'Healing Ballad',cd:12}]},
   warlock:{name:'Warlock',col:'#5a2d7a',hp:85,spd:145,dmg:12,desc:'Shadow bolts, and skeleton minions that wall off the horde.',
-    ab:[{id:'bolt',n:'Shadow Bolt',cd:.6},null,{id:'skel',n:'Raise Skeletons',cd:12}]},
-  rogue:{name:'Rogue',col:'#e8c93a',hp:90,spd:175,dmg:10,desc:'Fast dagger throws. Vanish, then hit for double.',
-    ab:[{id:'dagger',n:'Throwing Dagger',cd:.35},null,{id:'vanish',n:'Vanish',cd:12}]}
+    ab:[{id:'bolt',n:'Shadow Bolt',cd:.6},{id:'drain',n:'Drain Soul',cd:8},{id:'skel',n:'Raise Skeletons',cd:12}]},
+  rogue:{name:'Rogue',col:'#e8c93a',hp:90,spd:175,dmg:10,desc:'Fast cross-slashes and thrown knives. Vanish, then hit for double.',
+    ab:[{id:'xslash',n:'Cross Slash',cd:.5},{id:'dagger',n:'Throwing Knives',cd:3.5},{id:'vanish',n:'Vanish',cd:12}]}
 };
 const RACES = {
   human:{name:'Human',skin:'#ecc7a0',opts:['xp','luck']},
@@ -184,22 +184,22 @@ const RACES = {
 const CLASS_INFO={
   warrior:{role:'Tank / Brawler',range:'Melee',diff:1,lore:'Squires of Valeron are drilled to stand in the doorway so everyone else can stand behind it. Warriors trade finesse for steel, noise and an alarming enthusiasm for being hit.',pros:'Tough, simple, strong in a crowd',cons:'Must stay close to the fight',tip:'Open with War Cry, then wade in and whirl.',
     ab:['Wide melee arc that cuts every foe in front of you.','Spin for 150% damage to everything around you.','Allies within range deal 50% more damage for 7s.']},
-  paladin:{role:'Bulwark / Support',range:'Mid-range',diff:1,lore:'Sworn to the old sun-order of Valeron. Their hammers are blessed, their armor is blessed, and their sermons are, regrettably, also blessed and very long.',pros:'Sturdiest class, protects the party',cons:'Slow hammer, modest speed',tip:'Cast Aegis Prayer just before a boss slam.',
-    ab:['Hurl a holy hammer that pierces every foe in its path (140% damage).','—','Nearby allies take 40% less damage for 9s and are healed for 8% of their max health.']},
+  paladin:{role:'Bulwark / Support',range:'Melee / Mid-range',diff:1,lore:'Sworn to the old sun-order of Valeron. Their hammers are blessed, their armor is blessed, and their sermons are, regrettably, also blessed and very long.',pros:'Sturdiest class, protects the party',cons:'Slow hammer, modest speed',tip:'Cast Aegis Prayer just before a boss slam.',
+    ab:['Swing your hammer in a short, heavy melee arc (115% damage).','Hurl a holy hammer that pierces every foe in its path (140% damage).','Nearby allies take 40% less damage for 9s and are healed for 8% of their max health.']},
   priest:{role:'Healer / Support',range:'Ranged',diff:2,lore:'Keepers of the candle-halls beneath the castle. A priest believes every wound is a chance for mercy, and every skeleton is a chance for a lecture.',pros:'Heals allies with every shot; party shields',cons:'Fragile, low damage',tip:'Aim light bolts through your friends to heal them.',
-    ab:['Light bolt that wounds foes and heals the allies it strikes.','—','Shield nearby allies (45 + 8 per level) for 10s.']},
+    ab:['Light bolt that wounds foes and heals the allies it strikes.','Raise a healing circle at your feet for 5s that mends every ally standing in it (3% max health every half second).','Shield nearby allies (45 + 8 per level) for 10s.']},
   ranger:{role:'Marksman / Trapper',range:'Long range',diff:2,lore:'Wardens of the Elderwood border who sleep in trees and shoot from the next one over. Rangers prefer to meet danger at a comfortable distance.',pros:'Longest reach, fast, crits slowed foes',cons:'Light armor, needs room to kite',tip:'Drop a snare in the doorway, shoot from the back.',
-    ab:['Fast, long-range arrow with a high crit chance on slowed targets.','—','Place a snare trap that holds enemies in place (lasts 14s).']},
+    ab:['Fast, long-range arrow with a high crit chance on slowed targets.','Loose a cone of 5 arrows (60% damage each).','Place a snare trap that holds enemies in place (lasts 14s).']},
   mage:{role:'Burst / Crowd Control',range:'Long range',diff:3,lore:'Graduates of the Cinder Academy, where the final exam is surviving the final exam. Mages carry the most firepower and the least hit points in the realm.',pros:'Highest damage, area fireballs, freezes rooms',cons:'Lowest health, punishes mistakes',tip:'Frost Nova first, fireballs on the frozen crowd.',
-    ab:['Fireball that bursts on impact (130% damage, area).','—','Freeze every foe nearby for 3s and damage them (50%).']},
+    ab:['Fireball that bursts on impact (130% damage, area).','A bolt of lightning that jumps between up to 4 foes (100% damage, fading with each jump).','Freeze every foe nearby for 3s and damage them (50%).']},
   druid:{role:'Bruiser / Shapeshifter',range:'Melee / Form',diff:2,lore:'Keepers of the hidden groves, who answer to the seasons and are rude to anyone who builds a fence. A druid is either a bear, an owl, or a very cross person.',pros:'Hardy, strong up close, crowd-slowing owl form',cons:'Short reach in bear form',tip:'Slip into Owl Form to kite a pack, then claw it down.',
-    ab:['Bear claws sweep a wide arc (130% damage).','—','Become an owl for 7s: enemies nearby are slowed and your light shines farther.']},
+    ab:['Bear claws sweep a wide arc (130% damage).','Vines erupt in a line ahead (90% damage) and slow every foe they touch for 2.5s.','Become an owl for 7s: enemies nearby are slowed and your light shines farther.']},
   bard:{role:'Support / Aggro Control',range:'Ranged',diff:2,lore:'Wandering minstrels who survive by being charming, loud and slightly faster than whatever is chasing them. Every dungeon deserves a soundtrack.',pros:'Pulls enemies off allies, heals the party',cons:'Low damage, needs good timing',tip:'Sour Notes pull the horde off your weakest friend.',
-    ab:['Sour note that taunts the enemy it hits (60% damage).','—','Heal all nearby allies for 30% of their max health.']},
+    ab:['Sour note that taunts the enemy it hits (60% damage).','A short blast of sound (70% damage) that knocks foes back and confuses them for 1.5s.','Heal all nearby allies for 30% of their max health.']},
   warlock:{role:'Summoner / Caster',range:'Ranged',diff:2,lore:'Scholars who read the book that said not to. Their shadows are well-behaved, mostly, and their skeleton friends never complain about the pay.',pros:'Piercing bolts, minions soak damage',cons:'Low health, minions expire',tip:'Raise skeletons in a corridor to wall off the horde.',
-    ab:['Shadow bolt that pierces every foe in line (120% damage).','—','Raise 3 skeleton minions that fight for 14s.']},
-  rogue:{role:'Assassin / Skirmisher',range:'Ranged / Fast',diff:3,lore:'Quiet people with long coats and short answers. Rogues finish fights before the torches burn down, or they are already somewhere else.',pros:'Fastest class, quickest attacks, big burst',cons:'Fragile, rewards careful play',tip:'Vanish, then spend the double damage on the boss.',
-    ab:['Rapid thrown daggers (95% damage, fastest attack in the game).','—','Vanish for 3s; your next strikes deal double damage for 4s.']}
+    ab:['Shadow bolt that pierces every foe in line (120% damage).','Drain the nearest foe for 2s, dealing damage and healing you for 45% of it.','Raise 3 skeleton minions that fight for 14s.']},
+  rogue:{role:'Assassin / Skirmisher',range:'Melee / Ranged',diff:3,lore:'Quiet people with long coats and short answers. Rogues finish fights before the torches burn down, or they are already somewhere else.',pros:'Fastest class, quickest attacks, big burst',cons:'Fragile, rewards careful play',tip:'Vanish, then spend the double damage on the boss.',
+    ab:['A quick X-shaped double cut in melee (two hits, 70% damage each).','Throw 3 knives in a spread (80% damage each).','Vanish for 3s; your next strikes deal double damage for 4s.']}
 };
 const RACE_INFO={
   human:{home:'Valeron & the Free Cities',lore:'Adaptable, stubborn, and everywhere. Humans built Valeron, and mostly forgot why. They learn fast and luck into things.',fits:'Any class — a safe first pick',pros:'Learns faster, finds better loot'},
@@ -439,9 +439,9 @@ function toast(s,col,t){G.toasts.push({s,col:col||'#eadfc4',t:t||3.2});if(G.toas
 function xpNeed(l){return Math.round(40*Math.pow(l,1.35));}
 function newChar(cls,race,name,g){if(!RACES[race])race='human';return{id:Math.random().toString(36).slice(2,10),cls,race,g:g==='f'?'f':'m',racial:pick(RACES[race].opts),name:(name||'').trim()||pick(NAMES),lvl:1,xp:0,gold:0,up:{vit:0,mig:0,swi:0,foc:0},items:{},lore:[],best:0};}
 function makePlayer(ch,idx){const p={ch,idx,cls:ch.cls,x:0,y:0,r:12,fx:1,fy:0,cds:[0,0,0],hp:0,maxhp:1,down:false,rev:0,flash:0,b:{},score:0,kills:0,lcd:0,st:{},slow:0,anim:0};recalc(p);p.hp=p.maxhp;return p;}
-function recalc(p){const ch=p.ch,C=CLASSES[ch.cls];let hp=C.hp+ch.lvl*9+ch.up.vit*12,dmg=C.dmg+ch.lvl*1.6+ch.up.mig*2,cr=0,hs=0,dr=0,rg=0;p.pr={};p.use=null;
+function recalc(p){const ch=p.ch,C=CLASSES[ch.cls];let hp=C.hp+ch.lvl*9+ch.up.vit*12,dmg=C.dmg+ch.lvl*1.6+ch.up.mig*2,cr=0,hs=0,dr=0,rg=0;p.pr={};p.pv={};p.use=null;
   for(const s of SLOTS){const it=ch.items[s];if(!it)continue;const st=itemStats(it);hp+=st.hp||0;dmg+=st.dmg||0;cr+=st.crit||0;hs+=st.haste||0;dr+=st.dr||0;rg+=st.regen||0;
-    if(it.tier===2)p.pr[s]=1;else if(it.tier===3){const L=LEGS[ch.cls]&&LEGS[ch.cls][s];if(L)p.use={id:L[1],n:L[0],cd:L[3],t:L[2]};}}
+    if(it.tier===2){if(it.v&&EPIC2[ch.cls]&&EPIC2[ch.cls][s])p.pv[s]=1;else p.pr[s]=1;}else if(it.tier===3){const L=legOf(ch.cls,it);if(L)p.use={id:L[1],n:L[0],cd:L[3],t:L[2]};}}
   if(ch.racial==='hp')hp*=1.18;
   p.maxhp=Math.round(hp);p.base=dmg;p.crit=cr;p.dr=Math.min(40,dr);p.regen=rg;p.spd=C.spd*(1+ch.up.swi*.04)*(ch.racial==='speed'?1.1:1);
   p.cdm=Math.max(.35,1-ch.up.foc*.04-(ch.racial==='cd'?.12:0)-hs/100);p.hp=Math.min(p.hp||p.maxhp,p.maxhp);}
@@ -595,6 +595,19 @@ function arc(p,rng,half,m,kb){ring(p.x+p.fx*rng*.5,p.y+p.fy*rng*.5,rng*.55,'#fff
   for(const e of G.enemies){if(e.dead)continue;const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy);if(d>rng+e.r)continue;
     const dot=(dx*p.fx+dy*p.fy)/(d||1);if(dot<Math.cos(half))continue;const[a,c]=pdmg(p,m);hitE(e,a,p,c,kb||10);}
   crackNear(p.x+p.fx*rng*.7,p.y+p.fy*rng*.7,rng*.5);}
+function arcRot(p,rng,half,m,kb,ang){const fx=p.fx,fy=p.fy,c=Math.cos(ang),s=Math.sin(ang);p.fx=fx*c-fy*s;p.fy=fx*s+fy*c;arc(p,rng,half,m,kb);p.fx=fx;p.fy=fy;}
+function chainLight(p){const pv=p.pv||{};let best=null,bd=1e9;for(const e of G.enemies){if(e.dead)continue;const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy);if(d>300)continue;if((dx*p.fx+dy*p.fy)/(d||1)<.3)continue;if(d<bd){bd=d;best=e;}}
+  if(!best){for(const e of G.enemies){if(e.dead)continue;const d=dist(p,e);if(d<bd&&d<260){bd=d;best=e;}}}
+  if(!best){G.fx.push({k:'bolt',x:p.x,y:p.y,x2:p.x+p.fx*120,y2:p.y+p.fy*120,t:.25,max:.25});return;}
+  const jumps=4+(pv.ring?3:0),hit=new Set();let from={x:p.x,y:p.y-4},cur=best;
+  for(let i=0;i<jumps&&cur;i++){hit.add(cur);G.fx.push({k:'bolt',x:from.x,y:from.y,x2:cur.x,y2:cur.y,t:.25,max:.25});const[d,c]=pdmg(p,Math.pow(.88,i));hitE(cur,d,p,c,4);spFx('hit',cur.x,cur.y,'#9ad8ff',0);
+    from={x:cur.x,y:cur.y};let nx=null,nd=130;for(const e of G.enemies){if(e.dead||hit.has(e))continue;const d2=dist(cur,e);if(d2<nd){nd=d2;nx=e;}}cur=nx;}}
+function vineLine(p){const L=190,W=30;ring(p.x+p.fx*L/2,p.y+p.fy*L/2,L/2,'#8aff7a');for(let d=30;d<=L;d+=40)spFx('vines',p.x+p.fx*d,p.y+p.fy*d,'#8aff7a',40);
+  for(const e of G.enemies){if(e.dead)continue;const dx=e.x-p.x,dy=e.y-p.y,t=dx*p.fx+dy*p.fy;if(t<0||t>L+e.r)continue;if(Math.abs(dx*p.fy-dy*p.fx)<e.r+W){const[d,c]=pdmg(p,.9);hitE(e,d,p,c,0);e.slow=Math.max(e.slow||0,2.5);}}
+  if(p.pv&&p.pv.ring){zone(p,p.x+p.fx*L*.6,p.y+p.fy*L*.6,70,4,p.base*1.0,'#5ac84a',1);}}
+function drainSoul(p){let best=null,bd=1e9;for(const e of G.enemies){if(e.dead)continue;const d=dist(p,e);if(d>230)continue;const f=(e.x-p.x)*p.fx+(e.y-p.y)*p.fy>0?0:60;if(d+f<bd){bd=d+f;best=e;}}
+  if(!best){ring(p.x,p.y,40,'#b06aff');return;}const mul=(p.pv&&p.pv.neck)?2:1;
+  for(let i=0;i<4;i++)later(i*.5,()=>{if(p.down||best.dead||dist(p,best)>320)return;const[d,c]=pdmg(p,.45);hitE(best,d,p,c,0);G.fx.push({k:'bolt',x:best.x,y:best.y,x2:p.x,y2:p.y-4,t:.4,max:.4});const h=Math.round(d*.45*mul);p.hp=Math.min(p.maxhp,p.hp+h);G.fx.push({k:'txt',x:p.x,y:p.y-18,t:.6,max:.6,s:'+'+h,col:'#7aff9a'});});}
 function useAbil0(p,slot){const a=CLASSES[p.cls].ab[slot];if(p.ch.racial==='cd')spFx('mind',p.x,p.y-26,'#ff8ac6',0);spFx('cast',p.x+p.fx*14,p.y+p.fy*14-4,CLASSES[p.cls].col,0);p.cds[slot]=a.cd*p.cdm;p.swing=.22;p.swingN=(p.swingN||0)+1;let d,c;
   switch(a.id){
   case'slash':arc(p,58,1.0,1);sfx('slash');break;
@@ -614,7 +627,15 @@ function useAbil0(p,slot){const a=CLASSES[p.cls].ab[slot];if(p.ch.racial==='cd')
   case'song':for(const q of allies(p,240)){q.hp=Math.min(q.maxhp,q.hp+q.maxhp*.3);ring(q.x,q.y,50,'#7aff9a');spFx('notes',q.x,q.y,'#7aff9a');}toast('Healing Ballad','#7aff9a');sfx('song');break;
   case'bolt':[d,c]=pdmg(p,1.2);shoot(p,{sp:450,dmg:d,crit:c,life:.9,pierce:1,col:'#b06aff',r:6,k:'bolt'});sfx('bolt');break;
   case'skel':for(let i=0;i<3;i++)G.minions.push({x:p.x+Math.cos(i*2.1)*26,y:p.y+Math.sin(i*2.1)*26,r:10,hp:45+p.ch.lvl*5,life:14,atk:0,own:p});ring(p.x,p.y,60,'#9a6aff');spFx('bones',p.x,p.y,'#9a6aff',34);sfx('skel');break;
-  case'dagger':[d,c]=pdmg(p,.95);shoot(p,{sp:580,dmg:d,crit:c,life:.7,col:'#cfd8e0',r:4,k:'dagger'});sfx('dagger');break;
+  case'dagger':for(const an of[0,-.2,.2]){[d,c]=pdmg(p,.8);shootAng(p,{sp:580,dmg:d,crit:c,life:.7,col:'#cfd8e0',r:4,k:'dagger'},an);}sfx('dagger');break;
+  case'hsmash':arc(p,50,1.1,1.15,20);sfx('slash');break;
+  case'xslash':arcRot(p,50,.8,.7,8,.5);later(.09,()=>{if(!p.down)arcRot(p,50,.8,.7,8,-.5);});sfx('slash');break;
+  case'sanct':{const pv=p.pv||{},r=95*(pv.neck?1.25:1),t=5*(pv.neck?1.5:1);zone(p,p.x,p.y,r,t,0,'#7aff9a',0);G.zn[G.zn.length-1].heal=.03;ring(p.x,p.y,r,'#7aff9a');spFx('aegis',p.x,p.y,'#7aff9a',0);toast('Sanctuary Circle','#7aff9a');sfx('bless');break;}
+  case'multi':{const pv=p.pv||{},n=pv.neck?8:5,sp=pv.neck?.9:.6;for(let i=0;i<n;i++){[d,c]=pdmg(p,.6);shootAng(p,{sp:540,dmg:d,crit:c,life:.8,col:'#d9c89a',r:4,k:'arrow'},(i/(n-1)-.5)*sp);}sfx('arrow');break;}
+  case'chain':chainLight(p);sfx('bolt');break;
+  case'vines':vineLine(p);sfx('claw');break;
+  case'chord':{arc(p,120,.9,.7,40);const dur=(p.pv&&p.pv.neck)?3:1.5;for(const e of G.enemies){if(e.dead)continue;const dx=e.x-p.x,dy=e.y-p.y,dd=Math.hypot(dx,dy);if(dd>120+e.r)continue;if((dx*p.fx+dy*p.fy)/(dd||1)<Math.cos(.9))continue;tauntToFriend(e,p,dur);}spFx('notes',p.x+p.fx*50,p.y+p.fy*50,'#ff8ac6');sfx('note');break;}
+  case'drain':drainSoul(p);sfx('bolt');break;
   case'vanish':addBuff(p,'vanish',1,3);addBuff(p,'dmg',2,4);ring(p.x,p.y,60,'#5a5a78');spFx('smoke',p.x,p.y,'#5a5a78',0);toast('Vanished! Next strikes hit double','#aab');sfx('vanish');break;
   }}
 // ----- pickups -----
@@ -1097,6 +1118,14 @@ const ABI={
   skel:[['M12 3 C7 3 4 7 4 11 C4 14 6 15 6 17 L6 20 L18 20 L18 17 C18 15 20 14 20 11 C20 7 17 3 12 3Z','#f2ead0'],[_c(9,11,2),'#2a1d10'],[_c(15,11,2),'#2a1d10']],
   dagger:[['M12 2 L15 14 H9Z','#d4dae2'],['M7 14h10v2H7z','#c8962c'],['M11 16h2v6h-2z','#6a3a1a']],
   vanish:[['M6 18 C2 18 2 12 7 12 C7 7 14 6 15 11 C20 10 21 18 16 18Z','#8a8aa8']],
+  hsmash:[['M11 8h2v14h-2z','#8a5a2a'],['M4 2h16v7H4z','#c8c8d0'],['M4 2h16v2H4z','#ffe27a']],
+  xslash:[['M4 4 L20 20','none','#e8e0c0',3],['M20 4 L4 20','none','#e8e0c0',3]],
+  sanct:[[_c(12,12,9),'none','#7aff9a',2.2],[_c(12,12,3),'#7aff9a']],
+  multi:[['M3 21 L12 3','none','#d8c8a0',2],['M12 21 L12 3','none','#d8c8a0',2],['M21 21 L12 3','none','#d8c8a0',2],['M12 2 L9 7 H15Z','#c8c8d0']],
+  chain:[['M14 2 L6 12 H11 L8 22 L18 9 H12Z','#9ad8ff']],
+  vines:[['M4 21 Q10 14 8 8 Q7 4 12 3','none','#6fbf5a',2.6],['M12 21 Q17 14 15 9','none','#6fbf5a',2.6],['M18 21 Q21 15 20 10','none','#6fbf5a',2.6]],
+  chord:[['M3 9 Q8 4 13 9','none','#ff8ac6',2.2],['M3 15 Q8 10 13 15','none','#ff8ac6',2.2],['M14 4 L21 12 L14 20Z','#ff7ab8']],
+  drain:[[_c(12,12,8),'#5a2d7a'],['M12 6 V18 M7 12 H17','none','#7aff9a',2]],
   leg:[['M12 2L14.5 9L22 9.5L16 14L18.2 21.5L12 17.2L5.8 21.5L8 14L2 9.5L9.5 9Z','#ff9a2a'],['M12 7L13.2 11L17 11.5L14 14L15 18L12 15.8L9 18L10 14L7 11.5L10.8 11Z','#ffe0a0']]
 };
 const ABP={};
@@ -4214,12 +4243,28 @@ const clampN=(v,a,b,d)=>{v=+v;return isNaN(v)?d:Math.max(a,Math.min(b,v));};
 function itemStats(it){const b=IBASE[it.slot][it.tier],f=Math.max(.5,Math.min(2.4,1+.12*(it.lvl-8)))*it.r,fp=Math.min(f,1.5),o={};
   for(const k in b){const pct=(k==='crit'||k==='haste'||k==='dr');o[k]=k==='regen'?b[k]:Math.max(1,Math.round(b[k]*(pct?fp:f)));}return o;}
 function itemInfo(cls,it){let name,fx=null,cd=0;const si=SLOTS.indexOf(it.slot);
-  if(it.tier===3){const L=LEGS[cls][it.slot];if(L){name=L[0];fx=L[2];cd=L[3];}else name=LEGPRE[(it.lvl+si)%3]+' '+ITEM_NAMES[cls][si];}
-  else if(it.tier===2){name=EPICS[cls][si][0];fx=EPICS[cls][si][1];}
+  if(it.tier===3){const L=legOf(cls,it);if(L){name=L[0];fx=L[2];cd=L[3];}else name=LEGPRE[(it.lvl+si)%3]+' '+ITEM_NAMES[cls][si];}
+  else if(it.tier===2){const E=(it.v&&EPIC2[cls]&&EPIC2[cls][it.slot])||EPICS[cls][si];name=E[0];fx=E[1];}
   else{const pr=ITIER_PRE[it.tier];name=pr[(it.lvl+si)%pr.length]+' '+ITEM_NAMES[cls][si];}
   return{name,fx,cd};}
 function itemScore(it){const s=itemStats(it);return(s.dmg||0)*1.5+(s.hp||0)*.25+(s.crit||0)*3+(s.haste||0)*3+(s.dr||0)*4+(s.regen||0)*5+it.tier*6;}
-function mkItem(cls,depth,tier){tier=tier|0;const slot=pick(SLOTS);return{id:uid(),slot,tier,lvl:Math.max(1,depth|0),r:+(.9+RNG()*.2).toFixed(2),lock:0,fav:0,cls};}
+function hasVar(cls,slot,tier){return tier===2?!!(EPIC2[cls]&&EPIC2[cls][slot]):tier===3?!!(LEG2[cls]&&LEG2[cls][slot]):false;}
+function mkItem(cls,depth,tier){tier=tier|0;const slot=pick(SLOTS);return{id:uid(),slot,tier,lvl:Math.max(1,depth|0),r:+(.9+RNG()*.2).toFixed(2),lock:0,fav:0,v:(hasVar(cls,slot,tier)&&Math.random()<.5)?1:0,cls};}
+const EPIC2={
+paladin:{neck:['Sunlit Collar','Radiant Swing: Hammer Swing hits heal you for 4% of your max health.']},
+rogue:{ring:['Crossed Blades Signet','Crossfire: Cross Slash has a 30% chance to strike a third time.']},
+priest:{neck:['Locket of the Quiet Grove','Quiet Grove: Sanctuary Circle lasts 50% longer and is 25% wider.']},
+ranger:{neck:['Hunter\'s Quiver Charm','Full Quiver: Multishot looses 8 arrows.']},
+mage:{ring:['Stormband','Forked Lightning: Chain Lightning jumps 3 more times.']},
+druid:{ring:['Thornroot Band','Briar Patch: Thorn Vines leave brambles for 4s that hurt and slow foes.']},
+bard:{neck:['Whistle of Discord','Mayhem: Discordant Chord confuses foes for twice as long.']},
+warlock:{neck:['Vampiric Locket','Hungering Drain: Drain Soul heals you for twice as much.']}};
+const LEG2={
+paladin:{weapon:['Sunfall, the Dawnbreaker\'s Maul','sunfall','Call down 8 holy hammers in a ring around you (350% damage each, piercing).',55]},
+rogue:{weapon:['Fang of a Thousand Cuts','cuts','Slash every foe nearby three times for 150% damage per cut.',50]},
+priest:{armor:['Seraph\'s Sanctuary Vestments','holyground','Raise a vast holy circle for 9s that heals allies 4% of their health every half second.',70]},
+mage:{weapon:['Stormcaller\'s Scepter','tempest','Lightning strikes up to 8 nearby foes for 400% damage.',55]}};
+function legOf(cls,it){return(it.v&&LEG2[cls]&&LEG2[cls][it.slot])||(LEGS[cls]&&LEGS[cls][it.slot])||null;}
 const TW={chest:[78,19,2.7,.3],secret:[46,42,11,1],kill:[84,15,1.3,.15],boss:[52,43,4.3,.3]};
 function rollTier(src,luck,depth){const w=(TW[src]||TW.chest).slice(),bn=(1+.03*(depth||1))*(luck||1);w[2]*=bn;w[3]*=bn;const tot=w[0]+w[1]+w[2]+w[3];let r=Math.random()*tot;for(let i=0;i<4;i++){r-=w[i];if(r<0)return i;}return 0;}
 
@@ -4228,7 +4273,7 @@ function legacyItem(r,cls,slot){const pw=clampN(r.power,1,60,1);return{id:uid(),
 function cleanItem(r,cls,slot){if(!r||typeof r!=='object')return null;
   if(typeof r.tier!=='number'){return SLOTS.includes(slot)&&typeof r.power==='number'?legacyItem(r,cls,slot):null;}
   const sl=SLOTS.includes(r.slot)?r.slot:null;if(!sl)return null;let tier=Math.floor(clampN(r.tier,0,3,0));
-  return{id:String(r.id||uid()).replace(/[^\w]/g,'').slice(0,10)||uid(),slot:sl,tier,lvl:Math.floor(clampN(r.lvl,1,60,1)),r:clampN(r.r,.9,1.1,1),lock:r.lock?1:0,fav:r.fav?1:0,cls};}
+  return{id:String(r.id||uid()).replace(/[^\w]/g,'').slice(0,10)||uid(),slot:sl,tier,lvl:Math.floor(clampN(r.lvl,1,60,1)),r:clampN(r.r,.9,1.1,1),lock:r.lock?1:0,fav:r.fav?1:0,v:(r.v&&hasVar(cls,sl,tier))?1:0,cls};}
 function cleanInv(o,c){const cls=o.cls,ci=c.items,cb=c.bag,cp=c.potion;c={items:ci,bag:cb};o.potion=cleanPot(cp);o.items={};o.bag=[];const seen=new Set();let leg=0;const extra=[];
   if(c.items&&typeof c.items==='object')for(const s of SLOTS){const it=cleanItem(c.items[s],cls,s);if(!it||it.slot!==s||seen.has(it.id))continue;seen.add(it.id);
     if(isPow(it)){if(leg){extra.push(it);continue;}leg=1;}o.items[s]=it;}
@@ -4359,7 +4404,10 @@ function postCast(p,id,slot){const s=ist(p),pr=p.pr||{},n=(s.cast&&s.cast[id])||
     if(id==='song'&&pr.neck)for(const q of allies(p,240))addBuff(q,'haste',1,6);}
   if(p.cls==='rogue'){if(id==='dagger'&&pr.ring&&Math.random()<.2)for(const a of[-.22,.22]){const[d,c]=pdmg(p,.95);shootAng(p,{sp:580,dmg:d,crit:c,life:.7,col:'#cfd8e0',r:4,k:'dagger'},a);}
     if(id==='vanish'){if(pr.neck){ring(p.x,p.y,150,'#8a8aa8');for(const e of foes(p.x,p.y,150))e.slow=Math.max(e.slow||0,3);p.cds[slot]*=.7;}if(pr.armor)s.hush=1;}}}
-function useAbil(p,slot){const a=CLASSES[p.cls].ab[slot];preCast(p,a.id);useAbil0(p,slot);postCast(p,a.id,slot);}
+function postCast2(p,id){const pv=p.pv||{};
+  if(id==='hsmash'&&pv.neck&&G.enemies.some(e=>!e.dead&&dist(p,e)<50+e.r)){p.hp=Math.min(p.maxhp,p.hp+p.maxhp*.04);G.fx.push({k:'txt',x:p.x,y:p.y-18,t:.6,max:.6,s:'+',col:'#7aff9a'});}
+  if(id==='xslash'&&pv.ring&&Math.random()<.3)later(.2,()=>{if(!p.down){arcRot(p,50,.8,.7,8,0);spFx('cast',p.x+p.fx*20,p.y+p.fy*20-4,'#e8c93a',0);}});}
+function useAbil(p,slot){const a=CLASSES[p.cls].ab[slot];preCast(p,a.id);useAbil0(p,slot);postCast(p,a.id,slot);postCast2(p,a.id);}
 
 // ----- damage hooks -----
 function hurtPre(p,amt,src,melee){if(p.b.inv)return-1;const pr=p.pr||{},s=ist(p);
@@ -4401,6 +4449,10 @@ function minionEnd(m){const p=m.own;if(p&&p.cls==='warlock'&&p.pr&&p.pr.ring&&!m
 function useLegend(p){if(!p||p.down||!p.use||(p.lcd||0)>0)return false;const u=p.use,f=LEGFN[u.id];if(!f)return false;
   if(f(p)===false)return false;p.lcd=u.cd*p.cdm;p.lcdMax=p.lcd;toast(p.ch.name+': '+u.n+'!','#ff9a2a',3);sfx('proc');ring(p.x,p.y,120,'#ff9a2a');G.shake=Math.max(G.shake||0,6);return true;}
 const LEGFN={
+sunfall:p=>{for(let i=0;i<8;i++)shootAng(p,{sp:380,dmg:p.base*3.5,life:.8,pierce:9,col:'#ffe27a',r:9,k:'hammer'},i*Math.PI/4);ring(p.x,p.y,110,'#ffe27a');spFx('aegis',p.x,p.y,'#ffe27a',0);},
+cuts:p=>{const t=foes(p.x,p.y,210);ring(p.x,p.y,210,'#e8e0c0');for(const e of t)for(let j=0;j<3;j++)later(j*.12,()=>{if(!e.dead){hitE(e,p.base*1.5,p,true,6);spFx('hit',e.x,e.y,'#fff',0);}});},
+holyground:p=>{zone(p,p.x,p.y,170,9,0,'#fff7c0',0);G.zn[G.zn.length-1].heal=.04;ring(p.x,p.y,170,'#fff7c0');spFx('pillar',p.x,p.y,'#fff7c0',70);},
+tempest:p=>{const t=G.enemies.filter(e=>!e.dead&&dist(p,e)<280).sort((a,b)=>dist(p,a)-dist(p,b)).slice(0,8);for(const e of t){G.fx.push({k:'bolt',x:e.x,y:e.y-140,x2:e.x,y2:e.y,t:.3,max:.3});hitE(e,p.base*4,p,true,8);}ring(p.x,p.y,120,'#9ad8ff');},
 titanfall:p=>{let d=170;while(d>20&&blocked(p.x+p.fx*d,p.y+p.fy*d,12))d-=20;spFx('smoke',p.x,p.y,'#fff',0);p.x+=p.fx*d;p.y+=p.fy*d;spFx('eslam',p.x,p.y,'#fff',10);boom(p.x,p.y,100,p.base*4,p);for(const e of foes(p.x,p.y,105))e.frozen=Math.max(e.frozen||0,2);},
 bulwark:p=>{addBuff(p,'def',.7,6);for(const e of foes(p.x,p.y,300)){if(e.d.boss)continue;e.taunt=p;e.tauntT=6;e.aggro=true;}spFx('aegis',p.x,p.y,'#ffcf6a',0);},
 judgment:p=>{const L=320;ring(p.x+p.fx*L/2,p.y+p.fy*L/2,L/2,'#fff2a0');for(let d=30;d<=L;d+=40)spFx('pillar',p.x+p.fx*d,p.y+p.fy*d,'#fff2a0',30);
@@ -4452,7 +4504,7 @@ function itemTick(p,dt){const s=ist(p),pr=p.pr||{};if(p.lcd>0)p.lcd-=dt;if(p.pcd
   legTick(p,dt);}
 function itemUpdate(dt){
   if(G.tq&&G.tq.length){const q=G.tq;G.tq=[];for(const t of q){t.t-=dt;if(t.t<=0){try{t.fn();}catch(e){}}else G.tq.push(t);}}
-  if(G.zn&&G.zn.length)G.zn=G.zn.filter(z=>{z.t-=dt;z.tick-=dt;if(z.tick<=0){z.tick=.5;for(const e of foes(z.x,z.y,z.r)){if(z.dps)hitE(e,z.dps*.5,z.own);if(z.slow)e.slow=Math.max(e.slow||0,.8);}}return z.t>0;});
+  if(G.zn&&G.zn.length)G.zn=G.zn.filter(z=>{z.t-=dt;z.tick-=dt;if(z.tick<=0){z.tick=.5;if(z.heal)for(const q of G.players)if(!q.down&&Math.hypot(q.x-z.x,q.y-z.y)<z.r)q.hp=Math.min(q.maxhp,q.hp+q.maxhp*z.heal);for(const e of foes(z.x,z.y,z.r)){if(z.dps)hitE(e,z.dps*.5,z.own);if(z.slow)e.slow=Math.max(e.slow||0,.8);}}return z.t>0;});
   for(const e of G.enemies){if(e.dead)continue;
     if(e.mark>0)e.mark-=dt;
     if(e.dot){e.dot.t-=dt;e.dot.k+=dt;if(e.dot.k>=.5){e.dot.k=0;hitE(e,e.dot.dps*.5,e.dot.own);spFx('curse',e.x,e.y,'#9a78ff',20);}if(e.dot.t<=0)e.dot=null;}
@@ -4897,7 +4949,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.10.9';
+const KOV_VER='1.11.0';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
