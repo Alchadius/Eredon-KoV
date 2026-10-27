@@ -292,9 +292,15 @@ const EDEF = {
   bonehound:{n:'Bone Hound',hp:42,spd:120,dmg:9,r:12,col:'#d8d0b8',sc:24,xp:15},
   mourningmaid:{n:'Mourning Maid',hp:58,spd:50,dmg:11,r:12,col:'#d8d0f0',sc:38,xp:25,fly:1},
   ravenmatriarch:{n:'Raven Matriarch',hp:210,spd:70,dmg:18,r:20,col:'#3a2a50',sc:72,xp:46,fly:1},
-  b_weeping:{n:'The Weeping Queen',hp:620,spd:40,dmg:22,r:22,col:'#e0d8f8',sc:300,xp:165,mini:1,fly:1}
+  b_weeping:{n:'The Weeping Queen',hp:620,spd:40,dmg:22,r:22,col:'#e0d8f8',sc:300,xp:165,mini:1,fly:1},
+  blightedhart:{n:'Blighted Hart',hp:72,spd:70,dmg:14,r:17,col:'#3a3a2c',sc:34,xp:22},
+  hollowarcher:{n:'Hollow Archer',hp:44,spd:55,dmg:11,r:12,col:'#5a7a6a',sc:32,xp:20},
+  gloomcap:{n:'Gloomcap',hp:64,spd:38,dmg:8,r:14,col:'#6a4a9a',sc:36,xp:22},
+  barkdryad:{n:'Barkflayed Dryad',hp:72,spd:42,dmg:12,r:14,col:'#5a6a4a',sc:40,xp:26},
+  hollowwarden:{n:'Hollow Warden',hp:240,spd:52,dmg:22,r:22,col:'#4a5a3a',sc:78,xp:50},
+  b_eldrin:{n:'Eldrin Hollowbrow',hp:600,spd:48,dmg:22,r:22,col:'#d8d0b8',sc:300,xp:165,mini:1}
 };
-const MINI={0:'b_maldrick',1:'b_rootmother',2:'b_brrgg',3:'b_mossback',4:'b_magmaw',5:'b_weeping'};
+const MINI={0:'b_maldrick',1:'b_rootmother',2:'b_brrgg',3:'b_mossback',4:'b_magmaw',5:'b_weeping',6:'b_eldrin'};
 const GHN='Grimhallow Keep';const VLN='Thimblewick Vale';const BWN='The Blightwood';const ORDER=[0,1,2,3,6,4,5];const DWN='Ironhearth Deep';   // working name of the dwarven city biome (rename here)
 const BIOMES = [{n:'Castle Valeron'},{n:VLN},{n:'Frostpeak'},{n:'Sunken Swamp'},{n:DWN},{n:GHN},{n:BWN}];
 // 4 zones x 3 floors each: floors 1-2 are the zone, floor 3 ends with the zone boss
@@ -311,9 +317,9 @@ const STAGES = [
   {n:'The Sunken Swamp',floor:'#25322a',floor2:'#2a382e',wall:'#3d4e30',top:'#5a7240',dark:.86,mult:1,pool:['snake','bogleech','orc','shaman','goblin','miretoad','bogleech']},
   {n:'The Rotting Mire',floor:'#222c20',floor2:'#27322a',wall:'#38472a',top:'#546a3a',dark:.88,mult:1,pool:['snake','bogleech','miretoad','orc','drownedlantern','shaman','goblin','toadlord']},
   {n:'Grumpy\'s Bog',floor:'#202a1e',floor2:'#252f24',wall:'#33422a',top:'#4e6234',dark:.9,mult:1,pool:['orc','shaman','miretoad','drownedlantern','bogleech','snake','toadlord']},
-  {n:BWN+': The Withered Edge',floor:'#14181a',floor2:'#181d1f',wall:'#242a2c',top:'#3a4a44',dark:.9,mult:1,pool:['shwolf','wraith','direwolf','shwolf','wraith','spider','direwolf']},
-  {n:BWN+': The Hollow Glades',floor:'#12161a',floor2:'#161b1f',wall:'#222830',top:'#38483f',dark:.92,mult:1,pool:['wraith','shwolf','direwolf','spider','wraith','direwolf','shwolf','spider']},
-  {n:BWN+': The Pale Court',floor:'#101418',floor2:'#14191d',wall:'#1e242c',top:'#34443c',dark:.94,mult:1,pool:['wraith','shwolf','wraith','direwolf','spider','wraith']},
+  {n:BWN+': The Withered Edge',floor:'#14181a',floor2:'#181d1f',wall:'#242a2c',top:'#3a4a44',dark:.9,mult:1,pool:['blightedhart','hollowarcher','gloomcap','blightedhart','hollowarcher','barkdryad']},
+  {n:BWN+': The Hollow Glades',floor:'#12161a',floor2:'#161b1f',wall:'#222830',top:'#38483f',dark:.92,mult:1,pool:['hollowarcher','barkdryad','blightedhart','gloomcap','hollowwarden','hollowarcher','blightedhart','barkdryad']},
+  {n:BWN+': The Pale Court',floor:'#101418',floor2:'#14191d',wall:'#1e242c',top:'#34443c',dark:.94,mult:1,pool:['hollowwarden','hollowarcher','barkdryad','gloomcap','blightedhart','hollowwarden','hollowarcher']},
   {n:DWN+': The Sunken Gate',floor:'#2a2630',floor2:'#2f2a36',wall:'#403a4c',top:'#665c76',dark:.84,mult:1,pool:['dwskel','imp','forgegolem','lavaslug','ghostminer','dwskel','imp']},
   {n:DWN+': The Silent Forges',floor:'#2c2426',floor2:'#322a2c',wall:'#46383a',top:'#6e5a58',dark:.86,mult:1,pool:['dwskel','forgegolem','ghostminer','lavaslug','imp','foundryoverseer','ghostminer','imp']},
   {n:DWN+': The Ember Throne',floor:'#2e1f20',floor2:'#352426',wall:'#4a2e2a',top:'#7a4a38',dark:.88,mult:1,pool:['imp','forgegolem','lavaslug','ghostminer','foundryoverseer','dwskel','imp','lavaslug']},
@@ -455,6 +461,7 @@ function genMap(depth,biome,seed,stg){
   for(let i=0;i<tries&&rooms.length<maxR;i++){const big=RNG()<.22,w=big?ri(11,16):ri(6,12),h=big?ri(9,13):ri(6,10),x=ri(2,MW-w-3-(stg===2?19:0)),y=ri(2,MH-h-3);
     if(x<2||rooms.some(r=>x<r.x+r.w+3&&x+w+3>r.x&&y<r.y+r.h+3&&y+h+3>r.y))continue;
     rooms.push({x,y,w,h,cx:x+(w>>1),cy:y+(h>>1)});carveRect(x,y,w,h);}
+  if(!rooms.length){const w=10,h=8,x=Math.max(2,(MW>>1)-5),y=Math.max(2,(MH>>1)-4);rooms.push({x,y,w,h,cx:x+(w>>1),cy:y+(h>>1)});carveRect(x,y,w,h);}
   // varied shapes: clipped corners (round halls)
   rooms.forEach(r=>{if(!r.boss&&r.w>=8&&r.h>=8&&RNG()<.32){r.round=1;for(let dy=0;dy<3;dy++)for(let dx=0;dx<3-dy;dx++){set(r.x+dx,r.y+dy,1);set(r.x+r.w-1-dx,r.y+dy,1);set(r.x+dx,r.y+r.h-1-dy,1);set(r.x+r.w-1-dx,r.y+r.h-1-dy,1);}}});
   // cross-shaped halls, organic bumps (wild zones) and recessed alcoves (castle)
@@ -556,7 +563,7 @@ function startLevel(depth,seed){
 // ----- combat -----
 function ring(x,y,r,col){G.fx.push({k:'ring',x,y,r,t:.4,max:.4,col});}
 function foes(x,y,r){return G.enemies.filter(e=>!e.dead&&Math.hypot(e.x-x,e.y-y)<r+e.r);}
-function hitE(e,amt,p,crit,kb){if(e.dead)return;if(e.frozen>0||e.slow>0)amt*=1.4;if(e.mark>0)amt*=1.2;if(e.type==='barkboar'&&e.dash>0)amt*=.6;amt=Math.max(1,Math.round(amt));e.hp-=amt;e.flash=.1;e.aggro=true;e.lastHit=p;sfx(crit?'crit':'hit');if(crit&&p&&p.ch&&p.ch.racial==='crit')spFx('eye',e.x,e.y-6,'#9aff8a',0);spFx(crit?'crit':'hit',e.x,e.y-2,crit?'#ffd34a':'#fff6e0');for(let i=0;i<4;i++)G.fx.push({k:'p',x:e.x,y:e.y,vx:rnd(-120,120),vy:rnd(-120,120),t:.25,max:.25,col:crit?'#ffd34a':'#fff',r:2});
+function hitE(e,amt,p,crit,kb){if(e.dead)return;if(e.frozen>0||e.slow>0)amt*=1.4;if(e.mark>0)amt*=1.2;if(e.type==='barkboar'&&e.dash>0)amt*=.6;if(e.type==='hollowwarden'&&p&&p.x!==undefined&&!(e.slamT>0)){const ax=p.x-e.x,ay=p.y-e.y,al=Math.hypot(ax,ay)||1;if((ax*(e.cfx||0)+ay*(e.cfy||0))/al>.3){amt*=.45;spFx('hit',e.x+ax/al*e.r,e.y+ay/al*e.r,'#b8ff6a');}}amt=Math.max(1,Math.round(amt));e.hp-=amt;e.flash=.1;e.aggro=true;e.lastHit=p;sfx(crit?'crit':'hit');if(crit&&p&&p.ch&&p.ch.racial==='crit')spFx('eye',e.x,e.y-6,'#9aff8a',0);spFx(crit?'crit':'hit',e.x,e.y-2,crit?'#ffd34a':'#fff6e0');for(let i=0;i<4;i++)G.fx.push({k:'p',x:e.x,y:e.y,vx:rnd(-120,120),vy:rnd(-120,120),t:.25,max:.25,col:crit?'#ffd34a':'#fff',r:2});
   if(kb&&p&&!e.d.boss){const d=Math.hypot(e.x-p.x,e.y-p.y)||1;moveE(e,(e.x-p.x)/d*kb,(e.y-p.y)/d*kb,e.d.fly);}
   G.fx.push({k:'txt',x:e.x,y:e.y-e.r,t:.7,max:.7,s:amt+(crit?'!':''),col:crit?'#ffd34a':'#fff'});if(e.hp<=0)killE(e,p);}
 function killE(e,p){e.dead=true;e.dt=G.t;G.kills++;if(e.type==='cheesegolem'){spFx('summon',e.x,e.y,'#e8b830',40);for(let i=0;i<3;i++)G.enemies.push(Object.assign(spawnEnemy('rat',e.x+rnd(-18,18),e.y+rnd(-18,18)),{aggro:true}));}if(e.type==='icegolem'){spFx('shards',e.x,e.y,'#8ad8ff',90);hurtRing(e,70,e.dmg*.8,.8);}if(!e.rev&&!e.sum&&REVIVABLE.indexOf(e.type)>=0){(G.bones=G.bones||[]).push({x:e.x,y:e.y,t:G.t,d:G.depth,type:e.type});if(G.bones.length>12)G.bones.shift();}if(e.type==='lavaslug'){G.haz.push({x:e.x,y:e.y,r:30,t:3,tick:.4});spFx('stench',e.x,e.y,'#ff7a2a',30);}if(e.type==='mothwisp'){G.haz.push({x:e.x,y:e.y,r:42,t:4,tick:.4});spFx('sporecloud',e.x,e.y,'#b8ff9a',42);}const k=p||e.lastHit||G.players.find(q=>!q.down)||G.players[0];killHook(e,k);
@@ -790,6 +797,27 @@ function updEnemy(e,dt){if(e.dead)return;e.t+=dt;e.flash-=dt;e.atk-=dt;if(e.atkT
     if(big){e.cdC=(e.cdC===undefined?4:e.cdC)-dt;if(e.cdC<=0){e.cdC=6;e.atkT=.6;if(!e.hands)e.hands=[];for(const q of G.players){if(q.down)continue;e.hands.push({x:q.x,y:q.y,t:1});ring(q.x,q.y,44,'#8ad8ff');}}
       if(e.hands&&e.hands.length){for(const q of e.hands)q.t-=dt;const rd2=e.hands.filter(q=>q.t<=0);if(rd2.length){e.hands=e.hands.filter(q=>q.t>0);for(const q of rd2){spFx('blast',q.x,q.y,'#8ad8ff',46);G.haz.push({x:q.x,y:q.y,r:34,t:3,tick:.3});for(const p of G.players)if(!p.down&&Math.hypot(p.x-q.x,p.y-q.y)<34+(p.r||10))hurt(p,e.dmg*.8,e,false);}}}
       e.cdD=(e.cdD===undefined?8:e.cdD)-dt;if(e.cdD<=0){e.cdD=14;e.atkT=.6;toast('The Queen calls her mourners!','#8ad8ff',2);summon(e,'wraith',2,4);}}}
+  else if(ty==='blightedhart'){e.cdB-=dt;if(e.cdB<=0&&d>90&&d<260&&!(e.chT>0)&&!(e.dash>0)){e.chT=.5;e.cdB=5;e.chx=ux;e.chy=uy;ring(e.x,e.y,e.r+8,'#8aff4a');e.atkT=.5;}
+    if(e.chT>0){e.chT-=dt;dx=0;dy=0;sp*=.05;if(e.chT<=0)e.dash=.7;}
+    if(e.dash>0){e.dash-=dt;dx=e.chx;dy=e.chy;sp*=3.3;e.trT=(e.trT||0)-dt;if(e.trT<=0&&G.haz.length<90){e.trT=.14;G.haz.push({x:e.x,y:e.y,r:11,t:3.5,tick:.5});spFx('thornpool',e.x,e.y,'#8aff4a',11);}}}
+  else if(ty==='hollowarcher'){const w=Math.sin(e.t*2);if(d<170){dx=-ux-uy*w*.3;dy=-uy+ux*w*.3;}else if(d<260){dx=-uy*w*.6;dy=ux*w*.6;}
+    if(e.atk<=0&&d<360){e.atk=3;e.atkT=.5;sfx('bolt');for(const k of[-.15,0,.15]){const cs=Math.cos(k),sn2=Math.sin(k);G.proj.push({x:e.x,y:e.y,vx:(ux*cs-uy*sn2)*240,vy:(ux*sn2+uy*cs)*240,r:6,from:'e',dmg:e.dmg,life:1.8,col:'#b8ff6a',hit:[]});}}}
+  else if(ty==='gloomcap'){const w=Math.sin(e.t*1.5);if(d<170){dx=-ux;dy=-uy;}else if(d<260){dx=-uy*w*.5;dy=ux*w*.5;}
+    e.cdA-=dt;if(e.cdA<=0&&!(e.bmT>0)&&d<340){e.bmT=.8;e.cdA=5;e.tgx=tg.x;e.tgy=tg.y;ring(tg.x,tg.y,44,'#b88aff');e.atkT=.5;sfx('bolt');}
+    if(e.bmT>0){e.bmT-=dt;if(e.bmT<=0){spFx('sporecloud',e.tgx,e.tgy,'#b88aff',44);G.haz.push({x:e.tgx,y:e.tgy,r:44,t:4,tick:.4});for(const q of G.players)if(!q.down&&Math.hypot(q.x-e.tgx,q.y-e.tgy)<44+(q.r||10))hurt(q,e.dmg*1.2,e,false);}}
+    e.cdB=(e.cdB===undefined?5:e.cdB)-dt;if(e.cdB<=0){e.cdB=8;let n=0;for(const o of G.enemies){if(o.dead||o===e||Math.hypot(o.x-e.x,o.y-e.y)>170||o.hp>=o.maxhp)continue;o.hp=Math.min(o.maxhp,o.hp+o.maxhp*.2);spFx('summon',o.x,o.y,'#8aff4a',24);n++;}if(n)ring(e.x,e.y,170,'#8aff4a');}}
+  else if(ty==='barkdryad'){const w=Math.sin(e.t*1.8);if(d<150){dx=-ux-uy*w*.3;dy=-uy+ux*w*.3;}else if(d<240){dx=-uy*w*.5;dy=ux*w*.5;}
+    e.cdA-=dt;if(e.cdA<=0&&!(e.snT>0)&&d<330){e.snT=.7;e.cdA=6;e.tgx=tg.x;e.tgy=tg.y;ring(tg.x,tg.y,42,'#8aff4a');e.atkT=.6;}
+    if(e.snT>0){e.snT-=dt;if(e.snT<=0){spFx('thornpool',e.tgx,e.tgy,'#8aff4a',46);G.haz.push({x:e.tgx,y:e.tgy,r:32,t:3,tick:.4});for(const q of G.players)if(!q.down&&Math.hypot(q.x-e.tgx,q.y-e.tgy)<42+(q.r||10)){hurt(q,e.dmg,e,false);q.rootT=1.3;}sfx('hit');}}}
+  else if(ty==='hollowwarden'){e.cfx=ux;e.cfy=uy;e.cdA-=dt;if(e.cdA<=0&&d<120&&!(e.slamT>0)){e.slamT=.65;e.cdA=4.2;e.atkT=.65;e.chx=ux;e.chy=uy;ring(e.x+ux*50,e.y+uy*50,70,'#b8ff6a');}
+    if(e.slamT>0){e.slamT-=dt;sp*=.15;if(e.slamT<=0){spFx('whip',e.x+e.chx*50,e.y+e.chy*50,'#b8ff6a',90);conehit(e,110,e.dmg*1.3,.6);G.shake=Math.max(G.shake||0,4);sfx('boom');}}}
+  else if(ty==='b_eldrin'){if(!e.mnt){e.mnt=1;toast('Eldrin Hollowbrow raises his horn!','#ffd34a',3);sfx('drake');}
+    if(d<170){dx=-ux*.8;dy=-uy*.8;}else if(d<260){dx=0;dy=0;}
+    e.cdA-=dt;if(e.cdA<=0&&d<380){e.cdA=3.2;e.atkT=.5;sfx('bolt');for(const k of[-.3,-.15,0,.15,.3]){const cs=Math.cos(k),sn2=Math.sin(k);G.proj.push({x:e.x,y:e.y,vx:(ux*cs-uy*sn2)*250,vy:(ux*sn2+uy*cs)*250,r:6,from:'e',dmg:e.dmg*.7,life:1.8,col:'#b8ff6a',hit:[]});}}
+    e.cdB-=dt;if(e.cdB<=0&&d>80&&d<300&&!(e.chT>0)&&!(e.dash>0)){e.chT=.6;e.cdB=9;e.chx=ux;e.chy=uy;ring(e.x,e.y,e.r+10,'#b8ff6a');}
+    if(e.chT>0){e.chT-=dt;dx=0;dy=0;sp*=.05;if(e.chT<=0)e.dash=.5;}
+    if(e.dash>0){e.dash-=dt;dx=e.chx;dy=e.chy;sp*=3.6;if(e.dash<=0){spFx('blast',e.x,e.y,'#b8ff6a',70);hurtRing(e,70,e.dmg*1.1,.7);G.shake=Math.max(G.shake||0,4);}}
+    e.cdC=(e.cdC===undefined?7:e.cdC)-dt;if(e.cdC<=0){e.cdC=13;e.atkT=.6;toast('Eldrin sounds the hunting horn!','#b8ff6a',2);summon(e,'blightedhart',2,4);}}
   else if(ty==='b_treant'){const en=e.hp<e.maxhp*.5;dx=0;dy=0;
     e.cdA-=dt;if(e.cdA<=0&&d<400&&!(e.whipT>0)){e.cdA=en?3:4.2;e.whipT=.7;e.whipA=Math.atan2(uy,ux);e.atkT=.7;sfx('bolt');
       for(let k=1;k<=9;k++)G.fx.push({k:'p',x:e.x+Math.cos(e.whipA)*34*k,y:e.y+Math.sin(e.whipA)*34*k,vx:0,vy:-20,t:.7,max:.7,col:'#b88aff',r:3});}
@@ -3035,6 +3063,49 @@ MODELS.mourningmaid=()=>{const g=new T.Group(),b=new T.Group();g.add(b);const rb
   glow(b,'#8ad8ff',2.2,[0,2.2,.1]);opac(g,.85);
   return{g,H:3.6,fr:2.2,upd(t,o){o=o||{};const a=AP(o);b.position.y=.3+sn(t*1.8)*.2;b.rotation.z=sn(t*1.2)*.05;arms.forEach(([A,s])=>A.rotation.z=a>0?s*(.4+sn(a*PI)*1.0):s*sn(t*2)*.1)}}};
 wrapV('mourningmaid',(v,m)=>{if(v!=='queen')return;const b=m.g.children[0];recolor(m.g,lerpTo('#e0d8f8',.2));m.g.scale.set(1.5,1.5,1.5);for(let i=0;i<5;i++)cone(b,'#c8a83a',[(i-2)*.16,3.6-Math.abs(i-2)*.05,.05],[.07,.4+(2-Math.abs(i-2))*.1,.07],[0,0,(i-2)*.15],{metal:1});add(b,CYL,'#c8a83a',[0,3.45,.05],[.5,.1,.4],null,{metal:1});glow(b,'#8ad8ff',3,[0,2.2,.2]);});
+MODELS.blightedhart=()=>{const g=new T.Group(),b=new T.Group();g.add(b);shadow(g,3,2);const fu='#2a2a22',mo='#5a7a3a',bk='#1a1a12';
+  sph(b,fu,[0,1.7,0],[.8,.75,1.4]);sph(b,'#3a3a2c',[0,1.4,-.2],[.7,.5,1.1]);for(const p of[[-.35,2.2,.2],[.3,2.15,-.3],[0,2.0,.7]])sph(b,mo,[p[0],p[1],p[2]],[.3,.12,.3],{rough:1});
+  const legs=[];for(const[x,z]of[[-.45,.9],[.45,.9],[-.45,-.9],[.45,-.9]]){const l=new T.Group();l.position.set(x,1.3,z);b.add(l);limb(l,[0,0,0],[0,-.7,.1],.12,fu);limb(l,[0,-.7,.1],[0,-1.3,-.05],.09,bk);legs.push(l);}
+  const neck=new T.Group();neck.position.set(0,2.0,1.0);b.add(neck);limb(neck,[0,0,0],[0,.7,.5],.28,fu);
+  const head=new T.Group();head.position.set(0,.8,.6);neck.add(head);sph(head,'#3a3a2c',[0,0,0],[.36,.34,.55]);for(const s of[-1,1]){eye(head,'#b8ff6a',[s*.2,.15,.2],.07);limb(head,[s*.15,.3,-.1],[s*.3,1.0,-.2],.05,bk);limb(head,[s*.3,1.0,-.2],[s*.7,1.6,-.1],.04,bk);limb(head,[s*.4,1.25,-.2],[s*.2,1.9,-.3],.035,bk);limb(head,[s*.5,1.35,-.15],[s*1.0,1.6,-.3],.03,bk);sph(head,'#8aff4a',[s*.7,1.62,-.1],.07,{glow:1});sph(head,'#8aff4a',[s*.2,1.92,-.3],.07,{glow:1});}
+  glow(b,'#8aff4a',2,[0,1.8,0]);
+  return{g,H:4.2,fr:2.8,upd(t,o){o=o||{};const mv=o.mv,a=AP(o);legs.forEach((l,i)=>l.rotation.x=mv?sn(t*8+i*1.6)*.5:0);b.position.y=mv?Math.abs(sn(t*8))*.1:0;neck.rotation.x=a>0?.5*sn(a*PI):0}}};
+MODELS.hollowarcher=()=>{const g=new T.Group(),b=new T.Group();g.add(b);const rb='#3a5a4a',rd='#1a2a22',fc='#5a7a6a';
+  cone(b,rb,[0,1.0,0],[.7,2.0,.5],[PI,0,0],{two:1});sph(b,rd,[0,2.0,0],[.55,.7,.42]);
+  const head=new T.Group();head.position.set(0,2.85,.05);b.add(head);sph(head,fc,[0,0,0],[.4,.46,.38]);cone(head,rd,[0,.35,-.1],[.55,.8,.5],[-.35,0,0],{two:1});for(const s of[-1,1]){eye(head,'#b8ff6a',[s*.13,.04,.34],.07);cone(head,rb,[s*.45,.1,0],[.1,.55,.08],[0,0,-s*1.2]);}
+  const arm=new T.Group();arm.position.set(.55,2.4,0);b.add(arm);limb(arm,[0,0,0],[.3,-.2,.6],.09,fc);
+  const bow=new T.Group();bow.position.set(.5,-.1,.7);arm.add(bow);limb(bow,[0,-.9,0],[.25,-.45,0],.05,'#8a6a3a');limb(bow,[.25,-.45,0],[.3,.45,0],.05,'#8a6a3a');limb(bow,[.3,.45,0],[0,.9,0],.05,'#8a6a3a');limb(bow,[0,-.9,0],[0,.9,0],.012,'#d8d0a8');
+  const arm2=new T.Group();arm2.position.set(-.55,2.4,0);b.add(arm2);limb(arm2,[0,0,0],[-.1,-.4,.5],.09,fc);
+  glow(b,'#b8ff6a',1.6,[0,2.1,.2]);opac(g,.88);
+  return{g,H:3.6,fr:2.2,upd(t,o){o=o||{};const a=AP(o);b.position.y=.25+sn(t*2)*.15;arm2.rotation.x=a>0?.9*sn(a*PI):0}}};
+MODELS.gloomcap=()=>{const g=new T.Group(),b=new T.Group();g.add(b);shadow(g,2.4,2);const st='#cfc8a8',cp='#3a2a5a',sp='#b88aff';
+  add(b,CYL,st,[0,.9,0],[.55,1.8,.55]);add(b,CYL,'#8a8468',[0,1.2,0],[.58,.08,.58]);
+  sph(b,cp,[0,2.1,0],[1.6,.9,1.6]);for(const p of[[-.7,2.4,.2,.28],[0,2.7,-.2,.34],[.7,2.45,.1,.24],[.2,2.3,.9,.2],[-.3,2.25,-.8,.22]])sph(b,sp,[p[0],p[1],p[2]],[p[3],p[3]*.5,p[3]],{glow:1});glow(b,sp,3,[0,2.5,0]);
+  for(const s of[-1,1]){sph(b,'#1a0a2a',[s*.18,1.4,.5],[.1,.14,.06]);eye(b,'#d8ff6a',[s*.18,1.4,.54],.04);}
+  const arms=[];for(const s of[-1,1]){const A=new T.Group();A.position.set(s*.5,1.2,0);b.add(A);limb(A,[0,0,0],[s*.5,-.3,.3],.1,st);limb(A,[s*.5,-.3,.3],[s*.5,.1,.7],.08,st);arms.push([A,s]);}
+  return{g,H:3.4,fr:2.4,upd(t,o){o=o||{};const a=AP(o);b.scale.y=1+sn(t*2)*.03;b.rotation.z=sn(t*1.5)*.04;arms.forEach(([A,s],i)=>A.rotation.x=a>0?-1.2*sn(a*PI):sn(t*2+i)*.1)}}};
+MODELS.barkdryad=()=>{const g=new T.Group(),b=new T.Group();g.add(b);shadow(g,2.6,2);const bk='#3a2e22',gr='#5a6a4a',dk='#1a140e';
+  cone(b,bk,[0,1.0,0],[.9,2.0,.7],[PI,0,0],{two:1});for(let i=-1;i<=1;i++)limb(b,[i*.3,.2,.3],[i*.3,2.0,.3],.03,dk);sph(b,gr,[0,2.2,0],[.55,.55,.42]);
+  const head=new T.Group();head.position.set(0,2.95,.05);b.add(head);sph(head,'#5a6a4a',[0,0,0],[.4,.46,.38]);for(const s of[-1,1]){sph(head,dk,[s*.14,.06,.3],[.08,.1,.05]);eye(head,'#b8ff6a',[s*.14,.06,.33],.04);}
+  for(const[x,a2,h]of[[-.2,-.4,1.2],[0,-.1,1.4],[.2,.4,1.1],[.35,.9,.8]]){limb(head,[x*.5,.4,-.1],[x+a2*.5,.4+h*.6,-.1],.05,dk);limb(head,[x+a2*.5,.4+h*.6,-.1],[x+a2,.4+h,-.15],.035,dk);sph(head,'#8aff4a',[x+a2,.4+h,-.15],.06,{glow:1});}
+  const arms=[];for(const s of[-1,1]){const A=new T.Group();A.position.set(s*.5,2.3,0);b.add(A);limb(A,[0,0,0],[s*.7,-.3,.4],.11,bk);limb(A,[s*.7,-.3,.4],[s*1.3,-.9,.8],.09,bk);for(let f=-1;f<=1;f++)limb(A,[s*1.3,-.9,.8],[s*(1.4+f*.1),-1.3,1.0+f*.15],.03,dk);arms.push([A,s]);}
+  for(const s of[-1,1])limb(b,[s*.5,.3,.2],[s*1.2,.1,.9],.06,bk);
+  return{g,H:3.8,fr:2.2,upd(t,o){o=o||{};const a=AP(o);b.position.y=.25+sn(t*1.6)*.1;arms.forEach(([A,s])=>A.rotation.x=a>0?-1.1*sn(a*PI):sn(t*1.5)*.1)}}};
+MODELS.hollowwarden=()=>{const g=new T.Group(),b=new T.Group();g.add(b);shadow(g,2.6,2);const ar='#3a4a38',lt='#5a6a48',dk='#1a2a1a',bk='#2a2218';
+  cone(b,dk,[0,.9,0],[.9,1.8,.7],[PI,0,0],{two:1});add(b,BOX,ar,[0,2.1,0],[1.0,1.1,.7],null,{metal:1});for(const s of[-1,1]){sph(b,lt,[s*.65,2.55,0],[.38,.3,.38],{metal:1});cone(b,'#2a3a22',[s*.8,2.8,0],[.12,.5,.12],[0,0,-s*.6],{metal:1});}
+  const head=new T.Group();head.position.set(0,3.0,0);b.add(head);add(head,BOX,ar,[0,0,0],[.6,.7,.6],null,{metal:1});add(head,BOX,'#050a08',[0,0,.31],[.4,.12,.02]);for(const s of[-1,1])eye(head,'#b8ff6a',[s*.1,0,.33],.04);
+  for(const x of[-.2,0,.2])limb(head,[x*.5,.35,-.1],[x*1.5,1.0,-.2],.04,bk);
+  const sh=new T.Group();sh.position.set(-.95,2.0,.4);b.add(sh);add(sh,BOX,'#3a4a30',[0,0,0],[.2,1.5,1.0],null,{metal:1});add(sh,BOX,'#1a2a18',[-.12,0,0],[.04,1.4,.1]);sph(sh,'#b8ff6a',[-.15,0,0],.14,{glow:1});glow(sh,'#b8ff6a',1.2,[-.15,0,0]);
+  const sw=new T.Group();sw.position.set(.95,2.0,.5);b.add(sw);limb(sw,[0,-.4,0],[0,2.2,0],.05,'#d8e0d0',{metal:1});add(sw,BOX,'#4a3a28',[0,-.5,0],[.5,.08,.1]);glow(sw,'#b8ff6a',1.6,[0,1.0,0]);
+  return{g,H:4.1,fr:2.6,upd(t,o){o=o||{};const a=AP(o);b.position.y=Math.abs(sn(t*2))*.04;sw.rotation.x=a>0?-1.8*sn(a*PI):sn(t*1.5)*.05;sw.rotation.z=a>0?-.6*sn(a*PI):0}}};
+MODELS.eldrin=()=>{const g=new T.Group(),b=new T.Group();g.add(b);shadow(g,3,2.4);const rb='#1e2a22',bn='#e8e0c8',bk='#2a2218';
+  cone(b,rb,[0,1.2,0],[1.2,2.4,.9],[PI,0,0],{two:1});add(b,BOX,'#2a3a30',[0,2.3,.1],[1.0,1.0,.6],null,{metal:1});for(let i=-1.5;i<=1.5;i++)limb(b,[i*.25,1.9,.4],[i*.25,2.6,.4],.03,bn);
+  const head=new T.Group();head.position.set(0,3.3,.05);b.add(head);sph(head,bn,[0,0,0],[.42,.5,.4]);for(const s of[-1,1]){sph(head,'#050a08',[s*.15,.08,.3],[.1,.12,.06]);eye(head,'#b8ff6a',[s*.15,.08,.34],.05);}cone(head,'#050a08',[0,-.1,.36],[.08,.14,.04],[PI,0,0]);
+  for(const s of[-1,1]){limb(head,[s*.2,.4,-.05],[s*.5,1.1,-.1],.07,bk);limb(head,[s*.5,1.1,-.1],[s*1.0,1.6,-.1],.06,bk);limb(head,[s*.6,1.3,-.1],[s*.5,2.0,-.2],.05,bk);limb(head,[s*.75,1.45,-.1],[s*1.4,1.7,-.2],.045,bk);limb(head,[s*.5,.9,-.1],[s*.1,1.5,-.2],.04,bk);for(const p of[[s*1.0,1.6],[s*.5,2.0],[s*1.4,1.7]])sph(head,'#8aff4a',[p[0],p[1],-.15],.08,{glow:1});}
+  const arm=new T.Group();arm.position.set(.9,2.6,0);b.add(arm);limb(arm,[0,0,0],[.3,-.4,.5],.12,rb);const horn=new T.Group();horn.position.set(.35,-.4,.7);arm.add(horn);limb(horn,[0,-.6,0],[0,.4,.2],.07,bn);cone(horn,bn,[0,.55,.25],[.18,.3,.18],[0,0,0]);
+  const arm2=new T.Group();arm2.position.set(-.9,2.6,0);b.add(arm2);limb(arm2,[0,0,0],[-.3,-.3,.5],.12,rb);limb(arm2,[-.3,-.3,.5],[-.4,.2,.9],.05,'#5a3a22');
+  glow(b,'#b8ff6a',2.4,[0,2.4,.4]);
+  return{g,H:4.7,fr:2.8,upd(t,o){o=o||{};const a=AP(o);b.position.y=.2+sn(t*1.6)*.1;arm.rotation.x=a>0?-1.2*sn(a*PI):sn(t*1.5)*.05;head.rotation.x=a>0?-.2*sn(a*PI):sn(t)*.04}}};
 MODELS.b_treant=()=>{const g=new T.Group(),b=new T.Group();g.add(b);shadow(g,3.5,3);const bk='#3a3040',bd='#1a1420',gr='#8affb0',th='#9a50d8';
   for(let i=0;i<8;i++){const a=i/8*TAU;limb(b,[Math.cos(a)*.8,.5,Math.sin(a)*.8],[Math.cos(a)*2.3,.1,Math.sin(a)*2.3],.28,bd);}
   sph(b,bk,[0,2.2,0],[1.5,2.3,1.35]);sph(b,bd,[0,1.2,0],[1.7,1.4,1.5]);
@@ -3085,7 +3156,7 @@ MODELS.b_ghor=()=>{const g=new T.Group(),b=new T.Group();g.add(b);const ob='#6a4
     R.rotation.x=a>0?SW(a)*.45:-.25+sn(ph)*.05;R.rotation.z=a>0?0:.1;L.rotation.x=-.35+sn(ph+1)*.06;
     seg.forEach((q,i)=>{const lash=a>0?(a<.4?-.1:sn((a-.4)/.6*PI)*.9):0;q.rotation.y=(a>0?lash*.25:sn(ph*1.5-i*.6)*.35)*((i%2)?1:-1);q.rotation.x=a>0?(a<.4?-.35:.25):(.18+sn(ph*1.2-i*.5)*.25)});}}};
 const SPEC={rat:{gh:26,yaw:.7,N:12,P:TAU},mouse:{model:'rat',var:'mouse',gh:16,yaw:.7,N:12,P:TAU},batling:{model:'bat',var:'ling',gh:24,yaw:.3,N:12,P:4*PI/9},spiderling:{model:'spider',var:'ling',gh:22,yaw:.35,N:12,P:TAU},iceskel:{model:'skeleton',var:'ice',gh:58,yaw:.5,N:12,P:TAU},shaman:{gh:44,yaw:.5,N:12,P:TAU},shwolf:{model:'wolf',var:'ghost',gh:38,yaw:1.0,N:12,P:TAU},b_rat:{gh:100,yaw:.5,N:10,P:TAU},b_mother:{model:'spider',var:'mother',gh:124,yaw:.35,N:12,P:TAU},b_icypaw:{gh:112,yaw:.5,N:10,P:TAU},b_grumpy:{gh:118,yaw:.5,N:12,P:TAU},bat:{gh:42,yaw:.3,N:12,P:4*PI/9},wolf:{gh:34,yaw:1.0,N:12,P:TAU},direwolf:{model:'wolf',var:'dire',gh:68,yaw:1.0,N:12,P:TAU},frostwolf:{model:'wolf',var:'frost',gh:46,yaw:1.0,N:12,P:TAU},spider:{gh:38,yaw:.35,N:12,P:TAU},skeleton:{gh:58,yaw:.5,N:12,P:TAU},ogre:{gh:80,yaw:.5,N:10,P:TAU},troll:{gh:72,yaw:.5,N:10,P:TAU},
- b_ogre:{gh:96,yaw:.5,N:10,P:TAU},b_drake:{gh:112,yaw:.95,N:12,P:TAU},b_kal:{gh:90,yaw:.5,N:10,P:TAU},dwskel:{model:'skeleton',var:'dwarf',gh:50,yaw:.5,N:12,P:TAU},imp:{gh:36,yaw:.4,N:12,P:TAU},b_ghor:{gh:150,yaw:.5,N:12,P:TAU},b_treant:{gh:160,yaw:.5,N:12,P:TAU},forgegolem:{gh:84,yaw:.5,N:12,P:TAU},lavaslug:{gh:44,yaw:.8,N:12,P:TAU},ghostminer:{gh:66,yaw:.5,N:12,P:TAU},foundryoverseer:{model:'forgegolem',var:'overseer',gh:100,yaw:.5,N:12,P:TAU},b_magmaw:{model:'lavaslug',var:'boss',gh:84,yaw:.8,N:12,P:TAU},carrionraven:{gh:52,yaw:.4,N:12,P:TAU},bonehound:{gh:50,yaw:.9,N:12,P:TAU},mourningmaid:{gh:68,yaw:.5,N:12,P:TAU},ravenmatriarch:{model:'carrionraven',var:'matriarch',gh:86,yaw:.4,N:12,P:TAU},b_weeping:{model:'mourningmaid',var:'queen',gh:102,yaw:.5,N:12,P:TAU},snowharpy:{gh:52,yaw:.4,N:12,P:TAU},icegolem:{gh:78,yaw:.5,N:12,P:TAU},yetibrawler:{gh:76,yaw:.5,N:12,P:TAU},bogleech:{gh:40,yaw:.9,N:12,P:TAU},miretoad:{gh:50,yaw:.8,N:12,P:TAU},drownedlantern:{gh:62,yaw:.5,N:12,P:TAU},trollchief:{model:'troll',var:'chief',gh:90,yaw:.5,N:10,P:TAU},toadlord:{model:'miretoad',var:'lord',gh:70,yaw:.8,N:12,P:TAU},b_brrgg:{model:'yetibrawler',var:'boss',gh:114,yaw:.5,N:12,P:TAU},b_mossback:{model:'mossback',gh:84,yaw:.9,N:12,P:TAU},gaoler:{gh:70,yaw:.5,N:12,P:TAU},cheesegolem:{gh:60,yaw:.5,N:12,P:TAU},thornling:{gh:52,yaw:.5,N:12,P:TAU},mothwisp:{gh:44,yaw:.4,N:12,P:TAU},barkboar:{gh:50,yaw:.9,N:12,P:TAU},ratchief:{model:'rat',var:'chief',gh:48,yaw:.7,N:12,P:TAU},hedgestag:{model:'barkboar',var:'stag',gh:66,yaw:.9,N:12,P:TAU},b_maldrick:{model:'gaoler',var:'boss',gh:104,yaw:.5,N:12,P:TAU},b_rootmother:{model:'thornling',var:'mother',gh:108,yaw:.5,N:12,P:TAU},wraith:{gh:44,yaw:.4,N:12,P:TAU},cryptknight:{model:'skeleton',var:'crypt',gh:56,yaw:.5,N:12,P:TAU},gravewarden:{model:'skeleton',var:'warden',gh:78,yaw:.5,N:12,P:TAU},bear:{gh:46,yaw:1.0,N:8,P:TAU},owl:{gh:30,yaw:.3,N:8,P:TAU/12},goblin:{gh:38,yaw:.5,N:12,P:TAU},snake:{gh:36,yaw:.8,N:12,P:TAU},orc:{gh:68,yaw:.5,N:12,P:TAU}};
+ b_ogre:{gh:96,yaw:.5,N:10,P:TAU},b_drake:{gh:112,yaw:.95,N:12,P:TAU},b_kal:{gh:90,yaw:.5,N:10,P:TAU},dwskel:{model:'skeleton',var:'dwarf',gh:50,yaw:.5,N:12,P:TAU},imp:{gh:36,yaw:.4,N:12,P:TAU},b_ghor:{gh:150,yaw:.5,N:12,P:TAU},b_treant:{gh:160,yaw:.5,N:12,P:TAU},blightedhart:{gh:84,yaw:.9,N:12,P:TAU},hollowarcher:{gh:68,yaw:.5,N:12,P:TAU},gloomcap:{gh:66,yaw:.5,N:12,P:TAU},barkdryad:{gh:72,yaw:.5,N:12,P:TAU},hollowwarden:{gh:80,yaw:.5,N:12,P:TAU},b_eldrin:{model:'eldrin',gh:96,yaw:.5,N:12,P:TAU},forgegolem:{gh:84,yaw:.5,N:12,P:TAU},lavaslug:{gh:44,yaw:.8,N:12,P:TAU},ghostminer:{gh:66,yaw:.5,N:12,P:TAU},foundryoverseer:{model:'forgegolem',var:'overseer',gh:100,yaw:.5,N:12,P:TAU},b_magmaw:{model:'lavaslug',var:'boss',gh:84,yaw:.8,N:12,P:TAU},carrionraven:{gh:52,yaw:.4,N:12,P:TAU},bonehound:{gh:50,yaw:.9,N:12,P:TAU},mourningmaid:{gh:68,yaw:.5,N:12,P:TAU},ravenmatriarch:{model:'carrionraven',var:'matriarch',gh:86,yaw:.4,N:12,P:TAU},b_weeping:{model:'mourningmaid',var:'queen',gh:102,yaw:.5,N:12,P:TAU},snowharpy:{gh:52,yaw:.4,N:12,P:TAU},icegolem:{gh:78,yaw:.5,N:12,P:TAU},yetibrawler:{gh:76,yaw:.5,N:12,P:TAU},bogleech:{gh:40,yaw:.9,N:12,P:TAU},miretoad:{gh:50,yaw:.8,N:12,P:TAU},drownedlantern:{gh:62,yaw:.5,N:12,P:TAU},trollchief:{model:'troll',var:'chief',gh:90,yaw:.5,N:10,P:TAU},toadlord:{model:'miretoad',var:'lord',gh:70,yaw:.8,N:12,P:TAU},b_brrgg:{model:'yetibrawler',var:'boss',gh:114,yaw:.5,N:12,P:TAU},b_mossback:{model:'mossback',gh:84,yaw:.9,N:12,P:TAU},gaoler:{gh:70,yaw:.5,N:12,P:TAU},cheesegolem:{gh:60,yaw:.5,N:12,P:TAU},thornling:{gh:52,yaw:.5,N:12,P:TAU},mothwisp:{gh:44,yaw:.4,N:12,P:TAU},barkboar:{gh:50,yaw:.9,N:12,P:TAU},ratchief:{model:'rat',var:'chief',gh:48,yaw:.7,N:12,P:TAU},hedgestag:{model:'barkboar',var:'stag',gh:66,yaw:.9,N:12,P:TAU},b_maldrick:{model:'gaoler',var:'boss',gh:104,yaw:.5,N:12,P:TAU},b_rootmother:{model:'thornling',var:'mother',gh:108,yaw:.5,N:12,P:TAU},wraith:{gh:44,yaw:.4,N:12,P:TAU},cryptknight:{model:'skeleton',var:'crypt',gh:56,yaw:.5,N:12,P:TAU},gravewarden:{model:'skeleton',var:'warden',gh:78,yaw:.5,N:12,P:TAU},bear:{gh:46,yaw:1.0,N:8,P:TAU},owl:{gh:30,yaw:.3,N:8,P:TAU/12},goblin:{gh:38,yaw:.5,N:12,P:TAU},snake:{gh:36,yaw:.8,N:12,P:TAU},orc:{gh:68,yaw:.5,N:12,P:TAU}};
 const MOD={},CAM={},CACHE={};
 function cam(type){if(CAM[type])return CAM[type];const S=SPEC[type],m=MOD[type]||(MOD[type]=MODELS[SPEC[type].model||type](SPEC[type].var)),k=S.gh/m.H,W=Math.ceil(2*m.fr*k)+6,c=new T.OrthographicCamera(-W/2/k,W/2/k,W/2/k,-W/2/k,.1,100);
   const d=new T.Vector3(.5,.55,.9).normalize(),cy=m.H*.5;c.position.set(d.x*30,cy+d.y*30,d.z*30);c.lookAt(0,cy,0);c.updateMatrixWorld(true);c.updateProjectionMatrix();
@@ -4809,7 +4880,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.6.0';
+const KOV_VER='1.7.0';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
