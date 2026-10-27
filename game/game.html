@@ -972,6 +972,8 @@ const THEMES={
     prog:[0,0,5,6,0,3,5,4],mel:['7:6 8:2 7:4 4:4','5:6 7:2 8:4 7:4','4:4 5:4 7:4 11:4','10:8 8:4 r:4','7:4 8:4 10:4 11:4','12:6 11:2 10:4 8:4','8:4 7:4 5:4 7:4','4:8 3:4 r:4']},
   b6:{name:'blightwood',mr:47,scale:[0,1,3,5,7,8,10],bpm:72,lead:'flute',drum:'sway',arp:'harp',mix:1,
     prog:[0,5,6,0,3,5,6,4],mel:['7:6 8:2 7:4 5:4','5:6 7:2 8:4 7:4','8:4 10:4 8:4 7:4','7:8 5:4 r:4','5:4 7:4 8:4 10:4','12:6 10:2 8:4 7:4','8:4 7:4 5:4 3:4','5:8 4:4 r:4']},
+  chron:{name:'chronicle',mr:53,scale:[0,2,3,5,7,9,10],bpm:66,lead:'lullaby',drum:'none',arp:'harp',mix:.9,
+    prog:[0,5,3,6,0,5,4,0],mel:['4:6 7:2 9:4 7:4','8:4 7:4 5:4 7:4','5:6 4:2 3:4 4:4','2:4 4:4 6:8','7:4 9:4 11:4 9:4','10:6 9:2 7:4 5:4','4:4 6:4 7:4 6:4','4:12 r:4']},
   boss:{name:'boss',mr:48,scale:[0,2,3,5,7,8,11],bpm:140,lead:'brass',drum:'war',arp:'ost',mix:1.1,
     prog:[0,0,5,4,0,3,5,4],mel:['7:3 7:1 9:2 7:2 10:4 9:2 7:2','11:3 10:1 9:2 8:2 7:8','12:3 11:1 9:2 7:2 9:4 11:2 9:2','13:4 11:4 8:4 10:4','7:3 7:1 9:2 7:2 10:4 9:2 7:2','12:3 10:1 12:2 14:2 12:4 10:4','14:4 12:4 11:4 9:4','13:2 14:2 13:2 11:2 13:4 r:4']},
   over:{name:'over',mr:57,scale:[0,2,3,5,7,8,10],bpm:52,lead:'flute',drum:'none',arp:'none',mix:.8,
@@ -989,6 +991,7 @@ const LEADS={
   flute:{t:['sine','triangle'],mul:[1,2],mix:[1,.18],lp:4200,att:.05,rel:.18,vib:14,vol:.12},
   horn:{t:['sawtooth','triangle'],det:[-4,4],mix:[.5,1],lp0:500,lp:1500,att:.07,rel:.2,vib:9,vol:.1},
   brass:{t:['sawtooth','sawtooth','square'],det:[-6,6,0],mix:[.5,.5,.25],lp0:700,lp:2600,att:.05,rel:.14,vib:6,vol:.085,q:1.2},
+  lullaby:{t:['sine','triangle'],mul:[1,3],mix:[1,.1],lp:3600,att:.015,rel:.7,vib:5,vol:.11},
   reed:{t:['square','triangle'],mix:[.4,1],lp:1700,att:.04,rel:.15,vib:18,vol:.09,q:2}};
 function schedStep(th,s,t){if(!AU.on.m)return;const bar=Math.floor(s/16)%th.prog.length,st=s%16,sd=60/th.bpm/4,ch=th.prog[bar],loop=Math.floor(s/(16*th.prog.length)),F=AU.fight,k=th.mix||1;
   const dnt=d=>DN(th,d);
@@ -3869,7 +3872,7 @@ function logoHTML(){return LOGO_SRC?'<img src="'+LOGO_SRC+'" alt="Knights of Val
   '<path d="M0 18h24" stroke="#e8b84a88" stroke-width="2"/><path d="M510 18h10" stroke="#e8b84a88" stroke-width="2"/></svg></div>';}
 function titleScreen(){G=null;COOP=false;SEL.coop=false;musicPlay('title');const s=loadSave();
   show('<div class="panel fade">'+logoHTML()+'<p class="tag">A cozy, slightly cursed dungeon crawl for one to four heroes.</p><div class="menu"><button class="btn big" data-a="new"><span class="ic">&#9876;</span>New Game</button><button class="btn alt" data-a="chars"><span class="ic">&#9819;</span>Characters ('+s.chars.length+'/'+MAXCH+')</button><button class="btn alt" data-a="coop"><span class="ic">&#9876;</span>Co-op (2 Players)</button><button class="btn alt" data-a="online"><span class="ic">&#9733;</span>Play Online (up to 4)</button><div style="display:flex;gap:8px"><button class="btn alt" style="flex:1" data-a="chron"><span class="ic">&#9998;</span>Chronicles</button><button class="btn alt" style="flex:1" data-a="settings"><span class="ic">&#9881;</span>Settings</button></div></div>'+(HI?'<p class="hi">&#10070; High score '+HI+' &#10070;</p>':'')+'</div>',true);}
-ACT.chron=()=>story(CHRON_PAGES,titleScreen,'The Chronicles of Eredon');ACT.coop=()=>{COOP=true;SEL.coop=true;SEL.online=false;SEL.party=[];SEL.del=null;charsScreen();};ACT.cnew=()=>{SEL.online=false;SEL.n=1;SEL.coop=true;if(loadSave().chars.length>=MAXCH){fullScreen();return;}selectScreen();};
+ACT.chron=()=>{musicPlay('chron');story(CHRON_PAGES,titleScreen,'The Chronicles of Eredon');};ACT.coop=()=>{COOP=true;SEL.coop=true;SEL.online=false;SEL.party=[];SEL.del=null;charsScreen();};ACT.cnew=()=>{SEL.online=false;SEL.n=1;SEL.coop=true;if(loadSave().chars.length>=MAXCH){fullScreen();return;}selectScreen();};
 ACT.new=()=>{COOP=false;SEL.coop=false;SEL.online=false;SEL.n=1;if(loadSave().chars.length>=MAXCH){fullScreen();return;}selectScreen();};ACT.online=()=>{COOP=false;SEL.coop=false;SEL.online=true;netHeroScreen();};
 function fullScreen(){show('<div class="panel fade"><h2>Your roster is full</h2><p class="story">The Order keeps room for three heroes. Retire one in the Characters menu to make space.</p><div class="row"><button class="btn" data-a="chars">Characters</button><button class="btn alt" data-a="title">Back</button></div></div>');}
 SEL.party=[];SEL.del=null;
@@ -4880,7 +4883,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.7.0';
+const KOV_VER='1.8.0';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
