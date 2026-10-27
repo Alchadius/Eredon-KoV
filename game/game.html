@@ -3883,7 +3883,7 @@ function charsScreen(){const s=loadSave(),co=SEL.coop;let h='<div class="panel">
   for(let i=0;i<MAXCH;i++){const c=s.chars[i];
     if(!c){h+='<section class="hero" style="--hc:#3a3028"><div class="body" style="align-items:center;justify-content:center;min-height:180px"><h3 style="color:var(--parch-dim)">Empty Slot</h3><button class="btn alt" data-a="'+(co?'cnew':'new')+'">Create a Hero</button></div></section>';continue;}
     const C=CLASSES[c.cls],R=RACES[c.race],inP=SEL.party.includes(c.id),ni=SLOTS.filter(k=>c.items[k]).length;
-    h+='<section class="hero" style="--hc:'+C.col+'"><header><canvas class="pt big" width="80" height="96" data-pc="'+c.cls+'" data-pr="'+c.race+(c.g==='f'?'|f':'')+'"></canvas><div><h3>'+esc(c.name)+'</h3><div class="rank">'+rankOf(c.lvl)+'</div><p class="dim">Level '+c.lvl+' '+R.name+' '+C.name+'</p></div>'+CREST+'</header><div class="body"><p class="dim" style="font-size:13px">Deepest floor '+c.best+' &middot; Gold '+c.gold+' &middot; Relics '+ni+'/4 &middot; Lore '+c.lore.length+'/'+LORE.length+'</p>'+
+    h+='<section class="hero" style="--hc:'+C.col+'"><header><canvas class="pt big" width="80" height="96" data-pc="'+c.cls+'" data-pr="'+c.race+(c.g==='f'?'|f':'')+'"></canvas><div><h3>'+esc(c.name)+'</h3><div class="rank">'+rankOf(c.lvl)+'</div><p class="dim">Level '+c.lvl+' '+R.name+' '+C.name+'</p></div>'+CREST+'</header><div class="body"><p class="dim" style="font-size:13px">Deepest floor '+c.best+' &middot; Gold '+Math.round(c.gold)+' &middot; Relics '+ni+'/4 &middot; Lore '+c.lore.length+'/'+LORE.length+'</p>'+
       '<div class="row" style="justify-content:flex-start">'+(co?'':'<button class="btn" style="padding:7px 12px;font-size:12px" data-a="cplay" data-id="'+c.id+'">Play</button>')+'<button class="btn alt" style="padding:7px 12px;font-size:12px" data-a="cparty" data-id="'+c.id+'">'+(inP?(co?'Chosen &#10003;':'In party'):(co?'Choose':'Add to party'))+'</button>'+
       '<button class="btn alt" style="padding:7px 12px;font-size:12px" data-a="csheet" data-id="'+c.id+'">Character Sheet</button><button class="btn alt" style="padding:7px 12px;font-size:12px" data-a="cdel" data-id="'+c.id+'">'+(SEL.del===c.id?'Really retire?':'Retire')+'</button></div></div></section>';}
   h+='</div><div class="row">'+(SEL.party.length===2?'<button class="btn" data-a="cduo">Play Together (2 players)</button>':'')+(co?'<button class="btn alt" data-a="ccontrols">Controls</button>':'')+'<button class="btn alt" data-a="title">Back</button></div></div>';
@@ -4858,7 +4858,7 @@ function netDoneScreen(){const I=NET.doneInfo;if(!I)return;const ch=netMyCh();if
   let h='<div class="panel">';
   if(I.over){h+='<h2>The party has fallen</h2><p class="story">The torches gutter out. Your heroes keep their levels, gold and treasure.</p><p>Final score <b>'+I.sc+'</b> &middot; Reached depth '+I.d+'</p>';
     h+=NET.host?'<div class="row"><button class="btn" data-a="ntolobby">Back to Room</button></div>':'<p class="dim">Waiting for the host to bring everyone back to the room...</p>';}
-  else{h+='<h2>Depth '+I.d+' cleared</h2>'+(I.vic?(VSC[I.d]?sceneTag(VSC[I.d],'',1):'')+'<p class="story">'+esc(I.vic)+'</p>':'<p class="dim">Rest, spend your gold, and get ready for the next floor.</p>')+'<p>Party score <b>'+I.sc+'</b></p><div class="sheet"><section><h3>'+esc(ch.name)+' &middot; Lv '+ch.lvl+' &middot; '+ch.gold+' gold</h3><div class="row" style="justify-content:flex-start;margin-top:8px">';
+  else{h+='<h2>Depth '+I.d+' cleared</h2>'+(I.vic?(VSC[I.d]?sceneTag(VSC[I.d],'',1):'')+'<p class="story">'+esc(I.vic)+'</p>':'<p class="dim">Rest, spend your gold, and get ready for the next floor.</p>')+'<p>Party score <b>'+I.sc+'</b></p><div class="sheet"><section><h3>'+esc(ch.name)+' &middot; Lv '+ch.lvl+' &middot; '+Math.round(ch.gold)+' gold</h3><div class="row" style="justify-content:flex-start;margin-top:8px">';
     for(const u in UPS){const c=cost(ch.up[u]);h+='<button class="btn alt" style="font-size:12px;padding:6px 10px" data-a="nbuy" data-u="'+u+'"'+(ch.gold<c||rdy?' disabled':'')+'>'+UPS[u][0]+' ('+ch.up[u]+') &middot; '+c+'g<br><span style="text-transform:none;font-weight:400">'+UPS[u][1]+'</span></button>';}
     h+='</div></section></div><div class="row"><button class="btn" data-a="nready"'+(rdy?' disabled':'')+'>'+(rdy?'Ready':'Ready to Descend')+'</button></div><p class="dim">'+(wait.length?'Waiting for: '+wait.map(esc).join(', '):'Everyone is ready...')+'</p>';}
   show(h+'<div class="row"><button class="btn alt" data-a="nleave">Leave Room</button></div></div>');}
@@ -4886,7 +4886,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.10.0';
+const KOV_VER='1.10.1';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
