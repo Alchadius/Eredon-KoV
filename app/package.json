@@ -1,7 +1,7 @@
 {
   "name": "eredon-kov",
   "productName": "Eredon KoV",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Eredon KoV - Knights of Valor, a cozy dark-fantasy dungeon crawler with online co-op",
   "main": "main.js",
   "author": "Alchadius",
