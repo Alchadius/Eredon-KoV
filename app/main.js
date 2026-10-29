@@ -4,7 +4,7 @@ const { pathToFileURL } = require('url');
 
 // Update files are served from our own site. The first address that answers wins, so one outage never blocks updates.
 const BASES = (!app.isPackaged && process.env.KOV_BASES) ? process.env.KOV_BASES.split(',')
-  : ['https://eredon-kov.com/game/', 'https://eredon-kov.kovalchadius.workers.dev/game/'];
+  : ['https://eredon-kov.com/game/', 'https://eredon-kov.alchadius.workers.dev/game/'];
 const HOME = 'https://eredon-kov.com/';
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'kov', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }]);
