@@ -1,5 +1,5 @@
 const { app, BrowserWindow, protocol, ipcMain, shell, net } = require('electron');
-const path = require('path'), fs = require('fs'), https = require('https'), crypto = require('crypto');
+const path = require('path'), fs = require('fs'), crypto = require('crypto');
 const { pathToFileURL } = require('url');
 
 // Update files are served from our own site. The first address that answers wins, so one outage never blocks updates.
@@ -18,24 +18,24 @@ function activeDir() {
   if (u && fs.existsSync(path.join(userDir(), 'game.html')) && (!b || cmp(u.ver, b.ver) >= 0)) return userDir();
   return bundledDir();
 }
-function fetchBuf(url, n) {
-  return new Promise((res, rej) => {
-    if ((n || 0) > 5) return rej(new Error('redirects'));
-    const lib = /^http:/.test(url) && !app.isPackaged ? require('http') : https; // plain http only for local testing
-    const req = lib.get(url, { headers: { 'User-Agent': 'EredonKoV/' + app.getVersion(), 'Cache-Control': 'no-cache' } }, r => {
-      if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location) { r.resume(); return res(fetchBuf(r.headers.location, (n || 0) + 1)); }
-      if (r.statusCode !== 200) { r.resume(); return rej(new Error('HTTP ' + r.statusCode)); }
-      const c = []; r.on('data', d => c.push(d)); r.on('end', () => res(Buffer.concat(c)));
-    });
-    req.on('error', rej); req.setTimeout(20000, () => req.destroy(new Error('timeout')));
-  });
+// Uses Chromium's own network stack (like a browser), so it is treated like a normal visitor by the host.
+async function fetchBuf(url) {
+  const plain = /^http:/.test(url);
+  if (plain && app.isPackaged) throw new Error('insecure address');
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 20000);
+  try {
+    const r = await (plain ? fetch : net.fetch)(url, { headers: { 'Cache-Control': 'no-cache' }, signal: ctl.signal, redirect: 'follow' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return Buffer.from(await r.arrayBuffer());
+  } catch (e) { throw new Error(e && e.name === 'AbortError' ? 'timed out' : (e && e.message) || String(e)); }
+  finally { clearTimeout(t); }
 }
 async function fetchAny(rel, first) {
-  let err = null;
+  const errs = [];
   for (const b of (first ? [first].concat(BASES.filter(x => x !== first)) : BASES)) {
-    try { return { buf: await fetchBuf(b + rel + '?t=' + Date.now()), base: b }; } catch (e) { err = e; }
+    try { return { buf: await fetchBuf(b + rel + '?t=' + Date.now()), base: b }; } catch (e) { errs.push(b.replace(/^https?:\/\//, '').split('/')[0] + ': ' + e.message); }
   }
-  throw err || new Error('no update server');
+  throw new Error(errs.join(' | ') || 'no update server');
 }
 let remote = null, win = null;
 ipcMain.handle('kov:shellVersion', () => app.getVersion());
@@ -45,7 +45,7 @@ ipcMain.handle('kov:check', async () => {
     const got = await fetchAny('version.json'); remote = JSON.parse(got.buf.toString('utf8')); remote._base = got.base;
     const shellOld = remote.shell && cmp(app.getVersion(), remote.shell) < 0;
     return { available: cmp(remote.ver, cur.ver) > 0 || shellOld, latest: remote.ver, current: cur.ver, shellOutdated: !!shellOld };
-  } catch (e) { return { available: false, error: 'Could not check for updates (offline?).', current: cur.ver }; }
+  } catch (e) { return { available: false, error: 'Could not check for updates. (' + (e.message || e) + ')', current: cur.ver }; }
 });
 ipcMain.handle('kov:apply', async () => {
   try {
