@@ -2,9 +2,10 @@ const { app, BrowserWindow, protocol, ipcMain, shell, net } = require('electron'
 const path = require('path'), fs = require('fs'), https = require('https'), crypto = require('crypto');
 const { pathToFileURL } = require('url');
 
-const REPO = 'Alchadius/Eredon-KoV';
-const RAW = 'https://raw.githubusercontent.com/' + REPO + '/main/game/';
-const RELEASES = 'https://github.com/' + REPO + '/releases/latest';
+// Update files are served from our own site. The first address that answers wins, so one outage never blocks updates.
+const BASES = (!app.isPackaged && process.env.KOV_BASES) ? process.env.KOV_BASES.split(',')
+  : ['https://eredon-kov.com/game/', 'https://eredon-kov.therealalchadius.workers.dev/game/'];
+const HOME = 'https://eredon-kov.com/';
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'kov', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }]);
 
@@ -20,7 +21,8 @@ function activeDir() {
 function fetchBuf(url, n) {
   return new Promise((res, rej) => {
     if ((n || 0) > 5) return rej(new Error('redirects'));
-    const req = https.get(url, { headers: { 'User-Agent': 'EredonKoV/' + app.getVersion(), 'Cache-Control': 'no-cache' } }, r => {
+    const lib = /^http:/.test(url) && !app.isPackaged ? require('http') : https; // plain http only for local testing
+    const req = lib.get(url, { headers: { 'User-Agent': 'EredonKoV/' + app.getVersion(), 'Cache-Control': 'no-cache' } }, r => {
       if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location) { r.resume(); return res(fetchBuf(r.headers.location, (n || 0) + 1)); }
       if (r.statusCode !== 200) { r.resume(); return rej(new Error('HTTP ' + r.statusCode)); }
       const c = []; r.on('data', d => c.push(d)); r.on('end', () => res(Buffer.concat(c)));
@@ -28,24 +30,31 @@ function fetchBuf(url, n) {
     req.on('error', rej); req.setTimeout(20000, () => req.destroy(new Error('timeout')));
   });
 }
+async function fetchAny(rel, first) {
+  let err = null;
+  for (const b of (first ? [first].concat(BASES.filter(x => x !== first)) : BASES)) {
+    try { return { buf: await fetchBuf(b + rel + '?t=' + Date.now()), base: b }; } catch (e) { err = e; }
+  }
+  throw err || new Error('no update server');
+}
 let remote = null, win = null;
 ipcMain.handle('kov:shellVersion', () => app.getVersion());
 ipcMain.handle('kov:check', async () => {
   const cur = readVer(activeDir()) || { ver: '0.0.0' };
   try {
-    remote = JSON.parse((await fetchBuf(RAW + 'version.json?t=' + Date.now())).toString('utf8'));
+    const got = await fetchAny('version.json'); remote = JSON.parse(got.buf.toString('utf8')); remote._base = got.base;
     const shellOld = remote.shell && cmp(app.getVersion(), remote.shell) < 0;
     return { available: cmp(remote.ver, cur.ver) > 0 || shellOld, latest: remote.ver, current: cur.ver, shellOutdated: !!shellOld };
   } catch (e) { return { available: false, error: 'Could not check for updates (offline?).', current: cur.ver }; }
 });
 ipcMain.handle('kov:apply', async () => {
   try {
-    if (!remote) remote = JSON.parse((await fetchBuf(RAW + 'version.json?t=' + Date.now())).toString('utf8'));
-    if (remote.shell && cmp(app.getVersion(), remote.shell) < 0) { shell.openExternal(RELEASES); return { error: 'A new installer is needed. The download page was opened in your browser.', manual: 1 }; }
+    if (!remote) { const got = await fetchAny('version.json'); remote = JSON.parse(got.buf.toString('utf8')); remote._base = got.base; }
+    if (remote.shell && cmp(app.getVersion(), remote.shell) < 0) { shell.openExternal(HOME); return { error: 'A new installer is needed. The download page was opened in your browser.', manual: 1 }; }
     const tmp = userDir() + '.tmp'; fs.rmSync(tmp, { recursive: true, force: true }); fs.mkdirSync(tmp, { recursive: true });
     for (const name of Object.keys(remote.files)) {
       if (!/^[A-Za-z0-9._-]+$/.test(name)) throw new Error('bad file name');
-      const buf = await fetchBuf(RAW + name + '?t=' + Date.now());
+      const { buf } = await fetchAny(name, remote._base);
       if (crypto.createHash('sha256').update(buf).digest('hex') !== remote.files[name]) throw new Error('Download was corrupted. Try again.');
       fs.writeFileSync(path.join(tmp, name), buf);
     }
