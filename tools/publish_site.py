@@ -1,7 +1,7 @@
 import re,hashlib,json,shutil,os,sys
 SRC='/tmp/claude-0/-home-claude/481a1bd1-1cf9-58e0-b881-a47419fa7a1c/scratchpad/'
 ROOT='/home/claude/eredon-kov/'
-SHELL='1.1.0'
+SHELL='1.2.0'
 h=open(SRC+'knights-of-valor.html').read()
 ver=re.search(r"const KOV_VER='([\d.]+)'",h).group(1)
 h=h.replace('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','three.min.js')

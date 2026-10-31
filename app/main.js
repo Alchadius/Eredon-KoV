@@ -2,9 +2,9 @@ const { app, BrowserWindow, protocol, ipcMain, shell, net } = require('electron'
 const path = require('path'), fs = require('fs'), crypto = require('crypto');
 const { pathToFileURL } = require('url');
 
-// Update files are served from our own site. The first address that answers wins, so one outage never blocks updates.
+// Update files: GitHub first (a release is just a push), then our own site as backups. The first address that answers wins, so one outage never blocks updates.
 const BASES = (!app.isPackaged && process.env.KOV_BASES) ? process.env.KOV_BASES.split(',')
-  : ['https://eredon-kov.com/game/', 'https://eredon-kov.alchadius.workers.dev/game/'];
+  : ['https://raw.githubusercontent.com/Alchadius/Eredon-KoV/main/site/game/', 'https://eredon-kov.com/game/', 'https://eredon-kov.alchadius.workers.dev/game/'];
 const HOME = 'https://eredon-kov.com/';
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'kov', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }]);
