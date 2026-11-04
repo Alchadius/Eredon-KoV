@@ -3915,7 +3915,7 @@ function CLAYM(kind,c,glow,metal){
  if(metal){return new T.MeshPhongMaterial({color:c,shininess:kind==='gold'?CP.gs:CP.ms,specular:new T.Color(kind==='gold'?0xffe9a0:0xc8d4ea),map:PAINT,bumpMap:CBUMP,bumpScale:.03})}
  return new T.MeshStandardMaterial({color:c,roughness:kind==='skin'?CP.rs:CP.rc,metalness:0,map:PAINT,bumpMap:CBUMP,bumpScale:CP.bs})}
 
-const SW=264,SH=300,FEETY=252,K=39,RPX=3,WW=100,WH=64,KW=16.5,WAX=22,WAY=32;
+const SW=88,SH=100,FEETY=84,K=13,RPX=3,WW=100,WH=64,KW=16.5,WAX=22,WAY=32;
 const renderer=new T.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});renderer.setPixelRatio(1);renderer.setClearColor(0x000000,0);
 const scene=new T.Scene();
 const lights={hemi:new T.HemisphereLight(0xfff0dc,0x5a4a7a,.8),key:new T.DirectionalLight(0xffffff,.95),fill:new T.DirectionalLight(0x9ab8ff,.4),rim:new T.DirectionalLight(0x7ec8ff,.6)};
@@ -10304,7 +10304,7 @@ function netFrame(dt){const now=Date.now();if(!NET.room)return;
 function netAlias(code,v){const a=CTRL[0],b=CTRL[1];for(const r of['u','d','l','r'])if(b[r]===code)K[a[r]]=v;for(let i=0;i<3;i++)if(b.a[i]===code)K[a.a[i]]=v;if(b.lg===code)K[a.lg]=v;if(b.po===code)K[a.po]=v;}
 // ===== DESKTOP APP: friends list, matchmaker signaling, WebRTC star rooms, update check =====
 // Active only inside the Eredon KoV desktop app (window.kovDesk is provided by its preload script).
-const KOV_VER='1.13.0';
+const KOV_VER='1.13.1';
 const DESK=typeof window!=='undefined'&&!!window.kovDesk;
 let KOVROOM=null,deskMenu=null,deskLobbyExtra=null,deskSettings=null;
 (function(){
